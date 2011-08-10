@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<form>
+	<group name="main">
+		<title>Содержание</title>
+		
+		<element name="title" type="string" is_required="true">
+			<label><![CDATA[Название]]></label>
+		</element>
+	
+		<element name="uri" type="folder" is_required="true">
+			<label><![CDATA[Локальная папка]]></label>
+			<description><![CDATA[Можно использовать латинские буквы, цифры и&nbsp;знак подчеркивания.]]></description>
+		</element>
+	
+		<element name="is_published" type="boolean">
+			<label><![CDATA[Раздел доступен]]></label>
+			<value>1</value>
+		</element>
+	
+		<element name="users" type="multiple">
+			<label><![CDATA[Пользователи, имеющие доступ]]></label>
+		</element>
+	
+		<element name="description" type="text">
+			<label><![CDATA[Описание]]></label>
+		</element>
+	</group>
+</form>

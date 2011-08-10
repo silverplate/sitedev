@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<form>
+	<group name="main">
+		<title>Страница</title>
+
+		<element name="title" type="string" is_required="true">
+			<label>Название</label>
+		</element>
+
+		<element name="is_published" type="boolean">
+			<label>Публиковать</label>
+			<value>1</value>
+		</element>
+
+		<element name="navigations" type="multiple">
+			<label><![CDATA[Добавлять в&nbsp;навигацию]]></label>
+		</element>
+
+		<element name="fo_handler_id" type="chooser">
+			<label>Обработчик</label>
+		</element>
+
+		<element name="title_compact" type="string">
+			<label>Компактное название</label>
+			<description><![CDATA[Будет использоваться в&nbsp;навигации вместо основного названия.]]></description>
+		</element>
+
+		<element name="link" type="string">
+			<label>Ссылка</label>
+		</element>
+	</group>
+
+	<group name="files">
+		<title>Файлы</title>
+
+		<element name="files" type="adding_files">
+			<label>Файлы</label>
+		</element>
+	</group>
+</form>

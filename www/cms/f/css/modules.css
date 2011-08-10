@@ -1,0 +1,340 @@
+/*** Global
+*********************************************************/
+a.add_element {
+	font-size: 0.84em;
+	color: black;
+	text-decoration: underline;
+	cursor: pointer;
+	display: block;
+	margin-top: 3px;
+}
+
+a.selected,
+span.selected {
+	color: #36c;
+}
+
+label.hidden,
+a.hidden,
+span.hidden {
+	color: #999;
+}
+
+a.active,
+span.active {
+	color: green;
+}
+
+a.denied,
+span.denied {
+	color: red;
+}
+
+a.visible,
+span.visible {
+	color: black;
+}
+
+table.module {
+	width: 100%;
+}
+
+table.module tr td.title,
+table.module tr td.subtitle,
+table.module tr td.navigation,
+table.module tr td.content {
+	vertical-align: top;
+}
+
+table.module tr td.title {
+	padding-right: 40px;
+}
+
+table.module tr td.navigation {
+	padding: 20px 40px 0 0;
+	width: 30%;
+}
+
+table.module tr td.subtitle {
+	width: 70%;
+}
+
+table.module tr td.content {
+	padding-top: 20px;
+	width: 70%;
+}
+
+div.form_message {
+	padding: 6px 10px;
+	color: white;
+	font-size: 0.84em;
+	float: right;
+	width: 180px;
+	margin-left: 20px;
+}
+
+div.error {
+	background-color: red;
+}
+
+div.success {
+	background-color: #093;
+}
+
+.function {
+	cursor: pointer;
+	border-bottom-width: 1px;
+	border-bottom-style: dashed;
+}
+
+
+/*** Local navigation
+*********************************************************/
+ul#filter_content {
+	font-size: 0.84em;
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+ul#filter_content li {
+	font-size: 0.84em;
+	margin-bottom: 5px;
+	line-height: 1.3em;
+}
+
+ul#filter_content.sortable li {
+	cursor: move;
+}
+
+ul#filter_content.sortable li a {
+	cursor: pointer;
+}
+
+span.sort_only {
+	font-style: italic;
+}
+
+
+
+/*** Data blocks
+*********************************************************/
+#document_data_blocks {
+	font-size: 0.84em;
+}
+
+a.new_window_link {
+	text-decoration: underline;
+	cursor: pointer;
+	display: block;
+	float: left;
+	clear: left;
+	margin: 0 0 3px 0;
+	/*padding-right: 17px;
+	background: url('/cms/f/icon_window.gif') no-repeat right;*/
+}
+
+div.document_data {
+	clear: both;
+	width: 90%;
+	margin-bottom: 15px;
+	cursor: move;
+}
+
+div.wysiwyg_switcher {
+	margin-top: 3px;
+	font-size: 0.84em;
+	padding-bottom: 1px;
+}
+
+div.wysiwyg_switcher a {
+	text-decoration: none;
+	border-bottom: 1px dashed #000;
+	cursor: pointer;
+}
+
+
+/*** Loading bar
+*********************************************************/
+#loading {
+	display: none;
+	position: fixed;
+	width: 220px;
+	height: 30px;
+	z-index: 999;
+	opacity: 0.85;
+	background: url('/cms/f/loading.gif') no-repeat;
+	left: 0;
+	top: 0;
+}
+
+
+/*** Data filter
+*********************************************************/
+table.date_filter td {
+	padding-bottom: 5px;
+}
+
+table.date_filter td.label {
+	font-size: 0.7em;
+	padding-right: 10px;
+}
+
+table.date_filter_periods td {
+	font-size: 0.7em;
+	padding-right: 10px;
+}
+
+table.date_filter_periods a {
+	text-decoration: none;
+	border-bottom: 1px dashed black;
+	cursor: pointer;
+	display: block;
+}
+
+div#filter_link {
+	background-color: #36c;
+	padding: 5px 10px;
+	float: left;
+	margin-bottom: 20px;
+}
+
+div#filter_link a {
+	font-size: 0.7em;
+	text-decoration: none;
+	cursor: pointer;
+	border-bottom: 1px dashed white;
+	color: white;
+	margin-bottom: 20px;
+}
+
+form#filter {
+	display: none;
+	border: 1px solid #ccc;
+	float: left;
+	padding: 10px;
+	margin-bottom: 20px;
+}
+
+div.filter_close {
+	text-align: right;
+	margin: -5px -5px 5px 5px;
+	line-height: 0.5em;
+}
+
+div.filter_close a {
+	cursor: pointer;
+	font-weight: bold;
+	color: #ccc;
+}
+
+html>body div.filter_close a {
+	font-weight: normal;
+}
+
+div.filter_input {
+	margin: 10px 0;
+	font-size: 0.84em;
+}
+
+div.filter_input table.chooser_item td.chooser_label {
+	font-size: 0.7em;
+}
+
+div.filter_input input.string {
+	display: block;
+	width: 100%;
+}
+
+div.filter_input table.chooser_item {
+	width: 100%;
+	margin-bottom: 0;
+}
+
+div.filter_input table.chooser_item table.chooser_item {
+	margin-top: 5px;
+}
+
+div.filter_input td.chooser_label {
+	width: 99%;
+}
+
+div.filter_input label.filter_name {
+	font-size: 1.2em;
+	border-bottom: 1px dashed black;
+}
+
+#filter_content {
+	font-size: 0.84em;
+}
+
+
+/*** List navigation
+*********************************************************/
+#list_navigation {
+	float:left;
+	border: 1px solid #ddd;
+	margin: 2em 0;
+	padding: 0.5em;
+	font-size: 0.84em;
+	clear: both;
+}
+
+.list_navigation_selected {
+	font-weight: bold;
+}
+
+.list_navigation_spacer {
+	margin: 0 0.5em;
+	color: grey;
+}
+
+
+/*** CMS logs
+*********************************************************/
+table.bo_logs {
+	width: 100%;
+}
+
+table.bo_logs td {
+	vertical-align: top;
+	font-size: 0.84em;
+	padding-bottom: 1em;
+}
+
+table.bo_logs td.date {
+	padding-right: 2em;
+	width: 5%;
+	font-size: 0.7em;
+	white-space: nowrap;
+}
+
+table.bo_logs a.section {
+	cursor: pointer;
+	text-decoration: none;
+	border-bottom: 1px dashed black;
+}
+
+table.bo_logs div.section {
+	display: none;
+	padding: 0.5em 2em 1em 2em;
+}
+
+table.bo_logs .action_1,
+table.bo_logs .action_2,
+table.bo_logs .action_6,
+table.bo_logs .action_7 {
+	color: grey;
+}
+
+table.bo_logs .action_3 {
+	color: green;
+}
+
+table.bo_logs .action_4 {
+	color: orange;
+}
+
+table.bo_logs .action_5 {
+	color: red;
+}

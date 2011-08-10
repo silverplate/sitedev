@@ -1,0 +1,122 @@
+<?php
+
+require('../prepend.php');
+
+$page = new BoPage();
+$page->SetTitle($g_section->GetTitle());
+
+if ($page->IsAuthorized()) {
+	if (isset($_GET['id'])) {
+		$obj = BoSection::Load($_GET['id']);
+		if (!$obj) unset($obj);
+
+	} elseif (isset($_GET['NEW'])) {
+		$obj = new BoSection;
+	}
+
+	if (isset($obj)) {
+		$form = new Form();
+		$form->Load('form.xml');
+
+		foreach (BoUser::GetList() as $item) {
+			$form->Elements['users']->AddOption($item->GetId(), $item->GetTitle());
+		}
+		
+		$bo_section_group_list = BoSectionGroup::GetList();
+		if($bo_section_group_list) {
+			$form->CreateGroup('section_group', 'Группы разделов');
+			$form->Groups['section_group']->AddElement($form->CreateElement(BoSectionGroup::GetPri(), 'chooser', 'Группа разделов', true));
+			foreach ($bo_section_group_list AS $group) {
+				$form->Elements[BoSectionGroup::GetPri()]->AddOption($group->GetId(), $group->GetTitle());
+			}
+		}
+
+		if ($obj->GetId()) {
+			$form->FillFields($obj->GetAttributeValues());
+			$form->Elements['users']->SetValue($obj->GetLinkIds('users'));
+			$form->CreateButton('Сохранить', 'update');
+			$form->CreateButton('Удалить', 'delete');
+
+		} else {
+			$form->CreateButton('Сохранить', 'insert');
+		}
+
+		$form->Execute();
+
+		if ($form->UpdateStatus == FORM_UPDATED) {
+			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
+				$obj->Delete();
+				BoLog::LogModule(BoLog::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
+				go_to_url($page->Url['path'] . '?DEL');
+
+			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
+				if (BoSection::CheckUnique($form->Elements['uri']->GetValue(), $obj->GetId())) {
+					$obj->DataInit($form->GetSqlValues());
+
+					if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
+						$obj->Create();
+						BoLog::LogModule(BoLog::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+					} else {
+						$obj->Update();
+						BoLog::LogModule(BoLog::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
+					}
+
+					if (isset($form->Elements['users'])) {
+						$obj->UpdateLinks('users', $form->Elements['users']->GetValue());
+					}
+
+					go_to_url($page->Url['path'] . '?id=' . $obj->GetId() . '&OK');
+
+				} else {
+					$form->UpdateStatus = FORM_ERROR;
+
+					$form->Elements['uri']->SetUpdateType(FIELD_ERROR_EXIST);
+					$form->Elements['uri']->SetErrorValue($form->Elements['uri']->GetValue());
+					$form->Elements['uri']->SetValue($obj->GetAttribute('uri'));
+				}
+			}
+		}
+
+		if ($form->UpdateStatus == FORM_ERROR) {
+			$page->SetUpdateStatus('error');
+
+		} elseif (isset($_GET['OK'])) {
+			$page->SetUpdateStatus('success');
+		}
+
+	} elseif (isset($_GET['DEL'])) {
+		$page->SetUpdateStatus('success', 'Раздел удален');
+	}
+
+	$list_xml = '<local_navigation is_sortable="true">';
+	foreach (BoSection::GetList() as $item) {
+		$list_xml .= $item->GetXml('bo_list', 'item');
+	}
+	$list_xml .= '</local_navigation>';
+
+	if (isset($obj)) {
+		$module = '<module type="simple" is_able_to_add="true"';
+
+		if ($obj->GetId()) {
+			$module .= ' id="' . $obj->GetId() . '">';
+			$module .= '<title><![CDATA[' . $obj->GetTitle() . ']]></title>';
+		} else {
+			$module .= ' is_new="true">';
+			$module .= '><title><![CDATA[Добавление]]></title>';
+		}
+
+		$module .= $form->GetXml();
+		$module .= $list_xml;
+		$module .= '</module>';
+
+		$page->AddContent($module);
+
+	} else {
+		$about = $g_section->GetAttribute('description') ? '<p class="first">' . $g_section->GetAttribute('description') . '</p>' : '';
+		$page->AddContent('<module type="simple" is_able_to_add="true">' . $list_xml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
+	}
+}
+
+$page->Output();
+
+?>

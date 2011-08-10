@@ -62,7 +62,7 @@ define('IS_ADMIN_MODE', get_admin_param('mode'));
 if (IS_KEY) {
 	set_admin_param($g_admin['params']['mode'], true);
 	set_admin_param($g_admin['params']['hidden'], true);
-	go_to_url('./' . (isset($_GET['xml']) ? '?xml' : ''));
+	goToUrl('./' . (isset($_GET['xml']) ? '?xml' : ''));
 
 } elseif (IS_ADMIN_MODE) {
 	$g_admin['is_delete_cache'] = isset($_GET['delete_cache']);

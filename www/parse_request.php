@@ -15,7 +15,7 @@ if ($g_cache->IsAvailable() && $g_cache->IsCache()) {
 	$document = Document::Load($url['path'], 'uri');
 
 	if ($document && $document->GetAttribute('link') && $document->GetAttribute('link') != $real_url['path']) {
-		go_to_url($document->GetAttribute('link'));
+		goToUrl($document->GetAttribute('link'));
 
 	} else {
 		if (

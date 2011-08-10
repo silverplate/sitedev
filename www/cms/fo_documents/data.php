@@ -84,17 +84,17 @@ if (is_null($document_id) || !Document::Load($document_id)) {
 		if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 			$obj->Delete();
 			BoLog::LogModule(BoLog::ACT_DELETE, $obj->GetId(), 'Блоки данных. Документ ' . $obj->GetAttribute(Document::GetPri()));
-			go_to_url($page->Url['path'] . '?parent_id=' . $obj->GetAttribute(Document::GetPri()) . '&DEL');
+			goToUrl($page->Url['path'] . '?parent_id=' . $obj->GetAttribute(Document::GetPri()) . '&DEL');
 
 		} elseif (isset($form->Buttons['create']) && $form->Buttons['create']->IsSubmited()) {
 			$obj->Create();
 			BoLog::LogModule(BoLog::ACT_CREATE, $obj->GetId(), 'Блоки данных. Документ ' . $obj->GetAttribute(Document::GetPri()));
-			go_to_url($page->Url['path'] . '?id=' . $obj->GetId() . '&parent_id=' . $obj->GetAttribute(Document::GetPri()) . '&OK');
+			goToUrl($page->Url['path'] . '?id=' . $obj->GetId() . '&parent_id=' . $obj->GetAttribute(Document::GetPri()) . '&OK');
 
 		} elseif (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited()) {
 			$obj->Update();
 			BoLog::LogModule(BoLog::ACT_MODIFY, $obj->GetId(), 'Блоки данных. Документ ' . $obj->GetAttribute(Document::GetPri()));
-			go_to_url($page->Url['path'] . '?id=' . $obj->GetId() . '&parent_id=' . $obj->GetAttribute(Document::GetPri()) . '&OK');
+			goToUrl($page->Url['path'] . '?id=' . $obj->GetId() . '&parent_id=' . $obj->GetAttribute(Document::GetPri()) . '&OK');
 		}
 	}
 

@@ -45,7 +45,7 @@ if ($page->IsAuthorized()) {
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 				$obj->Delete();
 				BoLog::LogModule(BoLog::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
-				go_to_url($page->Url['path'] . '?DEL');
+				goToUrl($page->Url['path'] . '?DEL');
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
 				if (BoUser::CheckUnique($form->Elements['login']->GetValue(), $obj->GetId())) {
@@ -80,7 +80,7 @@ if ($page->IsAuthorized()) {
 						Session::Clean($obj->GetId());
 					}
 
-					go_to_url($page->Url['path'] . '?id=' . $obj->GetId() . '&OK');
+					goToUrl($page->Url['path'] . '?id=' . $obj->GetId() . '&OK');
 
 				} else {
 					$form->UpdateStatus = FORM_ERROR;

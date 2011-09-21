@@ -115,7 +115,7 @@ function getNoEmptyNode($_name, $_value = null, array $_attrs = array())
 function getCdata($_name, $_cdata = null, array $_attrs = array())
 {
     return getNode($_name,
-                   !is_null($_cdata) && $_cdata != '' ? '<![CDATA[' . $_cdata . ']]>' : null,
+                   empty($_cdata) ? null : '<![CDATA[' . $_cdata . ']]>',
                    $_attrs);
 }
 

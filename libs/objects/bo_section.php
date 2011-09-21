@@ -150,7 +150,6 @@ class BoSection extends ActiveRecord {
 		if (!isset(self::$Base)) {
 			self::$Base = new ActiveRecord(self::ComputeTblName());
 			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'varchar', 10, true);
-			self::$Base->AddAttribute(BoSectionGroup::ComputeTblName() . '_id', 'varchar', 10);
 			self::$Base->AddAttribute('title', 'varchar', 255);
 			self::$Base->AddAttribute('uri', 'varchar', 255);
 			self::$Base->AddAttribute('description', 'text');

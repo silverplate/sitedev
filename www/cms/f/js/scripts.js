@@ -1,3 +1,16 @@
+function getParentElement(_parent, _name)
+{
+    if (_name.toLowerCase() == _parent.nodeName.toLowerCase()) {
+        return _parent;
+
+    } else if (_parent.parentNode) {
+        return getParentElement(_parent.parentNode, _name);
+
+    } else {
+        return false;
+    }
+}
+
 function get_random() {
 	return Math.round(Math.random() * Math.random() * 100000);
 }
@@ -121,7 +134,9 @@ function add_form_file_input(name) {
 	}
 
 	remove_ele.className = 'system';
-	remove_ele.onclick = function () { remove_form_file_input(name, remove_ele); }
+	remove_ele.onclick = function () {
+	    remove_form_file_input(name, remove_ele);
+	}
 	remove_ele.innerHTML = '&times;';
 
 	if (navigator.userAgent.indexOf('MSIE') != -1) {
@@ -131,7 +146,7 @@ function add_form_file_input(name) {
 		tr.appendChild(input_ele);
 	}
 
-	input_ele.innerHTML = '<input type="file" name="' + name + '[]" class="file" />';
+	input_ele.innerHTML = '<input type="file" name="' + name + '[]" class="file" multiple="true" />';
 }
 
 function remove_form_file_input(name, element) {
@@ -192,4 +207,58 @@ function item_sort(ele) {
 			onSuccess: hide_loading_bar
 		});
 	}
+}
+
+
+/*** Список элементов из таблицы с тройным составным первичным ключом
+*********************************************************/
+var tripleLinkCounter = 0;
+
+function addTripleLink(_name)
+{
+    showLoadingBar();
+
+    var containerEle = document.getElementById(_name);
+    if (containerEle) {
+        var count = containerEle.getElementsByTagName('table').length;
+        new Ajax.Request('ajax_' + _name + '.php', {
+            method: 'post',
+            postBody: 'name=' + _name + '&position=' + tripleLinkCounter + '&count=' + count,
+            onSuccess: function(_r) {
+                if (_r.responseText) {
+                    var ele = document.createElement('ins');
+                    ele.innerHTML = _r.responseText;
+                    containerEle.appendChild(ele);
+                    tripleLinkCounter++;
+                }
+
+                hideLoadingBar();
+            }
+        });
+    }
+}
+
+function deleteTripleLink(_button)
+{
+    var ele = getParentElement(_button.parentNode, 'ins');
+    if (!ele) {
+        ele = getParentElement(_button.parentNode, 'table');
+    }
+
+    if (ele) {
+        removeElement(ele);
+    }
+}
+
+
+/*** Формы
+*********************************************************/
+function replaceTextareaCdata()
+{
+    var elems = document.getElementsByTagName("textarea");
+    for (var i = 0; i < elems.length; i++) {
+        elems[i].value = elems[i].value
+                                 .replace(/&lt;!\[CDATA\[/gim, "<![CDATA[")
+                                 .replace(/\]\]&gt;/gim, "]]>");
+    }
 }

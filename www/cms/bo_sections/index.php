@@ -21,15 +21,6 @@ if ($page->IsAuthorized()) {
 		foreach (BoUser::GetList() as $item) {
 			$form->Elements['users']->AddOption($item->GetId(), $item->GetTitle());
 		}
-		
-		$bo_section_group_list = BoSectionGroup::GetList();
-		if($bo_section_group_list) {
-			$form->CreateGroup('section_group', 'Группы разделов');
-			$form->Groups['section_group']->AddElement($form->CreateElement(BoSectionGroup::GetPri(), 'chooser', 'Группа разделов', true));
-			foreach ($bo_section_group_list AS $group) {
-				$form->Elements[BoSectionGroup::GetPri()]->AddOption($group->GetId(), $group->GetTitle());
-			}
-		}
 
 		if ($obj->GetId()) {
 			$form->FillFields($obj->GetAttributeValues());

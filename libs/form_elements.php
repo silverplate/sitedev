@@ -106,9 +106,11 @@ class FormEle implements FormEleInterface {
 			$xml .= '<value>';
 			if (is_array($this->Value)) {
 				foreach ($this->Value as $key => $value) {
-					$xml .= preg_match('/^[a-z_]+$/', $key)
-						? '<' . $key . '>' . get_cdata($value) . '</' . $key . '>'
-						: '<item key="' . $key . '">' . get_cdata($value) . '</item>';
+				    if ($value != 'NULL') {
+                        $xml .= preg_match('/^[a-z_]+$/', $key)
+                            ? '<' . $key . '>' . get_cdata($value) . '</' . $key . '>'
+                            : '<item key="' . $key . '">' . get_cdata($value) . '</item>';
+                    }
 				}
 			} else {
 				$xml .= get_cdata($this->Value);
@@ -427,7 +429,7 @@ class FormEleDate extends FormEle {
 	public function ComputeValue($_data) {
 		$value = array();
 
-		if (isset($_data[$this->Name]) && $_data[$this->Name] != '0000-00-00') {
+		if (!empty($_data[$this->Name]) && $_data[$this->Name] != '0000-00-00') {
 			$date = strtotime($_data[$this->Name]);
 			$value = array('day' => date('d', $date), 'month' => date('m', $date), 'year' => date('Y', $date));
 
@@ -492,13 +494,29 @@ class FormEleDateTime extends FormEle {
 	public function ComputeValue($_data) {
 		$value = array();
 
-		if (isset($_data[$this->Name]) && $_data[$this->Name] != '0000-00-00 00:00:00') {
-			$date = strtotime($_data[$this->Name]);
-			$value = array('day' => date('d', $date), 'month' => date('m', $date), 'year' => date('Y', $date), 'hours' => date('H', $date), 'minutes' => date('i', $date));
+		if (
+		    !empty($_data[$this->Name]) &&
+		    $_data[$this->Name] != '0000-00-00 00:00:00'
+		) {
+            $date = is_numeric($_data[$this->Name])
+                  ? $_data[$this->Name]
+                  : strtotime($_data[$this->Name]);
+
+			$value = array('day' => date('d', $date),
+			               'month' => date('m', $date),
+			               'year' => date('Y', $date),
+			               'hours' => date('H', $date),
+			               'minutes' => date('i', $date));
 
 			return $value;
 
-		} elseif (isset($_data[$this->Name . '_day']) || isset($_data[$this->Name . '_month']) || isset($_data[$this->Name . '_year']) || isset($_data[$this->Name . '_hours']) || isset($_data[$this->Name . '_minutes'])) {
+		} else if (
+		    isset($_data[$this->Name . '_day']) ||
+		    isset($_data[$this->Name . '_month']) ||
+		    isset($_data[$this->Name . '_year']) ||
+		    isset($_data[$this->Name . '_hours']) ||
+		    isset($_data[$this->Name . '_minutes'])
+		) {
 			foreach (array('year', 'month', 'day', 'hours', 'minutes') as $i) {
 				if (isset($_data[$this->Name . '_' . $i])) {
 					$value[$i] = $_data[$this->Name . '_' . $i];
@@ -515,8 +533,9 @@ class FormEleDateTime extends FormEle {
 	public function CheckValue($_value = null) {
 		$is_value = true;
 
-		foreach (array('year', 'month', 'day', 'hours', 'minutes') as $i) {
-			if (!(isset($_value[$i]) && $_value[$i])) {
+// 		foreach (array('year', 'month', 'day', 'hours', 'minutes') as $i) {
+		foreach (array('year', 'month', 'day') as $i) {
+            if (empty($_value[$i])) {
 				$is_value = false;
 				break;
 			}
@@ -559,21 +578,37 @@ class FormEleDateTime extends FormEle {
 
 class FormEleDatePeriod extends FormEle {
 	public function ComputeValue($_data) {
-		if (isset($_data[$this->Name . '_from']) && $_data[$this->Name . '_from'] != '0000-00-00' && isset($_data[$this->Name . '_till']) && $_data[$this->Name . '_till'] != '0000-00-00') {
-			return array('from' => $_data[$this->Name . '_from'], 'till' => $_data[$this->Name . '_till']);
-		} else {
-			return false;
-		}
+	    $value = array('from' => null, 'till' => null);
+
+        if (
+            !empty($_data[$this->Name . '_from']) &&
+            $_data[$this->Name . '_from'] != '0000-00-00'
+        ) {
+            $value['from'] = $_data[$this->Name . '_from'];
+        }
+
+        if (
+            !empty($_data[$this->Name . '_till']) &&
+            $_data[$this->Name . '_till'] != '0000-00-00'
+        ) {
+            $value['till'] = $_data[$this->Name . '_till'];
+        }
+
+        return count($value) > 0 ? $value : false;
 	}
 
 	public function CheckValue($_value = null) {
-		$is_value = isset($_value['from']) && $_value['from'] && isset($_value['till']) && $_value['till'];
-
-		if ($this->IsRequired && !$is_value) {
+		if (
+		    $this->IsRequired &&
+		    (empty($_value['from']) || empty($_value['till']))
+		) {
 			return FIELD_ERROR_REQUIRED;
 
-		} elseif (!$is_value) {
-			return FIELD_NO_UPDATE;
+// 		} else if (
+// 		    !key_exists('from', $_value) &&
+// 		    !key_exists('till', $_value)
+// 		) {
+// 			return FIELD_NO_UPDATE;
 
 		} else {
 			return FIELD_SUCCESS;
@@ -583,10 +618,13 @@ class FormEleDatePeriod extends FormEle {
 	public function GetSqlValue() {
 		if ($this->UpdateType == FIELD_SUCCESS) {
 			$value = $this->GetValue();
-			if ($value) {
-				return array($this->Name . '_from' => $value['from'], $this->Name . '_till' => $value['till']);
-			}
+
+			return array(
+			    $this->Name . '_from' => empty($value['from']) ? 'NULL' : $value['from'],
+			    $this->Name . '_till' => empty($value['till']) ? 'NULL' : $value['till']
+			);
 		}
+
 		return false;
 	}
 }
@@ -613,47 +651,72 @@ class FormEleDatetimePeriod extends FormEle {
 	}
 
 	public function ComputeValue($_data) {
-		if (isset($_data[$this->Name . '_from']) && $_data[$this->Name . '_from'] != '0000-00-00' && isset($_data[$this->Name . '_till']) && $_data[$this->Name . '_till'] != '0000-00-00') {
-			$from = strtotime($_data[$this->Name . '_from']);
-			$till = strtotime($_data[$this->Name . '_till']);
+        $result = array('from' => null,
+                        'from_hours' => null,
+                        'from_minutes' => null,
+                        'till' => null,
+                        'till_hours' => null,
+                        'till_minutes' => null);
+		if (
+            !empty($_data[$this->Name . '_from']) &&
+		    $_data[$this->Name . '_from'] != '0000-00-00'
+		) {
+            $from = is_numeric($_data[$this->Name . '_from'])
+                  ? $_data[$this->Name . '_from']
+                  : strtotime($_data[$this->Name . '_from']);
 
-			$result = array(
-				'from' => date('Y-m-d', $from),
-				'from_hours' => date('H', $from),
-				'from_minutes' => date('i', $from),
-				'till' => date('Y-m-d', $till),
-				'till_hours' => date('H', $till),
-				'till_minutes' => date('i', $till)
-			);
-
-			foreach (array('from_hours', 'from_minutes', 'till_hours', 'till_minutes') as $i) {
-				$name = $this->Name . '_' . $i;
-				if (isset($_data[$name]) && (int) $_data[$name]) {
-					$result[$i] = sprintf('%02d', $_data[$name]);
-				}
-			}
-
-			return $result;
-
-		} else {
-			return false;
+            $result['from'] = date('Y-m-d', $from);
+            $result['from_hours'] = date('H', $from);
+            $result['from_minutes'] = date('i', $from);
 		}
+
+		if (
+            !empty($_data[$this->Name . '_till']) &&
+		    $_data[$this->Name . '_till'] != '0000-00-00'
+		) {
+            $till = is_numeric($_data[$this->Name . '_till'])
+                  ? $_data[$this->Name . '_till']
+                  : strtotime($_data[$this->Name . '_till']);
+
+            $result['till'] = date('Y-m-d', $till);
+            $result['till_hours'] = date('H', $till);
+            $result['till_minutes'] = date('i', $till);
+		}
+
+        foreach (
+            array('from_hours', 'from_minutes', 'till_hours', 'till_minutes')
+            as $i
+        ) {
+            $name = $this->Name . '_' . $i;
+
+            if (isset($_data[$name]) && (int) $_data[$name]) {
+                $result[$i] = sprintf('%02d', $_data[$name]);
+            }
+        }
+
+        return $result;
 	}
 
 	public function CheckValue($_value = null) {
-		$is_value = true;
-		foreach (array('from', 'from_hours', 'from_minutes', 'till', 'till_hours', 'till_minutes') as $i) {
-			if (!(isset($_value[$i]) && $_value[$i])) {
-				$is_value = false;
-				break;
-			}
-		}
+	    if ($_value) {
+            $is_value = true;
+//             foreach (array('from', 'from_hours', 'from_minutes', 'till', 'till_hours', 'till_minutes') as $i) {
+            foreach (array('from', 'till') as $i) {
+                if (!empty($_value[$i])) {
+                    $is_value = false;
+                    break;
+                }
+            }
+
+	    } else {
+	        $is_value = false;
+	    }
 
 		if ($this->IsRequired && !$is_value) {
 			return FIELD_ERROR_REQUIRED;
 
-		} elseif (!$is_value) {
-			return FIELD_NO_UPDATE;
+// 		} elseif (!$is_value) {
+// 			return FIELD_NO_UPDATE;
 
 		} else {
 			return FIELD_SUCCESS;
@@ -663,13 +726,13 @@ class FormEleDatetimePeriod extends FormEle {
 	public function GetSqlValue() {
 		if ($this->UpdateType == FIELD_SUCCESS) {
 			$value = $this->GetValue();
-			if ($value) {
-				return array(
-					$this->Name . '_from' => $value['from'] . ' ' . $value['from_hours'] . ':' . $value['from_minutes'] . ':00',
-					$this->Name . '_till' => $value['till'] . ' ' . $value['till_hours'] . ':' . $value['till_minutes'] . ':00'
-				);
-			}
+
+            return array(
+                $this->Name . '_from' => empty($value['from']) ? 'NULL' : "{$value['from']} {$value['from_hours']}:{$value['from_minutes']}:00",
+                $this->Name . '_till' => empty($value['till']) ? 'NULL' : "{$value['till']} {$value['till_hours']}:{$value['till_minutes']}:00"
+            );
 		}
+
 		return false;
 	}
 }
@@ -996,7 +1059,7 @@ class FormEleCalendarDatetime extends FormEle {
 		$minutes_xml = '<minutes>';
 		for ($i = 0; $i < 60; $i = $i + 10) {
 			$value = sprintf('%02d', $i);
-			$minutes_xml .= '<item value="' . $value . '">' . $value . '</item>';
+			$minutes_xml .= '<item value="' . $value . '">' . $i . '</item>';
 		}
 		$minutes_xml .= '</minutes>';
 
@@ -1004,13 +1067,21 @@ class FormEleCalendarDatetime extends FormEle {
 	}
 
 	public function ComputeValue($_data) {
-		if (isset($_data[$this->Name]) && $_data[$this->Name] != '0000-00-00 00:00:00') {
-			$from = strtotime($_data[$this->Name]);
+        $result = array('date' => null,
+                        'hours' => null,
+                        'minutes' => null);
+		if (
+		    !empty($_data[$this->Name]) &&
+		    $_data[$this->Name] != '0000-00-00 00:00:00'
+		) {
+            $date = is_numeric($_data[$this->Name])
+                  ? $_data[$this->Name]
+                  : strtotime($_data[$this->Name]);
 
 			$result = array(
-				'date' => date('Y-m-d', $from),
-				'hours' => date('H', $from),
-				'minutes' => date('i', $from)
+				'date' => date('Y-m-d', $date),
+				'hours' => date('H', $date),
+				'minutes' => date('i', $date)
 			);
 
 			foreach (array('hours', 'minutes') as $i) {
@@ -1019,28 +1090,32 @@ class FormEleCalendarDatetime extends FormEle {
 					$result[$i] = sprintf('%02d', $_data[$name]);
 				}
 			}
-
-			return $result;
-
-		} else {
-			return false;
 		}
+
+		return $result;
 	}
 
 	public function CheckValue($_value = null) {
-		$is_value = true;
-		foreach (array('date', 'hours', 'minutes') as $i) {
-			if (!(isset($_value[$i]) && $_value[$i])) {
-				$is_value = false;
-				break;
-			}
+	    if ($_value) {
+		    $is_value = true;
+
+// 		    foreach (array('date', 'hours', 'minutes') as $i) {
+		    foreach (array('date') as $i) {
+                if (empty($_value[$i])) {
+				    $is_value = false;
+    				break;
+	    		}
+		    }
+
+		} else {
+    		$is_value = false;
 		}
 
 		if ($this->IsRequired && !$is_value) {
 			return FIELD_ERROR_REQUIRED;
 
-		} elseif (!$is_value) {
-			return FIELD_NO_UPDATE;
+// 		} else if (!$is_value) {
+// 			return FIELD_NO_UPDATE;
 
 		} else {
 			return FIELD_SUCCESS;
@@ -1050,10 +1125,11 @@ class FormEleCalendarDatetime extends FormEle {
 	public function GetSqlValue() {
 		if ($this->UpdateType == FIELD_SUCCESS) {
 			$value = $this->GetValue();
-			if ($value) {
-				return array($this->Name => $value['date'] . ' ' . $value['hours'] . ':' . $value['minutes'] . ':00');
-			}
+            return array($this->Name => empty($value['date'])
+                                      ? 'NULL'
+                                      : "{$value['date']} {$value['hours']}:{$value['minutes']}:00");
 		}
+
 		return false;
 	}
 }

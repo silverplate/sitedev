@@ -1,19 +1,21 @@
 <?php
 
-function d($_var, $_format = true)
+function d($_var)
 {
-    return debug($_var, $_format);
+    return debug($_var);
 }
 
-function debug($_var, $_format = true) {
-	if ($_format) {
-		echo '<h3>Debug</h3><pre>';
-		if (is_string($_var)) echo htmlspecialchars($_var);
-		else print_r($_var);
-		echo '</pre>';
-	} else {
-		print_r($_var);
-	}
+function debug($_var)
+{
+    if (PHP_SAPI == 'cli') {
+        var_dump($_var);
+
+    } else {
+        echo '<pre>';
+        if (is_string($_var))   echo htmlspecialchars($_var);
+        else                    var_dump($_var);
+    }
+
 	die();
 }
 
@@ -156,7 +158,7 @@ function detect_cyr_charset($_str) {
 }
 
 function is_number($_try) {
-	return ereg('^\-?[1-9][0-9]*$', $_try);
+	return preg_match('/^\-?[1-9][0-9]*$/', $_try);
 }
 
 function cut_string($_string, $_length) {

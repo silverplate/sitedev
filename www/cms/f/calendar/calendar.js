@@ -145,7 +145,7 @@ function calendar(name, lang) {
 		var d = date.getDate().toString();
 		if (d.length == 1) d = '0' + d;
 
-		return date.getFullYear() + '-' + m + '-' + d;		
+		return date.getFullYear() + '-' + m + '-' + d;
 	}
 
 	this.get_date = function() {
@@ -157,6 +157,11 @@ function calendar(name, lang) {
 		this.get_input_ele().value = date.getDate() + ' ' + this.months[date.getMonth()].substr(0, 3).toLowerCase() + ' ' + date.getFullYear();
 		this.get_date_ele().value = this.get_sql_date(date);
 	}
+
+    this.is_date_set = function()
+    {
+        return this.get_date_ele().value != '';
+    }
 
 	this.clear_date = function() {
 		this.get_input_ele().value = '';
@@ -219,7 +224,10 @@ function calendar(name, lang) {
 		add_event(ele, 'click', cancel_event);
 		add_event(document, 'click', calendar_remove);
 
-		var now = this.get_date();
+		var selected = this.is_date_set() ? this.get_date() : false;
+		var now = new Date();
+		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
 		var calendar = y ? new Date(y, m, d) : this.get_date();
 		var y = calendar.getFullYear();
 		var m = calendar.getMonth();
@@ -251,7 +259,14 @@ function calendar(name, lang) {
 		while (!(calendar.getDay() == 1 && calendar.getMonth() == next_m.getMonth())) {
 			if (calendar.getMonth() != m) class_name += 'notnow';
 			if (calendar.getDay() == 0 || calendar.getDay() == 6) class_name += (class_name ? ' ' : '') + 'weekend';
-			if (calendar.valueOf() == now.valueOf()) class_name += (class_name ? ' ' : '') + 'selected';
+
+            if (calendar.valueOf() == today.valueOf()) {
+                class_name += (class_name ? ' ' : '') + 'today';
+            }
+
+			if (selected && calendar.valueOf() == selected.valueOf()) {
+			    class_name += (class_name ? ' ' : '') + 'selected';
+			}
 
 			content += '<td' + (class_name ? ' class="' + class_name + '"' : '') + '>';
 			content += '<a onclick="calendar_set(\'' + this.name + '\',' + calendar.getFullYear() + ',' + calendar.getMonth() + ',' + calendar.getDate() + '); return false;">' + calendar.getDate() + '</a></td>';

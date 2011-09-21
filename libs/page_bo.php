@@ -50,23 +50,7 @@ class BoPage extends Page {
 		if (isset($g_user) && $g_user) {
 			$user_sections_list = $g_user->GetSections();
 
-			foreach ($g_user->GetSectionGroups() as $item) {
-				$sections_xml .= '<group id="' . $item->GetId() . '">';
-				$sections_xml .= '<title><![CDATA[' . $item->GetTitle() . ']]></title>';
-				foreach ($user_sections_list AS $key => $section) {
-					if($item->GetId() == $section->GetAttribute(BoSectionGroup::GetPri())) {
-						$append_xml = $section->GetAttribute('description')
-							? '<description><![CDATA[' . $section->GetAttribute('description') . ']]></description>'
-							: '';
-						$sections_xml .= $section->GetXml('bo_navigation', 'item', $append_xml, $g_section && $g_section->GetId() == $section->GetId() ? array('selected' => 'true') : null);
-
-						if(isset($user_sections_list[$key])) unset($user_sections_list[$key]);
-					}
-				}
-				$sections_xml .= '</group>';
-			}
-
-			if($user_sections_list) {
+			if ($user_sections_list) {
 				foreach ($user_sections_list AS $key => $section) {
 					$append_xml = $section->GetAttribute('description')
 						? '<description><![CDATA[' . $section->GetAttribute('description') . ']]></description>'

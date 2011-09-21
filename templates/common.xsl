@@ -53,8 +53,9 @@
 	</xsl:template>
 
     <xsl:template name="html-image">
-		<xsl:param name="alt" />
 		<xsl:param name="id" />
+		<xsl:param name="alt" />
+		<xsl:param name="title" />
 		<xsl:param name="style" />
 
 		<img src="{@uri}" width="{@width}" height="{@height}">
@@ -64,6 +65,10 @@
 
             <xsl:if test="$alt != ''">
                 <xsl:attribute name="alt"><xsl:value-of select="$alt" /></xsl:attribute>
+            </xsl:if>
+
+            <xsl:if test="$title != ''">
+                <xsl:attribute name="title"><xsl:value-of select="$title" /></xsl:attribute>
             </xsl:if>
 
             <xsl:for-each select="@class">
@@ -80,11 +85,23 @@
     </xsl:template>
 
 	<xsl:template match="image|illu">
-		<xsl:param name="alt" />
 		<xsl:param name="id" />
+		<xsl:param name="alt" />
+		<xsl:param name="title" />
 		<xsl:param name="style" />
 
         <xsl:call-template name="html-image">
+            <xsl:with-param name="id">
+                <xsl:choose>
+                    <xsl:when test="$id">
+                        <xsl:value-of select="$id" />
+                    </xsl:when>
+                    <xsl:when test="@id">
+                        <xsl:value-of select="@id" />
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:with-param>
+
             <xsl:with-param name="alt">
                 <xsl:choose>
                     <xsl:when test="$alt">
@@ -99,13 +116,16 @@
                 </xsl:choose>
             </xsl:with-param>
 
-            <xsl:with-param name="id">
+            <xsl:with-param name="title">
                 <xsl:choose>
-                    <xsl:when test="$id">
-                        <xsl:value-of select="$id" />
+                    <xsl:when test="$title">
+                        <xsl:value-of select="$title" />
                     </xsl:when>
-                    <xsl:when test="@id">
-                        <xsl:value-of select="@id" />
+                    <xsl:when test="title">
+                        <xsl:value-of select="title" />
+                    </xsl:when>
+                    <xsl:when test="@title">
+                        <xsl:value-of select="@title" />
                     </xsl:when>
                 </xsl:choose>
             </xsl:with-param>

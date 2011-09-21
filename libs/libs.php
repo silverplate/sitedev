@@ -9,6 +9,11 @@ define('HANDLERS',      WD . 'handlers/');
 define('LIBRARIES',     WD . 'libs/');
 define('OBJECTS',       LIBRARIES . 'objects/');
 
+set_include_path(
+    LIBRARIES . PATH_SEPARATOR .
+    get_include_path()
+);
+
 require_once('strings.php');
 require_once('dates.php');
 require_once('files.php');

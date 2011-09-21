@@ -35,7 +35,7 @@ class FoPage extends Page {
 			$content = $this->GetHtml();
 			echo $content;
 
-			if ($gCache->isAvailable() && !$_is_404) {
+			if ($gCache && $gCache->isAvailable() && !$_is_404) {
 				$gCache->set($content);
 			}
 		} else {

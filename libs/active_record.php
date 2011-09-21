@@ -342,16 +342,16 @@ class ActiveRecord {
 				if ($item->IsPrimary()) {
 					if ($item->GetType() == 'varchar') {
 						$item->SetValue(Db::Get()->GetUnique($this->GetTable(), $item->GetName(), $item->GetLength()));
-					}
-					/*elseif ($item->GetType() == 'integer') {
-						$item->SetValue(Db::Get()->GetNextNumber($this->GetTable(), $item->GetName()));
-					}*/
 
-				} elseif ($item->GetName() == 'sort_order') {
+// 					} else if ($item->GetType() == 'integer') {
+// 						$item->SetValue(Db::Get()->GetNextNumber($this->GetTable(), $item->GetName()));
+					}
+
+				} else if ($item->GetName() == 'sort_order') {
 					$item->SetValue(Db::Get()->GetNextNumber($this->GetTable(), $item->GetName()));
 
-				} elseif ($item->GetName() == 'creation_date') {
-					$item->SetValue(date('Y-m-d H:i:s'));
+				} else if ($item->getName() == 'creation_date') {
+					$item->setValue($item->getType() == 'integer' ? time() : date('Y-m-d H:i:s'));
 				}
 			}
 
@@ -531,7 +531,13 @@ class ActiveRecord {
 		if ($list) {
 			foreach ($list as $item) {
 				$obj = new $_class;
-				$obj->DataInit($item);
+				//$obj->DataInit($item);
+
+				foreach ($obj->Attributes as $i) {
+                    if (isset($item[$i->GetName()])) {
+                        $i->SetValue($item[$i->GetName()]);
+                    }
+                }
 
 				if (is_array($obj->GetId())) {
 					array_push($result, $obj);
@@ -808,6 +814,11 @@ class ActiveRecordAttribute {
 	}
 
 	public function SetValue($_value) {
+        if ($_value == 'NULL') {
+            $this->Value = 'NULL';
+            return;
+        }
+
 		switch ($this->Type) {
 			case 'int':
 			case 'integer':
@@ -833,7 +844,16 @@ class ActiveRecordAttribute {
 	}
 
 	public function GetValue($_is_escape = true) {
-		if ('' == $this->Value && $_is_escape) {
+        if ($this->Value == 'NULL') {
+            return $this->Value;
+
+        } else if (
+            $this->Value == '' &&
+            (in_array($this->Type, array('date', 'datetime')))
+        ) {
+            return 'NULL';
+
+		} else if ($this->Value == '' && $_is_escape) {
 			return '\'\'';
 
 		} else {

@@ -126,6 +126,7 @@ input.string {
 }
 
 input.folder,
+input.filename,
 input.email,
 input.uri {
 	width: 20.6em;
@@ -164,7 +165,7 @@ textarea.wysiwyg,
 textarea.simple_wysiwyg {
 	width: 400px;
 	height: 100px;
-	font-family: Monaco, monospace;
+	font-family: Lucida Console, Consolas, Arial;
 }
 
 textarea.short_text {
@@ -183,6 +184,16 @@ textarea.simple_wysiwyg {
 	height: 125px;
 }
 
+td.alone .form_float_ele {
+    float: none !important;
+    margin-right: 0 !important;
+}
+
+td.alone textarea {
+    width: 100%;
+    height: 300px;
+}
+
 table.form_date td.day input,
 table.form_date td.month input,
 table.form_date td.hours input,
@@ -192,6 +203,7 @@ table.form_date td.minutes input {
 }
 
 table.form_date td.year input {
+	width: 50px;
 	text-align: center;
 }
 

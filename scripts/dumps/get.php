@@ -9,7 +9,7 @@ $conf['dbname'] = trim($conf['path'], '/');
 $return = null;
 
 if (empty($argv[1])) {
-	$patchesDir = realpath(WD . 'scripts/patches/dumps');
+	$patchesDir = realpath(WD . 'scripts/dumps');
 	$dumpFile = date('Y-m-d') . '.sql';
 	$dumpFilePath = $patchesDir . '/' . $dumpFile;
 	$dumpArchivePath = $dumpFilePath . '.tgz';

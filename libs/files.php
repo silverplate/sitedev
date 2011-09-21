@@ -12,16 +12,26 @@ function get_file_extension($_file) {
 	return isset($info['extension']) ? strtolower($info['extension']) : '';
 }
 
-function create_directory($_dir, $_is_recursive = false) {
+function createDirectory($_dir, $_isRecursive = true)
+{
 	if (!is_dir($_dir)) {
 		$mask = umask(0);
-		mkdir($_dir, 0777, $_is_recursive);
+		mkdir($_dir, 0777, $_isRecursive);
 		umask($mask);
 	}
 }
 
+function create_directory($_dir, $_isRecursive = false) {
+    createDirectory($_dir, $_isRecursive);
+}
+
 function remove_file($_file) {
 	return is_file($_file) ? unlink($_file) : false;
+}
+
+function removeDirectory($_dir, $_isSselfDelete = true, $_isOnlyFiles = false)
+{
+    remove_directory($_dir, $_isSselfDelete, $_isOnlyFiles);
 }
 
 function remove_directory($_dir, $_is_self_delete = true, $_is_only_files = false) {
@@ -175,14 +185,13 @@ function documentNotFound() {
 
 
 class File {
-	private $Path;
-	private $Uri;
-	private $FileName;
-	private $Name;
-	private $Extension;
-
-	private $PathStartsWith;
-	private $UriStartsWith;
+	protected $Path;
+	protected $Uri;
+	protected $FileName;
+	protected $Name;
+	protected $Extension;
+	protected $PathStartsWith;
+	protected $UriStartsWith;
 
 	public function __construct($_path, $_path_starts_with = null, $_uri_starts_with = null) {
 		$this->SetPathStartsWith($_path_starts_with);
@@ -301,8 +310,21 @@ class File {
 		return filesize($this->GetPath());
 	}
 
-	public static function NormalizeName($_name) {
-		return str_replace(' ', '_', strtolower(translit($_name)));
+	public static function normalizeName($_name)
+	{
+	    $name = html_entity_decode($_name, ENT_NOQUOTES, 'utf-8');
+	    $name = strtolower(trim(translit($name)));
+	    $name = preg_replace('/[^\s\-a-z.0-9_]/', '', $name);
+	    $name = preg_replace('/_+/', '_', $name);
+	    $name = preg_replace('/\s+/', '-', $name);
+	    $name = preg_replace('/-+/', '-', $name);
+
+		return $name;
+	}
+
+	public static function isImageExtension($_extension)
+	{
+		return in_array(strtolower($_extension), array('gif', 'jpeg', 'jpg', 'png'));
 	}
 }
 

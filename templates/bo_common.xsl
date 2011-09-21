@@ -14,37 +14,11 @@
 						<xsl:with-param name="title">Система управления</xsl:with-param>
 						</xsl:call-template-->
 
-					<xsl:for-each select="/node()/content/cms_sections">
-						<xsl:choose>
-							<xsl:when test="group">
-								<div id="navigation_groups">
-									<xsl:if test="group/item[@selected]">
-										<xsl:attribute name="style">display:none</xsl:attribute>
-									</xsl:if>
-									<xsl:for-each select="group">
-										<div class="group_item">
-											<a href="" onclick="$('navigation_groups').hide(); $('group_{@id}').show(); return false;"><xsl:value-of select="title" disable-output-escaping="yes" /></a>
-										</div>
-									</xsl:for-each>
-									<br />
-									<xsl:for-each select="item">
-										<xsl:call-template name="navigation_item">
-											<xsl:with-param name="uri" select="@uri" />
-											<xsl:with-param name="title" select="title/text()" />
-										</xsl:call-template>
-									</xsl:for-each>
-								</div>
-								<xsl:apply-templates select="group" mode="navigation_group" />
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:for-each select="item">
-									<xsl:call-template name="navigation_item">
-										<xsl:with-param name="uri" select="@uri" />
-										<xsl:with-param name="title" select="title/text()" />
-									</xsl:call-template>
-								</xsl:for-each>
-							</xsl:otherwise>
-						</xsl:choose>
+					<xsl:for-each select="/node()/content/cms_sections/item">
+                        <xsl:call-template name="navigation_item">
+                            <xsl:with-param name="uri" select="@uri" />
+                            <xsl:with-param name="title" select="title/text()" />
+                        </xsl:call-template>
 					</xsl:for-each>
 				</td>
 			</tr>

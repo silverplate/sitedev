@@ -153,12 +153,12 @@ table.cms_sections tr td div.description {
 }
 
 table.cms_sections tr td h3 {
-	margin:1.5em 0 1em 0;
-	font-size:1.2em;
+	margin: 1.5em 0 1em 0;
+	font-size: 1.2em;
 }
 
 table.cms_sections tr td h3.first {
-	margin-top:0;
+	margin-top: 0;
 }
 
 p.first {

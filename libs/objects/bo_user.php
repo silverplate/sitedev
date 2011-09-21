@@ -88,24 +88,6 @@ class BoUser extends ActiveRecord {
 		return BoSection::GetList(array('is_published' => 1, BoSection::GetPri() => $this->GetLinkIds('sections', $_is_published)));
 	}
 
-	public function GetSectionGroups($_is_published = true) {
-		$result = array();
-
-		$sections_list = BoSection::GetList(array('is_published' => 1, BoSection::GetPri() => $this->GetLinkIds('sections', $_is_published)));
-		if($sections_list) {
-			$section_group_ids = array();
-			foreach ($sections_list AS $section) {
-				array_push($section_group_ids, $section->GetAttribute(BoSectionGroup::GetPri()));
-			}
-
-			if($section_group_ids) {
-				return BoSectionGroup::GetList(array(BoSectionGroup::GetPri() => $section_group_ids, 'is_published' => 1));
-			}
-		}
-
-		return null;
-	}
-
 	public function IsSection($_id) {
 		return in_array($_id, $this->GetLinkIds('sections'));
 	}

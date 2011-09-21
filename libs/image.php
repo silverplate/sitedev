@@ -1,184 +1,205 @@
 <?php
 
-class Image {
-	private $Path;
-	private $Uri;
-	private $FileName;
-	private $Name;
-	private $Extension;
-	private $Width;
-	private $Height;
-	private $Text;
+class Image extends File
+{
+	protected $_width;
+	protected $_height;
+	protected $_type;
+	protected $_text;
 
-	private $PathStartsWith;
-	private $UriStartsWith;
-
-	public function Image($_path, $_path_starts_with = null, $_uri_starts_with = null) {
-		$this->SetPathStartsWith($_path_starts_with);
-		$this->SetUriStartsWith($_uri_starts_with);
-		$this->SetPath($_path);
-	}
-
-	public function SetPathStartsWith($_path) {
-		$this->PathStartsWith = $_path;
-	}
-
-	public function GetPathStartsWith() {
-		return $this->PathStartsWith;
-	}
-
-	public function ComputeUri() {
-		$this->Uri = ($this->GetPathStartsWith())
-			? str_replace($this->GetPathStartsWith(), $this->GetUriStartsWith(), $this->GetPath())
-			: $this->GetPath();
-	}
-
-	public function SetUriStartsWith($_uri) {
-		$this->UriStartsWith = $_uri;
-	}
-
-	public function GetUriStartsWith() {
-		return $this->UriStartsWith;
-	}
-
-	public function SetPath($_path) {
-		$info = pathinfo($_path);
-		$size = getimagesize($_path);
-
-		$this->Path = $_path;
-		$this->FileName = $info['basename'];
-		$this->Name = substr($info['basename'], 0, strlen($info['basename']) - strlen($info['extension']) - 1);
-		$this->Extension = $info['extension'];
-		$this->Width = $size[0];
-		$this->Height = $size[1];
-
-		$this->ComputeUri();
-	}
-
-	public function Delete() {
-		if (is_file($this->GetPath())) {
-			unlink($this->GetPath());
-		}
-	}
-
-	public function GetXml($_type_attribute = null) {
-		$xml  = '<image' . ((!is_null($_type_attribute) && $_type_attribute != '') ? ' type="' . $_type_attribute . '"' : '') . ' width="' . $this->GetWidth() . '" height="' . $this->GetHeight() . '" uri="' . $this->GetUri() . '"';
-		$xml .= ' path="' . $this->GetPath() . '" filename="' . $this->GetFileName() . '" name="' . $this->GetName() . '" extension="' . $this->GetExtension() . '"';
-		$xml .= '>';
-
-		if ($this->GetText()) {
-			$xml .= '<![CDATA[' . $this->GetText() . ']]>';
-		}
-
-		return $xml . '</image>';
-	}
-
-	/**
-	 * @param DOMDocument $dom
-	 * @param string $_type_attribute
-	 * @return DOMElement
-	 */
-	public function GetNode(DOMDocument $dom, $_type_attribute = null) {
-		$node = $dom->createElement('image');
-
-		if (!empty($_type_attribute)) {
-			$node->setAttribute('type', $_type_attribute);
-		}
-
-		$node->setAttribute('width', $this->GetWidth());
-		$node->setAttribute('height', $this->GetHeight());
-		$node->setAttribute('uri', $this->GetUri());
-		$node->setAttribute('path', $this->GetPath());
-		$node->setAttribute('filename', $this->GetFileName());
-		$node->setAttribute('name', $this->GetName());
-		$node->setAttribute('extension', $this->GetExtension());
-
-		if ($this->GetText()) {
-			$node->appendChild(
-				$dom->createCDATASection($this->GetText())
-			);
-		}
-
-		return $node;
-	}
-
-	public function GetPath() {
-		return $this->Path;
-	}
-
-	public function GetUri() {
-		return $this->Uri;
-	}
-
-	public function GetFileName() {
-		return $this->FileName;
-	}
-
-	public function GetName() {
-		return $this->Name;
-	}
-
-	public function GetExtension() {
-		return $this->Extension;
-	}
-
-	public function GetWidth() {
-		return (int) $this->Width;
-	}
-
-	public function GetHeight() {
-		return (int) $this->Height;
-	}
-
-	public function SetText($_value) {
-		$this->Text = $_value;
-	}
-
-	public function GetText() {
-		return $this->Text;
-	}
-
-	public static function IsImageExtension($_extension) {
-		return in_array(strtolower($_extension), array('gif', 'jpeg', 'jpg', 'png'));
-	}
-
-	public static function resize($_image, $_width = null, $_height = null, $_new = null)
+	public function setPath($_path)
 	{
-	    if (empty($_width) && empty($_height)) {
-	        return false;
-	    }
+	    parent::setPath($_path);
 
-		switch (strtolower(get_file_extension($_image))) {
-			case 'gif':
-				$image = imagecreatefromgif($_image);
-				break;
-			case 'jpg':
-			case 'jpeg':
-				$image = imagecreatefromjpeg($_image);
-				break;
-			case 'png':
-				$image = imagecreatefrompng($_image);
-				break;
-		}
-
-		if (isset($image)) {
-			$newPath = pathinfo(!empty($_new) ? $_new : $_image);
-			$newImage = rtrim($newPath['dirname'], '/') . '/' . get_file_name($newPath['basename']) . '.jpg';
-
-			list($nowWidth, $nowHeight) = getimagesize($_image);
-            $width = empty($_width) ? $_height / $nowHeight * $nowWidth : $_width;
-            $height = empty($_height) ? $_width / $nowWidth * $nowHeight : $_height;
-            $resized = imagecreatetruecolor($width, $height);
-
-			imagecopyresampled($resized, $image, 0, 0, 0, 0, $width, $height, $nowWidth, $nowHeight);
-			imagejpeg($resized, $newImage, 100);
-			chmod($newImage, 0777);
-
-			return true;
-		}
-
-		return false;
+		$size = getimagesize($this->getPath());
+		$this->_width  = $size[0];
+		$this->_height = $size[1];
+		$this->_type = $size[2];
 	}
+
+	public function getWidth() {
+		return (int) $this->_width;
+	}
+
+	public function getHeight() {
+		return (int) $this->_height;
+	}
+
+	public function getType() {
+		return $this->_type;
+	}
+
+	public function setText($_value) {
+		$this->_text = $_value;
+	}
+
+	public function getText() {
+		return $this->_text;
+	}
+
+	public function getXml($_typeAttribute = null)
+	{
+	    $attrs = array('width' => $this->getWidth(),
+	                   'height' => $this->getHeight(),
+	                   'uri' => $this->getUri(),
+	                   'path' => $this->getPath(),
+	                   'filename' => $this->getFileName(),
+	                   'name' => $this->getName(),
+	                   'extension' => $this->getExtension());
+
+        if ($_typeAttribute) {
+            $attrs['type'] = $_typeAttribute;
+        }
+
+	    return getCdata('image', $this->getText(), $attrs);
+	}
+
+    public function getHtml($_attrs = null)
+    {
+        $attrs = array('width' => $this->getWidth(),
+	                   'height' => $this->getHeight(),
+	                   'src' => $this->getUri(),
+	                   'alt' => $this->getText());
+
+        if ($_attrs) {
+            $attrs = array_merge($attrs, $_attrs);
+        }
+
+        return getCdata('img', null, $attrs);
+    }
+
+// 	public function GetNode(DOMDocument $dom, $_type_attribute = null)
+// 	{
+// 		$node = $dom->createElement('image');
+//
+// 		if (!empty($_type_attribute)) {
+// 			$node->setAttribute('type', $_type_attribute);
+// 		}
+//
+// 		$node->setAttribute('width', $this->GetWidth());
+// 		$node->setAttribute('height', $this->GetHeight());
+// 		$node->setAttribute('uri', $this->GetUri());
+// 		$node->setAttribute('path', $this->GetPath());
+// 		$node->setAttribute('filename', $this->GetFileName());
+// 		$node->setAttribute('name', $this->GetName());
+// 		$node->setAttribute('extension', $this->GetExtension());
+//
+// 		if ($this->GetText()) {
+// 			$node->appendChild(
+// 				$dom->createCDATASection($this->GetText())
+// 			);
+// 		}
+//
+// 		return $node;
+// 	}
+
+    public static function resize($_srcImage, $_dstWidth = null, $_dstHeight = null, $_dstFilePath = null)
+    {
+        if (empty($_dstWidth) && empty($_dstHeight)) {
+            throw new Exception('Destination width or height must be set');
+        }
+
+        if ($_srcImage instanceof Image) {
+            $srcFilePath =  $_srcImage->getPath();
+            $srcExtension = $_srcImage->getExtension();
+            $srcWidth =     $_srcImage->getWidth();
+            $srcHeight =    $_srcImage->getHeight();
+
+        } else {
+            $srcFilePath =  $_srcImage;
+            $srcExtension = get_file_extension($_srcImage);
+            $size =         getimagesize($_srcImage);
+            $srcWidth =     $size[0];
+            $srcHeight =    $size[1];
+        }
+
+        $dstWidth = empty($_dstWidth) ? $_dstHeight / $srcHeight * $srcWidth : $_dstWidth;
+        $dstHeight = empty($_dstHeight) ? $_dstWidth / $srcWidth * $srcHeight : $_dstHeight;
+        $dstFilePath = empty($_dstFilePath) ? $srcFilePath : $_dstFilePath;
+        $dstFileInfo = pathinfo($dstFilePath);
+
+        switch (strtolower($srcExtension)) {
+            case 'gif':
+                $srcImage = imagecreatefromgif($srcFilePath);
+                break;
+
+            case 'jpg':
+            case 'jpeg':
+                $srcImage = imagecreatefromjpeg($srcFilePath);
+                break;
+
+            case 'png':
+                $srcImage = imagecreatefrompng($srcFilePath);
+                break;
+        }
+
+        if (empty($srcImage)) {
+            throw new Exception('Unknown image type');
+        }
+
+        // Если исходное изображение больше
+        // хотя бы по одной стороне
+        if ($srcWidth > $dstWidth || $srcHeight > $dstHeight) {
+            $srcRate = $srcWidth / $srcHeight;
+            $dstRate = $dstWidth / $dstHeight;
+            $cropWidth = $srcWidth;
+            $cropHeight = $srcHeight;
+            $cropX = 0;
+            $cropY = 0;
+
+            // Если отношение ширины к высоте будущего
+            // изображения больше, чем у предыдущего
+            if ($dstRate > $srcRate) {
+                $cropHeight = $srcWidth / $dstRate;
+                $cropY = floor(($srcHeight - $cropHeight) / 2);
+
+            // Если меньше
+            } else if ($dstRate < $srcRate) {
+                $cropWidth = $srcHeight * $dstRate;
+                $cropX = floor(($srcWidth - $cropWidth) / 2);
+            }
+
+            // Если соотношения отличаются,
+            // то нужно обрезать изображение
+            if ($cropWidth != $srcWidth || $cropHeight != $srcHeight) {
+                $croppedImage = imagecreatetruecolor($cropWidth, $cropHeight);
+                imagecopy($croppedImage, $srcImage, 0, 0, $cropX, $cropY, $cropWidth, $cropHeight);
+                $srcImage = $croppedImage;
+                $srcWidth = $cropWidth;
+                $srcHeight = $cropHeight;
+            }
+
+            $newImage = imagecreatetruecolor($dstWidth, $dstHeight);
+            imagecopyresampled($newImage, $srcImage, 0, 0, 0, 0, $dstWidth, $dstHeight, $srcWidth, $srcHeight);
+
+            $dstFilePathWithType = $dstFileInfo['dirname'] . '/' . $dstFileInfo['filename'] . '.jpg';
+            createDirectory($dstFileInfo['dirname']);
+            imagejpeg($newImage, $dstFilePathWithType, 100);
+            chmod($dstFilePathWithType, 0777);
+
+            if (
+                is_null($_dstFilePath) &&
+                $dstFilePathWithType != $srcFilePath
+            ) {
+                unlink($srcFilePath);
+            }
+
+            return new Image($dstFilePathWithType, DOCUMENT_ROOT, '/');
+
+        // Исходное изображение меньше,
+        // поэтому ничего не делаем
+        } else {
+            $dstFilePathWithType = $dstFileInfo['dirname'] . '/' . $dstFileInfo['filename'] . '.' . $srcExtension;
+
+            if (!is_file($dstFilePathWithType)) {
+                createDirectory($dstFileInfo['dirname']);
+                copy($srcFilePath, $dstFilePathWithType);
+                chmod($dstFilePathWithType, 0777);
+            }
+
+            return new Image($dstFilePathWithType, DOCUMENT_ROOT, '/');
+        }
+    }
 
     public static function getByFileName(array $_files, $_filename)
     {
@@ -243,6 +264,109 @@ class Image {
         }
 
         return preg_replace('/^<root>|<\/root>$/', '', $dom->saveXml($dom->documentElement));
+    }
+
+    function resizeByWidth($_srcImage, $_dstWidth = null, $_dstFilePath = null)
+    {
+        if (empty($_dstWidth)) {
+            throw new Exception('Destination width must be set');
+        }
+
+        if ($_srcImage instanceof Image) {
+            $srcFilePath =  $_srcImage->getPath();
+            $srcExtension = $_srcImage->getExtension();
+            $srcWidth =     $_srcImage->getWidth();
+            $srcHeight =    $_srcImage->getHeight();
+            $srcType =      $_srcImage->getType();
+
+        } else {
+            $srcFilePath =  $_srcImage;
+            $srcExtension = get_file_extension($_srcImage);
+            $size =         getimagesize($_srcImage);
+            $srcWidth =     $size[0];
+            $srcHeight =    $size[1];
+            $srcType =      $size[2];
+        }
+
+        $dstWidth = $_dstWidth ? $_dstWidth : $srcWidth;
+        $dstFilePath = empty($_dstFilePath) ? $srcFilePath : $_dstFilePath;
+        $dstFileInfo = pathinfo($dstFilePath);
+        $dstFilePathWithType = $dstFileInfo['dirname'] . '/' . $dstFileInfo['filename'] . '.' . $srcExtension;
+
+        /*if(!is_dir($_path)) {
+            createDirectory($_path, true);
+        }*/
+
+        if($srcWidth > $dstWidth) {
+            $startX = $endX = $startY = $endY = 0;
+
+            $ratio = $srcWidth / $dstWidth; // Определили во сколько раз по ШИРИНЕ надо ужать оригинальное изображение
+            $dstHeight = floor($srcHeight / $ratio); // Вычислили какая идеальная ВЫСОТА должна быть у оригинального изображения
+
+            $endX = $srcWidth; // То берем всю ширину оригинального изображения
+            $endY = $srcHeight;
+
+            $newImage = imageCreateTrueColor($dstWidth, $dstHeight);
+            switch($srcType)
+            {
+                case 1:
+                    $oldImage = imageCreateFromGif($srcFilePath);
+                    break;
+                case 2:
+                    $oldImage = imageCreateFromJpeg($srcFilePath);
+                    break;
+                case 3:
+                    $oldImage = imageCreateFromPng($srcFilePath);
+                    break;
+            }
+
+            if(
+                imagecopyresampled(
+                    $newImage,
+                    $oldImage,
+                    0,
+                    0,
+                    $startX,
+                    $startY,
+                    $dstWidth,
+                    $dstHeight,
+                    $endX,
+                    $endY
+                )
+            ) {
+                switch($srcType) {
+                    case 1:
+                        imagegif($newImage, $dstFilePathWithType);
+                        break;
+                    case 2:
+                        imageJpeg($newImage, $dstFilePathWithType, 100);
+                        break;
+                    case 3:
+                        imagepng($newImage, $dstFilePathWithType, 100);
+                        break;
+                }
+
+                @chmod($dstFilePathWithType, 0777);
+
+                imageDestroy($newImage);
+                imageDestroy($oldImage);
+                return true;
+            } else {
+                imageDestroy($newImage);
+                imageDestroy($oldImage);
+                return false;
+            }
+        } else {
+            if (!is_file($dstFilePathWithType)) {
+                createDirectory($dstFileInfo['dirname']);
+                copy($srcFilePath, $dstFilePathWithType);
+                chmod($dstFilePathWithType, 0777);
+            }
+
+            return new Image($dstFilePathWithType, DOCUMENT_ROOT, '/');
+        }
+
+        return false;
     }
 }
 

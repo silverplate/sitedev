@@ -68,6 +68,10 @@ div.calendar table .weekend a {
 	color: #990000;
 }
 
+div.calendar table td.today {
+	background-color: yellow;
+}
+
 div.calendar table td.selected {
 	background-color: #990000;
 }

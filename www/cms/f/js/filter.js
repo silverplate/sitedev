@@ -56,7 +56,7 @@ function filter_update(ele_name, is_form_submit, is_sortable, is_date) {
 			setCookie('filter_' + inputs[i], input ? input.value : '');
 		}
 
-		var inputs = new Array('users', 'sections', 'actions');
+		var inputs = new Array('users', 'sections', 'actions', 'type', 'group');
 		for (var i = 0; i < inputs.length; i++) {
 			var check_ele = document.getElementById('is_filter_' + inputs[i]);
 			if (check_ele) {

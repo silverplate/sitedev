@@ -241,18 +241,26 @@ class Form {
 			$is_error = false;
 
 			foreach ($this->Elements as $name => $item) {
-				if ($item->GetType() == 'image' || $item->GetType() == 'adding_files') {
+				if (
+				    $item->GetType() == 'image' ||
+				    $item->GetType() == 'adding_files'
+				) {
 					$item->GetUpdateType($_FILES);
-				} elseif ($this->Method == FORM_GET) {
+
+				} else if ($this->Method == FORM_GET) {
 					$item->GetUpdateType($_GET);
+
 				} else {
 					$item->GetUpdateType($_POST);
 				}
 
-				if ($item->IsUpdateError()) $is_error = true;
+				if ($item->IsUpdateError()) {
+				    $is_error = true;
+				}
 			}
 
-			$this->UpdateStatus = ($is_error) ? FORM_ERROR : FORM_UPDATED;
+			$this->UpdateStatus = $is_error ? FORM_ERROR : FORM_UPDATED;
+
 		} else {
 			$this->UpdateStatus = FORM_NO_UPDATE;
 		}

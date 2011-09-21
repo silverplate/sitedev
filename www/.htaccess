@@ -9,4 +9,4 @@ RewriteRule .* /parse_request.php [L,QSA]
 RewriteRule ^$ /parse_request.php [L,QSA]
 
 RewriteCond %{REQUEST_URI} \.svn
-RewriteRule ^.*$ http://brusenskiy.ru [L,R]
+RewriteRule ^.*$ http://sitedev.ru [L,R]

@@ -219,7 +219,7 @@ class DocumentNavigation extends ActiveRecord {
 			self::$Base->AddAttribute('type', 'varchar', 255);
 			self::$Base->AddAttribute('title', 'varchar', 255);
 			self::$Base->AddAttribute('is_published', 'boolean');
-			self::$Base->AddAttribute('sort_order', 'int', 11);
+			self::$Base->AddAttribute('sort_order', 'int');
 		}
 
 		return self::$Base;

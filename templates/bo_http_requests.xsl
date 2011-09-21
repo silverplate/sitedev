@@ -160,12 +160,6 @@
 		<input type="text" id="{generate-id()}" name="document_data_form_ele_{@id}" value="{content/text()}" style="width: 30%; text-align: right;" />
 	</xsl:template>
 
-	<xsl:template match="document_data[@type_id = 'wysiwyg']" mode="document_data_form_ele">
-		<textarea id="document_data_form_ele_{@id}" name="document_data_form_ele_{@id}" class="wysiwyg" style="width: 100%;" wrap="off">
-			<xsl:value-of select="content/text()" />
-		</textarea>
-	</xsl:template>
-
 	<xsl:template match="document_data[@type_id = 'image']" mode="document_data_form_ele">
 		<xsl:choose>
 			<xsl:when test="additional/*/image">

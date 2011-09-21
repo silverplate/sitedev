@@ -126,7 +126,8 @@ class DbMysql {
 	public function MultiExecute($_query) {
 		$result = array();
 		foreach (explode(';', trim($_query, ';')) as $query) {
-			if ('' != $query) {
+		    $query = trim($query);
+			if (!empty($query)) {
 				array_push($result, $this->Execute($query));
 			}
 		}

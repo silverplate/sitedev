@@ -1,179 +1,207 @@
 DROP TABLE IF EXISTS `~db prefix~bo_log`;
-CREATE TABLE IF NOT EXISTS `~db prefix~bo_log` (
-	`~db prefix~bo_log_id` int(11) NOT NULL auto_increment,
-	`~db prefix~bo_user_id` varchar(10) NOT NULL default '',
-	`~db prefix~bo_section_id` varchar(10) NOT NULL default '',
-	`section_name` varchar(255) NOT NULL default '',
-	`user_name` varchar(255) NOT NULL default '',
-	`user_ip` varchar(15) NOT NULL default '',
-	`user_agent` varchar(255) NOT NULL default '',
-	`request_uri` text NOT NULL,
-	`request_get` text NOT NULL,
-	`request_post` text NOT NULL,
-	`cookies` text NOT NULL,
-	`script_name` varchar(50) NOT NULL default '',
-	`action_id` int(11) NOT NULL default '0',
-	`entry_id` varchar(30) NOT NULL default '',
-	`description` text NOT NULL,
-	`creation_date` datetime NOT NULL default '0000-00-00 00:00:00',
-	PRIMARY KEY (`~db prefix~bo_log_id`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~bo_log` (
+  `~db prefix~bo_log_id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `~db prefix~bo_user_id` CHAR(10) NOT NULL ,
+  `~db prefix~bo_section_id` CHAR(10) NOT NULL ,
+  `section_name` VARCHAR(255) NOT NULL ,
+  `user_name` VARCHAR(255) NOT NULL ,
+  `user_ip` CHAR(15) NOT NULL ,
+  `user_agent` VARCHAR(255) NOT NULL ,
+  `request_uri` TEXT NOT NULL ,
+  `request_get` TEXT NOT NULL ,
+  `request_post` TEXT NOT NULL ,
+  `cookies` TEXT NOT NULL ,
+  `script_name` VARCHAR(50) NOT NULL ,
+  `action_id` SMALLINT UNSIGNED NOT NULL ,
+  `entry_id` VARCHAR(30) NOT NULL ,
+  `description` TEXT NOT NULL ,
+  `creation_date` DATETIME NOT NULL ,
+  PRIMARY KEY (`~db prefix~bo_log_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~bo_section`;
-CREATE TABLE IF NOT EXISTS `~db prefix~bo_section` (
-	`~db prefix~bo_section_id` varchar(10) NOT NULL default '',
-	`~db prefix~bo_section_group_id` varchar(10) NOT NULL default '',
-	`title` varchar(255) NOT NULL default '',
-	`uri` varchar(255) NOT NULL default '',
-	`description` text NOT NULL,
-	`is_published` tinyint(1) NOT NULL default '0',
-	`sort_order` int(11) NOT NULL default '0',
-	PRIMARY KEY (`~db prefix~bo_section_id`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-DROP TABLE IF EXISTS `~db prefix~bo_section_group`;
-CREATE TABLE IF NOT EXISTS `~db prefix~bo_section_group` (
-  `~db prefix~bo_section_group_id` varchar(10) NOT NULL default '',
-  `title` varchar(255) NOT NULL default '',
-  `sort_order` int(11) NOT NULL default '0',
-  `is_published` tinyint(1) NOT NULL default '0',
-  PRIMARY KEY  (`~db prefix~bo_section_group_id`)
-) TYPE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE  TABLE IF NOT EXISTS `~db prefix~bo_section` (
+  `~db prefix~bo_section_id` CHAR(10) NOT NULL ,
+  `title` VARCHAR(255) NOT NULL ,
+  `uri` VARCHAR(255) NOT NULL ,
+  `description` TEXT NOT NULL ,
+  `is_published` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 ,
+  `sort_order` INT UNSIGNED NULL ,
+  PRIMARY KEY (`~db prefix~bo_section_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~bo_user`;
-CREATE TABLE IF NOT EXISTS `~db prefix~bo_user` (
-	`~db prefix~bo_user_id` varchar(10) NOT NULL default '',
-	`status_id` int(11) NOT NULL default '1',
-	`title` varchar(255) NOT NULL default '',
-	`login` varchar(30) NOT NULL default '',
-	`passwd` varchar(32) NOT NULL default '',
-	`email` varchar(255) NOT NULL default '',
-	`ip_restriction` text NOT NULL,
-	`reminder_key` varchar(30) NOT NULL default '',
-	`reminder_date` datetime NOT NULL default '0000-00-00 00:00:00',
-	PRIMARY KEY (`~db prefix~bo_user_id`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~bo_user` (
+  `~db prefix~bo_user_id` CHAR(10) NOT NULL ,
+  `status_id` SMALLINT UNSIGNED NOT NULL DEFAULT 1 ,
+  `login` VARCHAR(30) NOT NULL ,
+  `passwd` VARCHAR(32) NOT NULL ,
+  `email` VARCHAR(255) NOT NULL ,
+  `title` VARCHAR(255) NULL ,
+  `ip_restriction` TEXT NULL ,
+  `reminder_key` CHAR(30) NULL ,
+  `reminder_date` DATETIME NULL ,
+  PRIMARY KEY (`~db prefix~bo_user_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~bo_user_to_section`;
-CREATE TABLE IF NOT EXISTS `~db prefix~bo_user_to_section` (
-	`~db prefix~bo_user_id` char(10) NOT NULL default '',
-	`~db prefix~bo_section_id` char(10) NOT NULL default '',
-	PRIMARY KEY (`~db prefix~bo_user_id`,`~db prefix~bo_section_id`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~bo_user_to_section` (
+  `~db prefix~bo_user_id` CHAR(10) NOT NULL ,
+  `~db prefix~bo_section_id` CHAR(10) NOT NULL ,
+  PRIMARY KEY (`~db prefix~bo_user_id`, `~db prefix~bo_section_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~fo_data`;
-CREATE TABLE IF NOT EXISTS `~db prefix~fo_data` (
-	`~db prefix~fo_data_id` char(30) NOT NULL default '',
-	`~db prefix~fo_document_id` char(30) NOT NULL default '',
-	`~db prefix~fo_handler_id` char(10) NOT NULL default '',
-	`~db prefix~fo_data_content_type_id` varchar(10) NOT NULL default '',
-	`auth_status_id` int(11) NOT NULL default '0',
-	`tag` varchar(255) NOT NULL default '',
-	`title` varchar(255) NOT NULL default '',
-	`content` text NOT NULL,
-	`apply_type_id` int(11) NOT NULL default '1',
-	`is_mount` tinyint(1) NOT NULL default '0',
-	`is_published` tinyint(1) NOT NULL default '0',
-	`sort_order` int(11) NOT NULL default '0',
-	PRIMARY KEY (`~db prefix~fo_data_id`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~fo_data` (
+  `~db prefix~fo_data_id` CHAR(30) NOT NULL ,
+  `~db prefix~fo_document_id` CHAR(30) NOT NULL ,
+  `~db prefix~fo_handler_id` CHAR(10) NULL ,
+  `~db prefix~fo_data_content_type_id` CHAR(10) NOT NULL ,
+  `auth_status_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
+  `tag` VARCHAR(255) NOT NULL ,
+  `title` VARCHAR(255) NOT NULL ,
+  `content` TEXT NULL ,
+  `apply_type_id` SMALLINT UNSIGNED NOT NULL DEFAULT 1 ,
+  `is_mount` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 ,
+  `is_published` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 ,
+  `sort_order` INT UNSIGNED NULL ,
+  PRIMARY KEY (`~db prefix~fo_data_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~fo_data_content_type`;
-CREATE TABLE IF NOT EXISTS `~db prefix~fo_data_content_type` (
-	`~db prefix~fo_data_content_type_id` varchar(10) NOT NULL default '',
-	`title` varchar(255) NOT NULL default '',
-	`is_published` tinyint(1) NOT NULL default '0',
-	`sort_order` int(11) NOT NULL default '0',
-	PRIMARY KEY (`~db prefix~fo_data_content_type_id`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~fo_data_content_type` (
+  `~db prefix~fo_data_content_type_id` CHAR(10) NOT NULL ,
+  `title` VARCHAR(255) NOT NULL ,
+  `is_published` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 ,
+  `sort_order` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`~db prefix~fo_data_content_type_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~fo_document`;
-CREATE TABLE IF NOT EXISTS `~db prefix~fo_document` (
-	`~db prefix~fo_document_id` varchar(30) NOT NULL default '',
-	`~db prefix~fo_handler_id` char(10) NOT NULL default '',
-	`parent_id` varchar(30) NOT NULL default '',
-	`auth_status_id` int(11) NOT NULL default '0',
-	`title` varchar(255) NOT NULL default '',
-	`title_compact` varchar(255) NOT NULL default '',
-	`folder` varchar(255) NOT NULL default '',
-	`link` varchar(255) NOT NULL default '',
-	`uri` varchar(255) NOT NULL default '',
-	`is_published` tinyint(1) NOT NULL default '0',
-	`sort_order` int(11) NOT NULL default '0',
-	PRIMARY KEY (`~db prefix~fo_document_id`),
-	UNIQUE KEY `~db prefix~fo_document_uri` (`uri`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~fo_document` (
+  `~db prefix~fo_document_id` CHAR(30) NOT NULL ,
+  `~db prefix~fo_handler_id` CHAR(10) NOT NULL ,
+  `parent_id` CHAR(30) NULL ,
+  `auth_status_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
+  `title` VARCHAR(255) NOT NULL ,
+  `title_compact` VARCHAR(255) NULL ,
+  `folder` VARCHAR(255) NOT NULL ,
+  `link` VARCHAR(255) NULL ,
+  `uri` VARCHAR(255) NOT NULL ,
+  `is_published` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 ,
+  `sort_order` INT UNSIGNED NOT NULL ,
+  PRIMARY KEY (`~db prefix~fo_document_id`) ,
+  UNIQUE INDEX `uq_~db prefix~fo_document_uri` (`uri` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~fo_document_to_navigation`;
-CREATE TABLE IF NOT EXISTS `~db prefix~fo_document_to_navigation` (
-	`~db prefix~fo_document_id` char(30) NOT NULL default '',
-	`~db prefix~fo_navigation_id` char(30) NOT NULL default '',
-	PRIMARY KEY (`~db prefix~fo_document_id`,`~db prefix~fo_navigation_id`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~fo_document_to_navigation` (
+  `~db prefix~fo_document_id` CHAR(30) NOT NULL ,
+  `~db prefix~fo_navigation_id` CHAR(30) NOT NULL ,
+  PRIMARY KEY (`~db prefix~fo_document_id`, `~db prefix~fo_navigation_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~fo_handler`;
-CREATE TABLE IF NOT EXISTS `~db prefix~fo_handler` (
-	`~db prefix~fo_handler_id` char(10) NOT NULL default '',
-	`type_id` int(11) NOT NULL default '0',
-	`title` varchar(255) NOT NULL default '',
-	`filename` varchar(30) NOT NULL default '',
-	`is_document_main` tinyint(1) NOT NULL default '0',
-	`is_multiple` tinyint(1) NOT NULL default '0',
-	`is_published` tinyint(1) NOT NULL default '0',
-	PRIMARY KEY (`~db prefix~fo_handler_id`),
-	UNIQUE KEY `~db prefix~fo_handler_filename` (`type_id`,`filename`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~fo_handler` (
+  `~db prefix~fo_handler_id` CHAR(10) NOT NULL ,
+  `type_id` SMALLINT UNSIGNED NOT NULL ,
+  `title` VARCHAR(255) NOT NULL ,
+  `filename` VARCHAR(255) NOT NULL ,
+  `is_document_main` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 ,
+  `is_multiple` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 ,
+  `is_published` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`~db prefix~fo_handler_id`) ,
+  UNIQUE INDEX `uq_~db prefix~fo_handler_handler_filename` (`type_id` ASC, `filename` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~fo_navigation`;
-CREATE TABLE IF NOT EXISTS `~db prefix~fo_navigation` (
-	`~db prefix~fo_navigation_id` varchar(30) NOT NULL default '',
-	`name` varchar(255) NOT NULL default '',
-	`title` varchar(255) NOT NULL default '',
-	`type` enum('list','tree') NOT NULL default 'list',
-	`is_published` tinyint(1) NOT NULL default '0',
-	`sort_order` int(11) NOT NULL default '0',
-	PRIMARY KEY (`~db prefix~fo_navigation_id`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~fo_navigation` (
+  `~db prefix~fo_navigation_id` CHAR(30) NOT NULL ,
+  `name` VARCHAR(255) NOT NULL ,
+  `title` VARCHAR(255) NOT NULL ,
+  `type` ENUM('list','tree') NOT NULL DEFAULT 'list' ,
+  `is_published` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 ,
+  `sort_order` INT(11) UNSIGNED NULL ,
+  PRIMARY KEY (`~db prefix~fo_navigation_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~session`;
-CREATE TABLE IF NOT EXISTS `~db prefix~session` (
-	`~db prefix~session_id` varchar(30) NOT NULL default '',
-	`is_ip_match` tinyint(1) NOT NULL default '0',
-	`is_logged_in` tinyint(1) NOT NULL default '0',
-	`user_id` varchar(30) NOT NULL default '',
-	`user_agent` varchar(32) NOT NULL default '',
-	`user_ip` varchar(15) NOT NULL default '',
-	`life_span` int(11) NOT NULL default '0',
-	`timeout` int(11) NOT NULL default '0',
-	`creation_date` datetime NOT NULL default '0000-00-00 00:00:00',
-	`last_impression_date` datetime default NULL,
-	`valid_date` datetime default NULL,
-	PRIMARY KEY (`~db prefix~session_id`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~session` (
+  `~db prefix~session_id` CHAR(30) NOT NULL ,
+  `is_ip_match` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 ,
+  `is_logged_in` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 ,
+  `user_id` CHAR(30) NULL ,
+  `user_agent` CHAR(32) NULL ,
+  `user_ip` CHAR(15) NULL ,
+  `life_span` INT UNSIGNED NULL ,
+  `timeout` INT UNSIGNED NULL ,
+  `creation_date` DATETIME NULL ,
+  `last_impression_date` DATETIME NULL ,
+  `valid_date` DATETIME NULL ,
+  PRIMARY KEY (`~db prefix~session_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~session_param`;
-CREATE TABLE IF NOT EXISTS `~db prefix~session_param` (
-	`~db prefix~session_param_id` int(11) NOT NULL auto_increment,
-	`~db prefix~session_id` varchar(30) NOT NULL default '0',
-	`name` varchar(30) NOT NULL default '',
-	`value` text NOT NULL,
-	PRIMARY KEY (`~db prefix~session_param_id`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~session_param` (
+  `~db prefix~session_param_id` INT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `~db prefix~session_id` CHAR(30) NOT NULL ,
+  `name` VARCHAR(30) NOT NULL ,
+  `value` TEXT NOT NULL ,
+  PRIMARY KEY (`~db prefix~session_param_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 DROP TABLE IF EXISTS `~db prefix~user`;
-CREATE TABLE IF NOT EXISTS `~db prefix~user` (
-	`~db prefix~user_id` varchar(30) NOT NULL default '',
-	`status_id` int(11) NOT NULL default '0',
-	`first_name` varchar(255) NOT NULL default '',
-	`last_name` varchar(255) NOT NULL default '',
-	`patronymic_name` varchar(255) NOT NULL default '',
-	`email` varchar(255) NOT NULL default '',
-	`phone_code` varchar(255) NOT NULL default '',
-	`phone` varchar(255) NOT NULL default '',
-	`passwd` varchar(32) NOT NULL default '',
-	`reminder_key` varchar(30) NOT NULL default '',
-	`reminder_date` datetime NOT NULL default '0000-00-00 00:00:00',
-	`creation_date` datetime NOT NULL default '0000-00-00 00:00:00',
-	PRIMARY KEY (`~db prefix~user_id`),
-	UNIQUE KEY `~db prefix~user_email` (`email`)
-) ENGINE=MyISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+CREATE  TABLE IF NOT EXISTS `~db prefix~user` (
+  `~db prefix~user_id` CHAR(30) NOT NULL ,
+  `status_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
+  `first_name` VARCHAR(255) NULL ,
+  `last_name` VARCHAR(255) NULL ,
+  `patronymic_name` VARCHAR(255) NULL ,
+  `email` VARCHAR(255) NOT NULL ,
+  `phone_code` VARCHAR(255) NULL ,
+  `phone` VARCHAR(255) NULL ,
+  `passwd` CHAR(32) NOT NULL ,
+  `reminder_key` CHAR(30) NULL ,
+  `reminder_date` DATETIME NULL ,
+  `creation_date` DATETIME NULL ,
+  PRIMARY KEY (`~db prefix~user_id`) ,
+  UNIQUE INDEX `uq_~db prefix~user_email` (`email` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;

@@ -1,6 +1,5 @@
 function documentDataUpdateBranch(eleId, documentId, dataBlockId) {
 	show_loading_bar();
-	wysiwygInit('none', 'advanced');
 
 	var postBody = 'id=' + documentId;
 	if (dataBlockId) postBody += '&data_id=' + dataBlockId;
@@ -19,7 +18,7 @@ function documentDataUpdateBranch(eleId, documentId, dataBlockId) {
 				onUpdate: item_sort
 			});
 
-			window.setTimeout('applyDataWysiwyg(); hide_loading_bar();', 200);
+			window.setTimeout('hide_loading_bar();', 200);
 		}
 	});
 }

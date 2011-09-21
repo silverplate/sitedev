@@ -201,8 +201,8 @@ class User extends ActiveRecord {
 	public static function GetBase() {
 		if (!isset(self::$Base)) {
 			self::$Base = new ActiveRecord(self::ComputeTblName());
-			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'int', 8, true);
-			self::$Base->AddAttribute('status_id', 'int', 11);
+			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'varchar', 30, true);
+			self::$Base->AddAttribute('status_id', 'int');
 			self::$Base->AddAttribute('first_name', 'varchar', 255);
 			self::$Base->AddAttribute('last_name', 'varchar', 255);
 			self::$Base->AddAttribute('patronymic_name', 'varchar', 255);

@@ -37,9 +37,7 @@
 				<link href="/cms/f/calendar/calendar.css" type="text/css" rel="stylesheet" />
 
 				<script src="/cms/f/js/prototype_150.js" type="text/javascript" language="JavaScript" />
-				<script src="/cms/f/tinymce/jscripts/tiny_mce/tiny_mce.js" type="text/javascript" language="javascript" />
 				<script src="/cms/f/js/scriptaculous_170/scriptaculous.js" type="text/javascript" language="JavaScript" />
-				<script src="/cms/f/js/wysiwyg.js" type="text/javascript" language="JavaScript" />
 				<script src="/cms/f/js/module_documents.js" type="text/javascript" language="JavaScript" />
 				<script src="/cms/f/js/cookies.js" type="text/javascript" language="JavaScript" />
 				<script src="/cms/f/js/scripts.js" type="text/javascript" language="JavaScript" />

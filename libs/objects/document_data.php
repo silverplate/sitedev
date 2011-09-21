@@ -177,14 +177,14 @@ class DocumentData extends ActiveRecord {
 			self::$Base->AddForeignKey(Document::GetBase());
 			self::$Base->AddForeignKey(Handler::GetBase());
 			self::$Base->AddForeignKey(DocumentDataContentType::GetBase());
-			self::$Base->AddAttribute('auth_status_id', 'int', 11);
+			self::$Base->AddAttribute('auth_status_id', 'int');
 			self::$Base->AddAttribute('tag', 'varchar', 255);
 			self::$Base->AddAttribute('title', 'varchar', 255);
 			self::$Base->AddAttribute('content', 'text');
-			self::$Base->AddAttribute('apply_type_id', 'int', 11);
+			self::$Base->AddAttribute('apply_type_id', 'int');
 			self::$Base->AddAttribute('is_mount', 'boolean');
 			self::$Base->AddAttribute('is_published', 'boolean');
-			self::$Base->AddAttribute('sort_order', 'int', 11);
+			self::$Base->AddAttribute('sort_order', 'int');
 		}
 
 		return self::$Base;

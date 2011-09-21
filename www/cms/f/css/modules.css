@@ -141,18 +141,6 @@ div.document_data {
 	cursor: move;
 }
 
-div.wysiwyg_switcher {
-	margin-top: 3px;
-	font-size: 0.84em;
-	padding-bottom: 1px;
-}
-
-div.wysiwyg_switcher a {
-	text-decoration: none;
-	border-bottom: 1px dashed #000;
-	cursor: pointer;
-}
-
 
 /*** Loading bar
 *********************************************************/

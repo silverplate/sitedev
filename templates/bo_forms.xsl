@@ -40,10 +40,6 @@
 				</xsl:choose>
 			</form>
 
-			<xsl:if test="//element[contains(@type, 'wysiwyg')]">
-				<script type="text/javascript">applyWysiwyg();</script>
-			</xsl:if>
-
             <xsl:if test="//element[contains(@type, 'text')]">
                 <script type="text/javascript">replaceTextareaCdata();</script>
             </xsl:if>
@@ -477,21 +473,17 @@
 				</div>
 			</xsl:when>
 
-			<xsl:when test="@type = 'text' or @type = 'short_text' or @type = 'large_text' or @type = 'wysiwyg' or @type = 'simple_wysiwyg'">
+			<xsl:when test="@type = 'text' or @type = 'short_text' or @type = 'large_text'">
 				<div class="form_float_ele">
 					<textarea name="{@name}" id="form_ele_{@name}">
 						<xsl:attribute name="class">
 							<xsl:value-of select="@type" />
-							<xsl:if test="contains(@type, 'wysiwyg')"> wysiwyg_form_ele_<xsl:value-of select="@name" /></xsl:if>
 						</xsl:attribute>
 						<xsl:choose>
 							<xsl:when test="error/value/text()"><xsl:value-of select="error/value/text()" disable-output-escaping="no" /></xsl:when>
 							<xsl:otherwise><xsl:value-of select="value/text()" disable-output-escaping="no" /></xsl:otherwise>
 						</xsl:choose>
 					</textarea>
-					<xsl:if test="contains(@type, 'wysiwyg') and additional[wysiwyg[@file_path]]">
-						<input type="hidden" id="wysiwyg_file_path_form_ele_{@name}" value="{additional/wysiwyg/@file_path}" />
-					</xsl:if>
 				</div>
 			</xsl:when>
 

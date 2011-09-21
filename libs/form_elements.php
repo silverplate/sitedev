@@ -1142,8 +1142,6 @@ class FormEleSingleTree extends FormEleChooser {}
 class FormEleText extends FormEle {}
 class FormEleShortText extends FormEleText {}
 class FormEleLargeText extends FormEleText {}
-class FormEleWysiwyg extends FormEleText {}
-class FormEleSimpleWysiwyg extends FormEleText {}
 
 
 interface FormEleInterface {

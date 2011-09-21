@@ -126,16 +126,24 @@ class ActiveRecord {
 		}
 	}
 
-	public static function GetQueryCondition($_attributes = array()) {
+	public static function getQueryCondition($_attributes = array())
+	{
 		$conditions = array();
 
 		foreach ($_attributes as $attribute => $value) {
-			if (!$value) {
-				array_push($conditions, $attribute . ' = \'\'');
-			} elseif (is_array($value)) {
-				array_push($conditions, $attribute . ' IN (' . Db::Get()->EscapeList($value) . ')');
+		    if ($value === 'NULL') {
+		        array_push($conditions, 'ISNULL(' . $attribute . ')');
+
+// 		    } else if (!$value) {
+// 				array_push($conditions, "$attribute = ''");
+
+			} else if (is_array($value)) {
+				array_push($conditions,
+				           $attribute . ' IN (' . get_db_data($value) . ')');
+
 			} else {
-				array_push($conditions, $attribute . ' = ' . get_db_data($value));
+				array_push($conditions,
+				           $attribute . ' = ' . get_db_data($value));
 			}
 		}
 
@@ -814,8 +822,8 @@ class ActiveRecordAttribute {
 	}
 
 	public function SetValue($_value) {
-        if ($_value == 'NULL') {
-            $this->Value = 'NULL';
+        if ($_value === 'NULL') {
+            $this->Value = $_value;
             return;
         }
 

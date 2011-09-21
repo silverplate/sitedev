@@ -77,8 +77,9 @@ function bo_ajax_get_branch_xml($_class_name, $_parent_id, $_exclude_id) {
 	global $g_open_branches;
 
 	$result = '';
-	$conditions = array('parent_id' => $_parent_id);
+	$conditions = array('parent_id' => empty($_parent_id) ? 'NULL' : $_parent_id);
 	$row_conditions = array();
+
 	if ($_exclude_id) {
 		array_push(
 			$row_conditions,

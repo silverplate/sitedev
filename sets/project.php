@@ -1,7 +1,8 @@
 <?php
 
-if (is_file('local.php')) {
-    require_once 'local.php';
+$localSettingsFile = dirname(__FILE__) . '/local.php';
+if (is_file($localSettingsFile)) {
+    require_once $localSettingsFile;
 }
 
 date_default_timezone_set('Europe/Moscow');

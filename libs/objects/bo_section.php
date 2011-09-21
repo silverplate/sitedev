@@ -153,7 +153,7 @@ class BoSection extends ActiveRecord {
 			self::$Base->AddAttribute('title', 'varchar', 255);
 			self::$Base->AddAttribute('uri', 'varchar', 255);
 			self::$Base->AddAttribute('description', 'text');
-			self::$Base->AddAttribute('sort_order', 'int', 11);
+			self::$Base->AddAttribute('sort_order', 'int');
 			self::$Base->AddAttribute('is_published', 'boolean');
 		}
 

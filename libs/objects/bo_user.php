@@ -297,7 +297,7 @@ class BoUser extends ActiveRecord {
 		if (!isset(self::$Base)) {
 			self::$Base = new ActiveRecord(self::ComputeTblName());
 			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'varchar', 10, true);
-			self::$Base->AddAttribute('status_id', 'int', 11);
+			self::$Base->AddAttribute('status_id', 'int');
 			self::$Base->AddAttribute('title', 'varchar', 255);
 			self::$Base->AddAttribute('login', 'varchar', 30);
 			self::$Base->AddAttribute('passwd', 'varchar', 32);

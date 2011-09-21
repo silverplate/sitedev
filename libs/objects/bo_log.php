@@ -179,7 +179,7 @@ class BoLog extends ActiveRecord {
 	public static function GetBase() {
 		if (!isset(self::$Base)) {
 			self::$Base = new ActiveRecord(self::ComputeTblName());
-			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'int', 11, true);
+			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'int', 10, true);
 			self::$Base->AddForeignKey(BoUser::GetBase());
 			self::$Base->AddForeignKey(BoSection::GetBase());
 			self::$Base->AddAttribute('section_name', 'varchar', 255);
@@ -191,7 +191,7 @@ class BoLog extends ActiveRecord {
 			self::$Base->AddAttribute('request_post', 'text');
 			self::$Base->AddAttribute('cookies', 'text');
 			self::$Base->AddAttribute('script_name', 'varchar', 255);
-			self::$Base->AddAttribute('action_id', 'int', 11);
+			self::$Base->AddAttribute('action_id', 'int');
 			self::$Base->AddAttribute('entry_id', 'varchar', 30);
 			self::$Base->AddAttribute('description', 'text');
 			self::$Base->AddAttribute('creation_date', 'datetime');

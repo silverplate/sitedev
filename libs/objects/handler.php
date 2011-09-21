@@ -119,7 +119,7 @@ class Handler extends ActiveRecord {
 		if (!isset(self::$Base)) {
 			self::$Base = new ActiveRecord(self::ComputeTblName());
 			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'varchar', 10, true);
-			self::$Base->AddAttribute('type_id', 'int', 11, null, true);
+			self::$Base->AddAttribute('type_id', 'int', null, null, true);
 			self::$Base->AddAttribute('title', 'varchar', 255);
 			self::$Base->AddAttribute('filename', 'varchar', 30, null, true);
 			self::$Base->AddAttribute('is_document_main', 'boolean');

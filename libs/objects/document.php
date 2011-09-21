@@ -289,7 +289,24 @@ class Document extends ActiveRecord {
 
 		if ($_conditions) {
 			foreach ($_conditions as $attribute => $value) {
-				array_push($result['row_conditions'], $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . get_db_data($value) . ')' : ' = ' . get_db_data($value)));
+                if ($value === 'NULL') {
+                    array_push(
+                        $result['row_conditions'],
+                        'ISNULL(' . $self['table'] . '.' . $attribute . ')'
+                    );
+
+                } else if (is_array($value)) {
+                    array_push(
+                        $result['row_conditions'],
+                        $self['table'] . '.' . $attribute . ' IN (' . get_db_data($value) . ')'
+                    );
+
+                } else {
+                    array_push(
+                        $result['row_conditions'],
+                        $self['table'] . '.' . $attribute . ' = ' . get_db_data($value)
+                    );
+                }
 			}
 		}
 
@@ -402,14 +419,14 @@ class Document extends ActiveRecord {
 			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'varchar', 30, true);
 			self::$Base->AddForeignKey(Handler::GetBase());
 			self::$Base->AddAttribute('parent_id', 'varchar', 30);
-			self::$Base->AddAttribute('auth_status_id', 'int', 11);
+			self::$Base->AddAttribute('auth_status_id', 'int');
 			self::$Base->AddAttribute('title', 'varchar', 255);
 			self::$Base->AddAttribute('title_compact', 'varchar', 255);
 			self::$Base->AddAttribute('folder', 'varchar', 255);
 			self::$Base->AddAttribute('link', 'varchar', 255);
 			self::$Base->AddAttribute('uri', 'varchar', 255);
 			self::$Base->AddAttribute('is_published', 'boolean');
-			self::$Base->AddAttribute('sort_order', 'int', 11);
+			self::$Base->AddAttribute('sort_order', 'int');
 		}
 
 		return self::$Base;

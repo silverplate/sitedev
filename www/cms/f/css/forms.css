@@ -160,9 +160,7 @@ table.chooser_item td.chooser_label {
 
 textarea.text,
 textarea.short_text,
-textarea.large_text,
-textarea.wysiwyg,
-textarea.simple_wysiwyg {
+textarea.large_text {
 	width: 400px;
 	height: 100px;
 	font-family: Lucida Console, Consolas, Arial;
@@ -174,14 +172,6 @@ textarea.short_text {
 
 textarea.large_text {
 	height: 150px;
-}
-
-textarea.wysiwyg {
-	height: 250px;
-}
-
-textarea.simple_wysiwyg {
-	height: 125px;
 }
 
 td.alone .form_float_ele {

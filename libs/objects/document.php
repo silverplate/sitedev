@@ -117,16 +117,22 @@ class Document extends ActiveRecord {
 		}
 	}
 
-	private function ComputeUri($_parent_uri = null) {
-		if (!is_null($_parent_uri)) {
-			$uri = $_parent_uri;
+	private function computeUri($_parentUri = null)
+	{
+		if (!is_null($_parentUri)) {
+			$uri = $_parentUri;
 
-		} elseif ($this->GetAttribute('parent_id')) {
-			$parent = self::Load($this->GetAttribute('parent_id'));
-			$uri = $parent->GetAttribute('uri');
+		} else if (
+		    $this->getAttribute('parent_id') &&
+		    $this->getAttribute('parent_id') !== 'NULL'
+		) {
+			$parent = self::load($this->getAttribute('parent_id'));
+			$uri = $parent->getAttribute('uri');
 		}
 
-		if (!isset($uri)) $uri = '/';
+		if (!isset($uri)) {
+		    $uri = '/';
+		}
 
         $folder = $this->getAttribute('folder');
 
@@ -138,7 +144,7 @@ class Document extends ActiveRecord {
 			}
 		}
 
-		$this->SetAttribute('uri', $uri);
+		$this->setAttribute('uri', $uri);
 	}
 
 	public static function UpdateChildrenUri($_id = null) {

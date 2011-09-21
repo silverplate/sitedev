@@ -1,16 +1,3 @@
-function getParentElement(_parent, _name)
-{
-    if (_name.toLowerCase() == _parent.nodeName.toLowerCase()) {
-        return _parent;
-
-    } else if (_parent.parentNode) {
-        return getParentElement(_parent.parentNode, _name);
-
-    } else {
-        return false;
-    }
-}
-
 function get_random() {
 	return Math.round(Math.random() * Math.random() * 100000);
 }
@@ -47,48 +34,6 @@ function change_element_visibility(id, is_visible) {
 	var element = document.getElementById(id);
 	if (element) {
 		element.style.display = is_visible || (is_visible == null && element.style.display != 'block') ? 'block' : 'none';
-	}
-}
-
-
-/*** Loading bar
-*********************************************************/
-var loadings = 0;
-
-function show_loading_bar() {
-	var loading_ele = document.getElementById('loading');
-	if (loading_ele && loadings == 0) {
-		loading_ele.style.display = 'block';
-		wait_cursor(true);
-	}
-	loadings++;
-}
-
-function hide_loading_bar() {
-	var ele_loading = document.getElementById('loading');
-	loadings--;
-	if (ele_loading && loadings == 0) {
-		if (ele_loading) ele_loading.style.display = 'none';
-		wait_cursor(false);
-	}
-}
-
-function wait_cursor(is_on) {
-	var body_ele = document.getElementsByTagName('body');
-	if (body_ele) {
-		var classes = body_ele[0].className.split(' ');
-		var class_name = '';
-
-		for (var i = 0; i < classes.length; i++) {
-			if (classes[i] != 'wait') {
-				class_name = (class_name != '' ? ' ' : '') + classes[i];
-			}
-			if (is_on) {
-				class_name = (class_name != '' ? ' ' : '') + 'wait';
-			}
-		}
-
-		body_ele[0].className = class_name;
 	}
 }
 
@@ -157,55 +102,50 @@ function remove_form_file_input(name, element) {
 	}
 }
 
-function delete_file(ele, path) {
-	if (confirm('Удалить файл немедленно?')) {
-		show_loading_bar();
+function delete_file(_ele, _path) {
+	if (confirm("Удалить файл немедленно?")) {
+		showLoadingBar();
 
-		new Ajax.Request('/cms/ajax_delete_file.php', {
-			asynchronous: true,
-			method: 'post',
-			postBody: 'f=' + path,
-			onSuccess: function (r) {
-				if (r.responseText == 1) {
-					var file = ele.parentNode;
-					var parent = file.parentNode;
-					parent.removeChild(file);
+        $.post(
+            "/cms/ajax_delete_file.php",
+            "f=" + _path,
+            function (_response) {
+                if (_response == "1") {
+                    var file = _ele.parentNode;
+                    var parent = file.parentNode;
+                    parent.removeChild(file);
 
-					var is_child = false;
-					for (var i = 0; i < parent.childNodes.length; i++) {
-						if (parent.childNodes[i].nodeType == 1) {
-							is_child = true;
-						}
-					}
+                    var hasChild = false;
+                    for (var i = 0; i < parent.childNodes.length; i++) {
+                        if (parent.childNodes[i].nodeType == 1) {
+                            hasChild = true;
+                            break;
+                        }
+                    }
 
-					if (!is_child) parent.parentNode.removeChild(parent);
-				}
+                    if (!hasChild) {
+                        parent.parentNode.removeChild(parent);
+                    }
+                }
 
-				hide_loading_bar();
-			}
-		});
+                hideLoadingBar();
+            }
+        );
 	}
 }
 
-function item_sort(ele) {
-	var inputs = ele.getElementsByTagName('input');
-	var post_body = '';
+function itemSort(_event, _ui)
+{
+	var inputs = _ui.item.parent().find("input[type = 'hidden']");
+	var postBody = "";
 
 	for (var i = 0; i < inputs.length; i++) {
-		if (inputs[i].getAttribute('type') == 'hidden') {
-			if (post_body != '') post_body += '&';
-			post_body += 'items[]=' + inputs[i].value;
-		}
+        postBody += "&items[]=" + inputs[i].value;
 	}
 
-	if (post_body) {
-		show_loading_bar();
-		new Ajax.Request('ajax_sort.php', {
-			asynchronous: true,
-			method: 'post',
-			postBody: post_body,
-			onSuccess: hide_loading_bar
-		});
+	if (postBody) {
+		showLoadingBar();
+        $.post("ajax_sort.php", postBody.substr(1), hideLoadingBar);
 	}
 }
 
@@ -220,7 +160,9 @@ function addTripleLink(_name)
 
     var containerEle = document.getElementById(_name);
     if (containerEle) {
-        var count = containerEle.getElementsByTagName('table').length;
+        var count = containerEle.getElementsByTagName("table").length;
+
+/*
         new Ajax.Request('ajax_' + _name + '.php', {
             method: 'post',
             postBody: 'name=' + _name + '&position=' + tripleLinkCounter + '&count=' + count,
@@ -235,6 +177,21 @@ function addTripleLink(_name)
                 hideLoadingBar();
             }
         });
+ */
+        $.post(
+            "ajax_" + _name + ".php",
+            "name=" + _name + "&position=" + tripleLinkCounter + "&count=" + count,
+            function (_response) {
+                if (_response) {
+                    var ele = document.createElement("ins");
+                    ele.innerHTML = _response;
+                    containerEle.appendChild(ele);
+                    tripleLinkCounter++;
+                }
+
+                hideLoadingBar();
+            }
+        );
     }
 }
 

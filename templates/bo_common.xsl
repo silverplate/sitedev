@@ -324,7 +324,11 @@
 		</ul>
 
 		<xsl:if test="@is_sortable">
-			<script type="text/javascript" language="JavaScript">Sortable.create('filter_content', {onUpdate: item_sort});</script>
+			<script type="text/javascript">
+			    $(function() {
+			        $("#filter_content").sortable({update: itemSort});
+			    });
+			</script>
 		</xsl:if>
 	</xsl:template>
 

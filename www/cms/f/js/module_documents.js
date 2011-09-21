@@ -1,24 +1,25 @@
-function documentDataUpdateBranch(eleId, documentId, dataBlockId) {
-	show_loading_bar();
+function documentDataUpdateBranch(_eleId, _documentId, _dataBlockId)
+{
+	showLoadingBar();
 
-	var postBody = 'id=' + documentId;
-	if (dataBlockId) postBody += '&data_id=' + dataBlockId;
+	var postBody = "id=" + _documentId;
+	if (_dataBlockId) {
+	    postBody += "&data_id=" + _dataBlockId;
+	}
 
-	new Ajax.Request('http_request_data.php', {
-		asynchronous: true,
-		method: 'post',
-		postBody: postBody,
-		onComplete: function(r) {
-			document.getElementById(eleId).innerHTML = r.responseText;
+    $.post(
+        "http_request_data.php",
+        postBody,
+        function (_response) {
+            $("#" + _eleId).html(_response);
 
-			Sortable.create('document_data_blocks', {
-				tag: 'div',
-				only: 'document_data',
-				delay: 500,
-				onUpdate: item_sort
-			});
+            $("#document_data_blocks").sortable({
+                delay: 500,
+                items: "div.document_data",
+                update: itemSort
+            });
 
-			window.setTimeout('hide_loading_bar();', 200);
-		}
-	});
+			hideLoadingBar();
+        }
+    );
 }

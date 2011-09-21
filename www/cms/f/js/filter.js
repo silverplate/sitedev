@@ -39,7 +39,7 @@ function filter_update(ele_name, is_form_submit, is_sortable, is_date) {
 	}
 
 	if (form_ele && ele && (!is_date || (from && till))) {
-		show_loading_bar();
+		showLoadingBar();
 
 		if (is_date) {
 			setCookie('filter_from', from.toGMTString());
@@ -79,25 +79,24 @@ function filter_update(ele_name, is_form_submit, is_sortable, is_date) {
 			}
 		}
 
-		new Ajax.Request('ajax_filter.php', {
-			asynchronous: true,
-			method: 'post',
-			postBody: Form.serialize(form_ele),
-			onSuccess: function (r) {
-				ele.innerHTML = r.responseText;
+        $.post(
+            "ajax_filter.php",
+            $(form_ele).serialize(),
+            function(_response) {
+                ele.innerHTML = _response;
 
-				if (r.responseText.indexOf('Нет') != 0 && is_sortable) {
-					Sortable.create(ele_name, {onUpdate: item_sort});
-				}
+                if (_response.indexOf("Нет") != 0 && is_sortable) {
+                    $(ele).sortable({update: itemSort});
+                }
 
-				hide_loading_bar();
-			}
-		});
+                hideLoadingBar();
+            }
+        );
 	}
 }
 
 function filter_update_nav(page, is_sortable) {
-	show_loading_bar();
+	showLoadingBar();
 
 	var form_ele = document.getElementById('filter');
 	var ele = document.getElementById('filter_content');
@@ -105,18 +104,23 @@ function filter_update_nav(page, is_sortable) {
 
 	setCookie('filter_page', page);
 
-	new Ajax.Request('ajax_filter.php', {
-		asynchronous: true,
-		method: 'post',
-		postBody: Form.serialize(form_ele) + '&page=' + page + (selected_ele ? '&filter_selected_id=' + selected_ele.value : ''),
-		onSuccess: function (r) {
-			ele.innerHTML = r.responseText;
+    var postBody = $(form_ele).serialize() + "&page=" + page;
 
-			if (r.responseText.indexOf('Нет') != 0 && is_sortable) {
-				Sortable.create('filter_content', {onUpdate: item_sort});
-			}
+    if (selected_ele) {
+        postBody += "&filter_selected_id=" + selected_ele.value;
+    }
 
-			hide_loading_bar();
-		}
-	});
+    $.post(
+        "ajax_filter.php",
+        postBody,
+        function(_response) {
+            ele.innerHTML = _response;
+
+            if (_response.indexOf("Нет") != 0 && is_sortable) {
+                $(ele).sortable({update: itemSort});
+            }
+
+            hideLoadingBar();
+        }
+    );
 }

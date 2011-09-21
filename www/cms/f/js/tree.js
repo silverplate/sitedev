@@ -4,45 +4,59 @@ treeIconPlus.src = '/cms/f/icon_plus.gif';
 var treeIconMinus = new Image(9, 9);
 treeIconMinus.src = '/cms/f/icon_minus.gif';
 
-function treeLoad(updateEleId, moduleName, fieldName, parentId, type) {
-	show_loading_bar();
+function treeLoad(_updateEleId, _moduleName, _fieldName, _parentId, _type)
+{
+	showLoadingBar();
 
-	var postBody = 'module_name=' + moduleName + '&field_name=' + fieldName + '&type=' + type;
-	if (parentId) postBody += '&parent_id=' + parentId;
+	var postBody = "module_name=" + _moduleName
+	             + "&field_name=" + _fieldName
+	             + "&type=" + _type;
 
-	if (type != 'list') {
-		var currentObjectEle = document.getElementById('current_object_id');
-		if (currentObjectEle && currentObjectEle.value) postBody += '&current_object_id=' + currentObjectEle.value;
+	if (_parentId) {
+	    postBody += "&parent_id=" + _parentId;
 	}
 
-	var selectedIds = eval('formTreeValues_' + fieldName);
+	if (_type != "list") {
+		var currentObjectEle = document.getElementById("current_object_id");
+		if (currentObjectEle && currentObjectEle.value) {
+		    postBody += "&current_object_id=" + currentObjectEle.value;
+		}
+	}
+
+	var selectedIds = eval("formTreeValues_" + _fieldName);
 	if (selectedIds) {
 		for (var i = 0; i < selectedIds.length; i++) {
-			postBody += '&selected_ids[]=' + selectedIds[i];
+			postBody += "&selected_ids[]=" + selectedIds[i];
 		}
 	}
 
-	new Ajax.Updater(updateEleId, 'ajax_tree.php', {
-		asynchronous: true,
-		method: 'post',
-		postBody: postBody,
-		onComplete: function () {
-			if (type == 'list') {
-				Sortable.create('tree_list', {
-					tag: 'div',
-					only: 'sort_item',
-					tree: true,
-					treeTag: 'div',
-					delay: 500,
-					onUpdate: function(ele) {
-						updateTree(ele, fieldName);
-					}
-				});
-			}
+    $.post(
+        "ajax_tree.php",
+        postBody,
+        function(_response) {
+            $("#" + _updateEleId).html(_response);
 
-			hide_loading_bar();
-		}
-	});
+            if (_type == "list") {
+                $("#tree_list").sortable({
+                    delay: 500,
+/*
+                    opacity: 0.3,
+                    placeholder: "sort-placeholer",
+                    forcePlaceholderSize: true,
+ */
+                    items: "div.sort_item",
+                    update: function() {
+                        updateTree(document.getElementById(_updateEleId),
+                                   _fieldName);
+                    }
+                });
+
+                $( "#tree_list" ).disableSelection();
+            }
+
+            hideLoadingBar();
+        }
+    );
 }
 
 function updateTree(ele, fieldName) {
@@ -50,7 +64,7 @@ function updateTree(ele, fieldName) {
 	getTreeBranchIds('tree_list', ele, fieldName);
 
 	if (treeBranches.length > 0) {
-		show_loading_bar();
+		showLoadingBar();
 		var postBody = '';
 		var j;
 
@@ -61,13 +75,8 @@ function updateTree(ele, fieldName) {
 			}
 		}
 
-		new Ajax.Request('ajax_tree_sort.php', {
-			asynchronous: true,
-			method: 'post',
-			postBody: postBody.substr(1),
-			onComplete: hide_loading_bar
-		});
-	}
+        $.post("ajax_tree_sort.php", postBody.substr(1), hideLoadingBar);
+    }
 }
 
 function getTreeBranchIds(parentEleId, ele, fieldName) {

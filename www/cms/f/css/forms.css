@@ -202,7 +202,7 @@ table.form_date td.datetime_separator,
 table.form_date td.time_separator {
 	font-size: 0.8em;
 	padding: 0 3px;
-	color: #666;
+	color: #666666;
 }
 
 table.form_date td.date_separator {
@@ -400,3 +400,11 @@ div.sort_item {
 div.sort_item a {
 	cursor: pointer;
 }
+
+/*
+.sort-placeholer
+{
+    border: 1px dotted #36c;
+    width: 150px;
+}
+*/

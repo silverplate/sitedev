@@ -5,11 +5,6 @@
 	<group name="main">
 		<title>Страница</title>
 
-		<element name="folder" type="folder" is_required="true">
-			<label>Папка</label>
-			<description>Можно использовать латинские буквы, цифры и&nbsp;знак подчеркивания.</description>
-		</element>
-
 		<element name="title" type="string" is_required="true">
 			<label>Название</label>
 		</element>
@@ -17,6 +12,11 @@
 		<element name="title_compact" type="word">
 			<label>Компактное название</label>
 			<description>Будет использоваться в&nbsp;навигации вместо длинного названия.</description>
+		</element>
+
+		<element name="folder" type="folder" is_required="true">
+			<label>Папка</label>
+			<description>Можно использовать латинские буквы, цифры и&nbsp;знак подчеркивания.</description>
 		</element>
 
 		<element name="link" type="string">

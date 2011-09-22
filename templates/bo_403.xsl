@@ -76,7 +76,7 @@
 									<xsl:if test="/node()/system/session[@action = 6 or @action = 7]">
 										<xsl:attribute name="style">display: none;</xsl:attribute>
 									</xsl:if>
-									<span onclick="password_reminder(true);">Я забыл пароль</span>
+									<span onclick="password_reminder(true);">Я не помню пароль</span>
 								</div>
 
 								<table id="auth_reminder">

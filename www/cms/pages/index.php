@@ -15,6 +15,10 @@ if ($page->IsAuthorized()) {
 	}
 
 	if (isset($obj)) {
+	    $templateKey = TemplateDb::getPri();
+	    $documentTbl = Document::getTbl();
+	    $documentKey = Document::getPri();
+
 		$form = new Form();
 		$form->Load('document_form.xml');
 
@@ -25,9 +29,14 @@ if ($page->IsAuthorized()) {
 		$tmp = array();
 		foreach ($form->Elements as $name => $ele) {
 			if ($name == 'fo_handler_id') {
-				$tmp[Handler::GetPri()] = $ele;
-				$tmp[Handler::GetPri()]->SetName(Handler::GetPri());
-	
+			    $key = Handler::getPri();
+				$tmp[$key] = $ele;
+				$tmp[$key]->SetName($key);
+
+			} else if ($name == 'fo_template_id') {
+				$tmp[$templateKey] = $ele;
+				$tmp[$templateKey]->setName($templateKey);
+
 			} else {
 				$tmp[$name] = $ele;
 			}
@@ -45,34 +54,64 @@ if ($page->IsAuthorized()) {
 			$form->Elements[Handler::GetPri()]->AddOption($item->GetId(), $item->GetTitle());
 		}
 
+        $usedCond = '';
+        if ($obj->getId()) {
+            $usedCond = "WHERE $documentKey != " . $obj->getDbId();
+        }
+
+        $mainTemplateId = null;
+        $used = Db::get()->getList("SELECT $templateKey
+                                    FROM $documentTbl
+                                    $usedCond
+                                    GROUP BY $templateKey");
+        $templates = array();
+        $templatesParams = array('sort_order' => 'is_document_main DESC, title');
+        foreach (Template::getList(null, $templatesParams) as $id => $item) {
+            if (
+                ($obj->getId() && $obj->$templateKey == $id) ||
+                ($item->isPublished && ($item->isMultiple || !in_array($id, $used)))
+            ) {
+                $templates[$id] = $item->getTitle();
+            }
+
+            if ($item->isDocumentMain && $item->isPublished) {
+                $mainTemplateId = $id;
+            }
+        }
+
+		foreach ($templates as $id => $title) {
+			$form->Elements[$templateKey]->addOption($id, $title);
+		}
+
 		if (IS_USERS) {
-			$form->Groups['main']->AddElement($form->CreateElement('auth_status_id', 'chooser', 'Страница доступна'));
+			$form->Groups['system']->AddElement($form->CreateElement('auth_status_id', 'chooser', 'Страница доступна'));
 			foreach (User::GetAuthGroups() as $id => $params) {
 				$form->Elements['auth_status_id']->AddOption($id, strtolower_utf8($params['title1']));
 			}
 		}
 
-		$form->Groups['main']->AddElement($form->CreateElement('folder', 'folder', 'Папка', true));
-		$form->Elements['folder']->SetDescription('Можно использовать латинские буквы, цифры и&nbsp;знак подчеркивания.');
-		$form->Groups['main']->AddElement($form->CreateElement('parent_id', 'single_tree', 'Раздел'));
-		
 		if ($obj->GetId()) {
 			$form->FillFields($obj->GetAttributeValues());
+
 			$form->Elements['navigations']->SetValue($obj->GetLinkIds('navigations'));
 
 			foreach ($obj->GetFiles() as $item) {
 				$form->Elements['files']->AddAdditionalXml($item->GetXml());
 			}
 
-			$content_group = $form->CreateGroup('content', 'Содержание');
-			$content_group->AddAdditionalXml('<document_data />');
-
+            $form->Groups['content']->addAdditionalXml('<document_data />');
 			$form->CreateButton('Сохранить', 'update');
 			$form->CreateButton('Удалить', 'delete');
+
 		} else {
+            if ($mainTemplateId) {
+                $form->Elements[$templateKey]->setValue($mainTemplateId);
+            }
+
+            unset($form->Groups['content']);
 			$form->CreateButton('Сохранить', 'insert');
 		}
-		
+
 		$form->Execute();
 
 		if ($form->UpdateStatus == FORM_UPDATED) {
@@ -81,6 +120,9 @@ if ($page->IsAuthorized()) {
 
 			if ($is_root && $is_unique) {
 				$obj->DataInit($form->GetSqlValues());
+				if (!$obj->getAttribute('parent_id')) {
+				    $obj->setAttribute('parent_id', 'NULL');
+				}
 
 				if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 					$obj->Delete();

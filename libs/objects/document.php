@@ -4,6 +4,7 @@ class Document extends ActiveRecord {
 	private static $Base;
 	private $IsChildren;
 	private $Handler;
+	private $_template;
 	private $Language;
 	protected $Links = array('navigations' => null);
 
@@ -257,6 +258,17 @@ class Document extends ActiveRecord {
 		return $this->Handler;
 	}
 
+	public function getTemplate()
+	{
+		if (is_null($this->_template)) {
+		    $key = TemplateDb::getPri();
+		    $id = $this->getAttribute($key);
+		    $this->_template = $id ? Template::getById($id) : false;
+		}
+
+		return $this->_template;
+	}
+
 	public function GetHandlerFile() {
 		return $this->GetHandler() ? $this->GetHandler()->GetFilename() : false;
 	}
@@ -424,6 +436,7 @@ class Document extends ActiveRecord {
 			self::$Base = new ActiveRecord(self::ComputeTblName());
 			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'varchar', 30, true);
 			self::$Base->AddForeignKey(Handler::GetBase());
+			self::$Base->addForeignKey(TemplateDb::getBase());
 			self::$Base->AddAttribute('parent_id', 'varchar', 30);
 			self::$Base->AddAttribute('auth_status_id', 'int');
 			self::$Base->AddAttribute('title', 'varchar', 255);

@@ -118,23 +118,24 @@ class FormEle implements FormEleInterface {
 			$xml .= '</value>';
 		}
 
-		if ('' != $this->GetDescription() || 'adding_files' == $this->GetType()) {
+// 		if ('' != $this->GetDescription() || 'adding_files' == $this->GetType()) {
+		if ($this->getDescription() != '') {
 			$xml .= '<description><![CDATA[';
 
-			if ('' != $this->GetDescription()) {
-				$xml .= $this->GetDescription();
-			}
-
-			if ('adding_files' == $this->GetType()) {
-				if ('' != $this->GetDescription()) {
-					$xml .= ' ';
-				}
-
-				$xml .=
-					'Суммарный размер за&nbsp;один раз загружаемых файлов не&nbsp;должен превышать ' .
-					get_max_upload_size() .
-					'&nbsp;МБ.';
-			}
+// 			if ('' != $this->GetDescription()) {
+				$xml .= $this->getDescription();
+// 			}
+//
+// 			if ('adding_files' == $this->GetType()) {
+// 				if ('' != $this->GetDescription()) {
+// 					$xml .= ' ';
+// 				}
+//
+// 				$xml .=
+// 					'Суммарный размер за&nbsp;один раз загружаемых файлов не&nbsp;должен превышать ' .
+// 					get_max_upload_size() .
+// 					'&nbsp;МБ.';
+// 			}
 
 			$xml .= ']]></description>';
 		}

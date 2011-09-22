@@ -26,6 +26,16 @@ class ActiveRecordExtended extends ActiveRecord
                                 $_rowConds);
     }
 
+    public static function isUnique($_attribute, $_value, $_exclude = null)
+    {
+        return parent::isUnique(get_called_class(),
+                                self::getTbl(),
+                                self::getPri(),
+                                $_attribute,
+                                $_value,
+                                $_exclude);
+    }
+
     public static function load($_value, $_attribute = null)
     {
         return parent::load(get_called_class(),

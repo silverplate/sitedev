@@ -8,7 +8,14 @@ implements  DocumentHandlerInterface
     {
         parent::execute();
 
-        $this->setTemplate(TEMPLATES . 'fo.xsl');
+        $template = $this->Document->getTemplate();
+        if ($template->getFile()) {
+            $this->setTemplate($template->getFile()->getPath());
+
+        } else {
+            $this->setTemplate(TEMPLATES . 'fo.xsl');
+        }
+
 
         /*
         * Site navigation

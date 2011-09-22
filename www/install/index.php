@@ -8,9 +8,10 @@ $result = array();
 // Init for DB
 $boSections = array(
     array('title' => 'Страницы', 'uri' => 'pages', 'description' => 'Работа с навигацией и информационным наполнением страниц сайта.'),
-    array('title' => 'Обработчики', 'uri' => 'handlers', 'description' => 'Управление обработчиками страниц сайта и блоков данных.'),
-    array('title' => 'Типы навигации', 'uri' => 'navigation', 'description' => 'Редактирование типов навигации.', 'is_published' => 0),
     array('title' => 'Пользователи', 'uri' => 'users', 'description' => 'Редактирование пользователей сайта.', 'is_published' => 0),
+    array('title' => 'Обработчики', 'uri' => 'handlers', 'description' => 'Управление обработчиками страниц сайта и блоков данных.'),
+    array('title' => 'Шаблоны', 'uri' => 'templates', 'description' => 'Управление шаблонами сайта.'),
+    array('title' => 'Типы навигации', 'uri' => 'navigation', 'description' => 'Редактирование типов навигации.', 'is_published' => 0),
     array('title' => 'Пользователи СУ', 'uri' => 'cms-users', 'description' => 'Редактирование пользователей СУ.'),
     array('title' => 'Разделы СУ', 'uri' => 'cms-sections', 'description' => 'Редактирование разделов СУ.'),
     array('title' => 'Логи СУ', 'uri' => 'cms-logs', 'description' => 'Просмотр действий пользователей системы управления.', 'is_published' => 0)
@@ -25,13 +26,21 @@ $foHandlers = array(
     'not_found' => array('title' => 'Документ не найден', 'type_id' => 1, 'filename' => 'not_found.php', 'is_document_main' => 0, 'is_multiple' => 0)
 );
 
+$templates = array(
+    'common' => array('title' => 'Основной', 'filename' => 'fo.xsl'),
+    'modules' => array('title' => 'Модули', 'filename' => 'fo_modules.xsl', 'is_document_main' => 0)
+);
+
 $foDocuments = array(
-    array(
-        '/' => array('title' => SITE_TITLE, 'folder' => '/', 'handler' => 'common', 'navigations' => array('main'))
-    ),
-    array(
-        '/not_found/' => array('title' => 'Документ не найден', 'folder' => 'not_found', 'handler' => 'not_found')
-    )
+    array('/' => array('title' => SITE_TITLE,
+                       'folder' => '/',
+                       'handler' => 'common',
+                       'template' => 'common',
+                       'navigations' => array('main'))),
+    array('/not_found/' => array('title' => 'Документ не найден',
+                                 'folder' => 'not_found',
+                                 'handler' => 'not_found',
+                                 'template' => 'common'))
 );
 
 $foNavigations = array(
@@ -124,6 +133,22 @@ foreach ($foHandlers as $key => $i) {
 $result['FO handlers'] = count($foHandlerObjs);
 
 
+// Templates
+$templatesObjs = array();
+foreach ($templates as $key => $i) {
+    $obj = new Template();
+    $obj->getDb()->dataInit($i);
+    $obj->isPublished = isset($i['is_published']) ? $i['is_published'] : 1;
+    $obj->isMultiple = isset($i['is_multiple']) ? $i['is_multiple'] : 1;
+    $obj->isDocumentMain = isset($i['is_document_main']) ? $i['is_document_main'] : 1;
+    $obj->create();
+
+    $templatesObjs[$key] = $obj;
+}
+
+$result['FO templates'] = count($templatesObjs);
+
+
 // Navigation
 $foNavigationObjs = array();
 foreach ($foNavigations as $key => $i) {
@@ -149,6 +174,11 @@ foreach ($foDocuments as $level) {
         if (isset($i['handler']) && isset($foHandlerObjs[$i['handler']])) {
             $obj->setAttribute(Handler::getPri(),
                                $foHandlerObjs[$i['handler']]->getId());
+        }
+
+        if (isset($i['template']) && isset($templatesObjs[$i['template']])) {
+            $obj->setAttribute(TemplateDb::getPri(),
+                               $templatesObjs[$i['template']]->getId());
         }
 
         $parentUri = str_replace($i['folder'] . '/', '', $uri);
@@ -235,6 +265,7 @@ echo 'и пароль <b><code>' . $boUsers[0]['passwd'] . '</code></b>.</p>';
 
 $isError = false;
 $permissions = array(array(HANDLERS . '*', true),
+                     array(TEMPLATES, true),
                      array(DOCUMENT_ROOT . 'f/', true));
 
 foreach ($permissions as $path) {

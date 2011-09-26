@@ -12,10 +12,17 @@ class DocumentDataHandler {
 	protected $Document;
 	private $Content;
 	private $Type;
+	protected $_dataDocument;
 
 	public function __construct(&$_data, &$_document = null) {
 		$this->DocumentData = $_data;
 		$this->Document = $_document;
+
+        $dataDocumentId = $_data->getAttribute(Document::getPri());
+        $this->_dataDocument = $_document && $_document->getId() == $dataDocumentId
+                             ? $_document
+                             : Document::load($dataDocumentId);
+
 		$this->SetContent($this->DocumentData->GetAttribute('content'));
 		$this->SetType($this->DocumentData->GetTypeId());
 	}
@@ -152,7 +159,8 @@ class DocumentData extends ActiveRecord {
 		return $this->GetHandler() ? $this->GetHandler()->GetFilename() : false;
 	}
 
-	public static function initHandler($_handler, &$_documentData, &$_document) {
+	public static function initHandler($_handler, &$_documentData, &$_document)
+	{
         require_once $_handler->getFilename();
 
         $class = $_handler->getClassName();

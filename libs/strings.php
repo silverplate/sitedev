@@ -245,42 +245,6 @@ function strlen_utf8($_string) {
 		: strlen(decode($_string));
 }
 
-//function int_to_roman($int) {
-//	if (!is_number($int)) return false;
-//
-//	$int = abs($int);
-//	$thousands = (int) ($int / 1000);
-//	$int -= $thousands * 1000;
-//	$result = str_repeat('M', $thousands);
-//
-//	$table = array(
-//		900	=> 'CM',
-//		500	=> 'D',
-//		400	=> 'CD',
-//		100	=> 'C',
-//		90	=> 'XC',
-//		50	=> 'L',
-//		40	=> 'XL',
-//		10	=> 'X',
-//		9	=> 'IX',
-//		5	=> 'V',
-//		4	=> 'IV',
-//		1	=> 'I'
-//	);
-//
-//	while ($int) {
-//		foreach ($table as $part => $fragment) {
-//			if ($part <= $int) break;
-//		}
-//
-//		$amount = (int) ($int / $part);
-//		$int -= $part * $amount;
-//		$result .= str_repeat($fragment, $amount);
-//	}
-//
-//	return $result;
-//}
-
 function transformCaseToUnderline($_value)
 {
     $result = '';
@@ -288,12 +252,29 @@ function transformCaseToUnderline($_value)
         if (
             $i != 0 &&
             !in_array($_value{$i}, array('_', '-', ':')) &&
-            !in_array($_value{$i - 1}, array('_', '-')) &&
             $_value{$i} == strtoupper($_value{$i})
         ) {
             $result .= '_';
         }
         $result .= strtolower($_value{$i});
+    }
+    return $result;
+}
+
+function transformUnderlineToCase($_value, $_isFirstUppercased = false)
+{
+    $result = '';
+    for ($i = 0; $i < strlen($_value); $i++) {
+        if ($_value{$i} == '_' || $_value{$i} == '-') {
+            if ($i != 0 && $i != strlen($_value) - 1) {
+                $result .= strtoupper($_value{++$i});
+            }
+        } else {
+            $result .= $_value{$i};
+        }
+    }
+    if ($result != '' && $_isFirstUppercased) {
+        $result{0} = strtoupper($result{0});
     }
     return $result;
 }

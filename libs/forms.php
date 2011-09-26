@@ -297,79 +297,66 @@ class Form {
 		return $result;
 	}
 
-	public function UploadImages($_upload_dir, $_file_name_type = 'real') {
-		if ($_upload_dir) {
+	public function uploadImages($_uploadDir,
+	                             $_fileNameType = 'real',
+	                             $_fields = null)
+	{
+		if ($_uploadDir) {
 			$uploaded = array();
-			$upload_dir = rtrim($_upload_dir, '/') . '/';
-			foreach ($this->Elements as $item) {
-				if ($item->GetType() == 'image') {
-					$value = $item->GetValue();
-					$is_image = (isset($_POST[$item->GetName() . '_present']) && $_POST[$item->GetName() . '_present'] && is_file($_POST[$item->GetName() . '_present']));
-					$is_delete = (isset($_POST[$item->GetName() . '_delete']) && $_POST[$item->GetName() . '_delete']);
-					$is_upload = ($value && isset($value['name']) && $value['name'] && isset($value['tmp_name']) && $value['tmp_name']);
+			$uploadDir = rtrim($_uploadDir, '/') . '/';
+		    $fields = empty($_fields) || !is_array($_fields)
+		            ? array_keys($this->Elements)
+		            : $_fields;
 
-					if ($is_image && ($is_delete || $is_upload)) {
-						unlink($_POST[$item->GetName() . '_present']);
+			foreach ($this->Elements as $item) {
+				if (
+				    $item->getType() == 'image' &&
+				    in_array($item->getName(), $fields)
+				) {
+					$value = $item->getValue();
+					$isImage = !empty($_POST[$item->getName() . '_present'])
+					        && is_file($_POST[$item->getName() . '_present']);
+
+					$isDelete = !empty($_POST[$item->GetName() . '_delete']);
+
+					$isUpload = $value
+					         && !empty($value['name'])
+					         && !empty($value['tmp_name']);
+
+					if ($isImage && ($isDelete || $isUpload)) {
+						unlink($_POST[$item->getName() . '_present']);
 					}
 
-					if ($is_upload) {
-						create_directory($upload_dir, true);
+					if ($isUpload) {
+						create_directory($uploadDir, true);
 
-						switch ($_file_name_type) {
+						switch ($_fileNameType) {
 							case 'field':
-								$file_name = $item->GetName() . '.' . strtolower(get_file_extension($value['name']));
+								$fileName = $item->getName() . '.' . strtolower(get_file_extension($value['name']));
 								break;
 
 							case 'real':
 							default:
-								$file_name = $value['name'];
+								$fileName = File::normalizeName($value['name']);
 								break;
 						}
 
-						move_uploaded_file($value['tmp_name'], $upload_dir . $file_name);
-						chmod($upload_dir . $file_name, 0777);
-						$uploaded[$item->GetName()] = $upload_dir . $file_name;
+						move_uploaded_file($value['tmp_name'], $uploadDir . $fileName);
+						chmod($uploadDir . $fileName, 0777);
+						$uploaded[$item->getName()] = $uploadDir . $fileName;
 					}
 
-					if (is_directory_empty($upload_dir)) rmdir($upload_dir);
+					if (is_directory_empty($uploadDir)) {
+					    rmdir($uploadDir);
+					}
 				}
 			}
+
 			return $uploaded;
 		}
 
 		return false;
 	}
-
-/*
-	public function UploadFiles($_upload_dir) {
-		if ($_upload_dir) {
-			$uploaded = array();
-			$upload_dir = rtrim($_upload_dir, '/') .'/';
-			foreach ($this->Elements as $item) {
-				if ($item->GetType() == 'adding_files') {
-					$value = $item->GetValue();
-
-					if ($value && is_array($value) && isset($value[0])) {
-						foreach ($value as $file) {
-							if (isset($file['name']) && $file['name'] && isset($file['tmp_name']) && $file['tmp_name']) {
-								create_directory($upload_dir, true);
-								$file_name = translit($file['name']);
-
-								move_uploaded_file($file['tmp_name'], $upload_dir . $file_name);
-								chmod($upload_dir . $file_name, 0777);
-								$uploaded[$item->GetName()] = $upload_dir . $file_name;
-							}
-						}
-					}
-					if (is_directory_empty($upload_dir)) rmdir($upload_dir);
-				}
-			}
-			return $uploaded;
-		}
-
-		return false;
-	}
-*/
 
 	public static function InsertDynamicValues(&$_element, $_type) {
 		switch ($_type) {

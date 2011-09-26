@@ -19,6 +19,7 @@ function documentDataUpdateBranch(_eleId, _documentId, _dataBlockId)
                 update: itemSort
             });
 
+            replaceTextareaCdata();
 			hideLoadingBar();
         }
     );

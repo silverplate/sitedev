@@ -93,7 +93,11 @@ class Image extends File
 // 		return $node;
 // 	}
 
-    public static function resize($_srcImage, $_dstWidth = null, $_dstHeight = null, $_dstFilePath = null)
+    public static function resize($_srcImage,
+                                  $_dstWidth = null,
+                                  $_dstHeight = null,
+                                  $_dstFilePath = null,
+                                  $_quality = 90)
     {
         if (empty($_dstWidth) && empty($_dstHeight)) {
             throw new Exception('Destination width or height must be set');
@@ -174,7 +178,7 @@ class Image extends File
 
             $dstFilePathWithType = $dstFileInfo['dirname'] . '/' . $dstFileInfo['filename'] . '.jpg';
             createDirectory($dstFileInfo['dirname']);
-            imagejpeg($newImage, $dstFilePathWithType, 100);
+            imagejpeg($newImage, $dstFilePathWithType, $_quality);
             chmod($dstFilePathWithType, 0777);
 
             if (
@@ -265,109 +269,4 @@ class Image extends File
 
         return preg_replace('/^<root>|<\/root>$/', '', $dom->saveXml($dom->documentElement));
     }
-
-    function resizeByWidth($_srcImage, $_dstWidth = null, $_dstFilePath = null)
-    {
-        if (empty($_dstWidth)) {
-            throw new Exception('Destination width must be set');
-        }
-
-        if ($_srcImage instanceof Image) {
-            $srcFilePath =  $_srcImage->getPath();
-            $srcExtension = $_srcImage->getExtension();
-            $srcWidth =     $_srcImage->getWidth();
-            $srcHeight =    $_srcImage->getHeight();
-            $srcType =      $_srcImage->getType();
-
-        } else {
-            $srcFilePath =  $_srcImage;
-            $srcExtension = get_file_extension($_srcImage);
-            $size =         getimagesize($_srcImage);
-            $srcWidth =     $size[0];
-            $srcHeight =    $size[1];
-            $srcType =      $size[2];
-        }
-
-        $dstWidth = $_dstWidth ? $_dstWidth : $srcWidth;
-        $dstFilePath = empty($_dstFilePath) ? $srcFilePath : $_dstFilePath;
-        $dstFileInfo = pathinfo($dstFilePath);
-        $dstFilePathWithType = $dstFileInfo['dirname'] . '/' . $dstFileInfo['filename'] . '.' . $srcExtension;
-
-        /*if(!is_dir($_path)) {
-            createDirectory($_path, true);
-        }*/
-
-        if($srcWidth > $dstWidth) {
-            $startX = $endX = $startY = $endY = 0;
-
-            $ratio = $srcWidth / $dstWidth; // Определили во сколько раз по ШИРИНЕ надо ужать оригинальное изображение
-            $dstHeight = floor($srcHeight / $ratio); // Вычислили какая идеальная ВЫСОТА должна быть у оригинального изображения
-
-            $endX = $srcWidth; // То берем всю ширину оригинального изображения
-            $endY = $srcHeight;
-
-            $newImage = imageCreateTrueColor($dstWidth, $dstHeight);
-            switch($srcType)
-            {
-                case 1:
-                    $oldImage = imageCreateFromGif($srcFilePath);
-                    break;
-                case 2:
-                    $oldImage = imageCreateFromJpeg($srcFilePath);
-                    break;
-                case 3:
-                    $oldImage = imageCreateFromPng($srcFilePath);
-                    break;
-            }
-
-            if(
-                imagecopyresampled(
-                    $newImage,
-                    $oldImage,
-                    0,
-                    0,
-                    $startX,
-                    $startY,
-                    $dstWidth,
-                    $dstHeight,
-                    $endX,
-                    $endY
-                )
-            ) {
-                switch($srcType) {
-                    case 1:
-                        imagegif($newImage, $dstFilePathWithType);
-                        break;
-                    case 2:
-                        imageJpeg($newImage, $dstFilePathWithType, 100);
-                        break;
-                    case 3:
-                        imagepng($newImage, $dstFilePathWithType, 100);
-                        break;
-                }
-
-                @chmod($dstFilePathWithType, 0777);
-
-                imageDestroy($newImage);
-                imageDestroy($oldImage);
-                return true;
-            } else {
-                imageDestroy($newImage);
-                imageDestroy($oldImage);
-                return false;
-            }
-        } else {
-            if (!is_file($dstFilePathWithType)) {
-                createDirectory($dstFileInfo['dirname']);
-                copy($srcFilePath, $dstFilePathWithType);
-                chmod($dstFilePathWithType, 0777);
-            }
-
-            return new Image($dstFilePathWithType, DOCUMENT_ROOT, '/');
-        }
-
-        return false;
-    }
 }
-
-?>

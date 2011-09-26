@@ -17,9 +17,11 @@ class Handler extends ActiveRecord {
             throw new Exception('Unkown handler type');
         }
 
-        foreach (explode('_', get_file_name($this->getFilename())) as $item) {
-            $class .= ucfirst($item);
-        }
+        $class .= ucfirst(
+            transformUnderlineToCase(
+                get_file_name($this->getFilename())
+            )
+        );
 
         return $class;
     }

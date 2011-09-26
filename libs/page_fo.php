@@ -65,8 +65,6 @@ class DocumentHandler extends FoPage {
 				$this->SetRootNodeAttribute('xml:lang', $this->Document->GetLang());
 			}
 
-// 			$conditions = array();
-// 			if (!$this->IsShowHidden) $conditions['is_published'] = 1;
             $conditions = array('is_published' => 1);
 
 			$params = array();
@@ -168,14 +166,16 @@ class DocumentHandler extends FoPage {
 				}
 
 				if ($item->GetHandlerFile()) {
-					$handler = DocumentData::initHandler($item->getHandler(), $item, $this->Document);
-					$handler->Execute();
-// 					$this->AddContent($handler->GetXml());
-					array_push($dataXml, $handler->GetXml());
+					$handler = DocumentData::initHandler($item->getHandler(),
+					                                     $item,
+					                                     $this->Document);
+
+					$handler->execute();
+					array_push($dataXml, $handler->getXml());
+
 				} else {
-					$plain_data = new DocumentDataHandler($item);
-// 					$this->AddContent($plain_data->GetXml());
-					array_push($dataXml, $plain_data->GetXml());
+					$plainData = new DocumentDataHandler($item);
+					array_push($dataXml, $plainData->getXml());
 				}
 			}
 

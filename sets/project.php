@@ -29,8 +29,11 @@ if (defined('ENV')) {
     $productionSites = array('sitedev.ru', 'www.sitedev.ru');
 
     if (empty($_SERVER['HTTP_HOST'])) {
-        if (!empty($_SERVER['PWD']) && !empty($_SERVER['SCRIPT_FILENAME'])) {
-            $script = $_SERVER['PWD'] . '/' . $_SERVER['SCRIPT_FILENAME'];
+        if (!empty($_SERVER['PWD'])) {
+            $script = $_SERVER['PWD'];
+            if (!empty($_SERVER['SCRIPT_FILENAME'])) {
+                $script . '/' . $_SERVER['SCRIPT_FILENAME'];
+            }
 
             foreach ($stageSites as $item) {
                 if (strpos($script, '/' . $item . '/') !== false) {

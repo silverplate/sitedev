@@ -254,37 +254,39 @@ class File {
 		return $result;
 	}
 
-	/**
-	 * @param DOMDocument $dom
-	 * @param string $_type_attribute
-	 * @return DOMElement
-	 */
-	public function GetNode(DOMDocument $dom) {
-		$size = get_size_measure(filesize($this->GetPath()));
-		$node = $dom->createElement('file');
+    public function getNode($_dom, $_name = null, $_attributes = null)
+    {
+        $size = get_size_measure(filesize($this->getPath()));
+        $node = $_dom->createElement('file');
 
-		$node->setAttribute('uri', $this->GetUri());
-		$node->setAttribute('path', $this->GetPath());
-		$node->setAttribute('filename', $this->GetFileName());
-		$node->setAttribute('name', $this->GetName());
-		$node->setAttribute('extension', $this->GetExtension());
+        if (!empty($_attributes)) {
+            foreach ($_attributes as $name => $value) {
+                $node->setAttribute(normalizeXmlName($name), $value);
+            }
+        }
 
-		$size_ru = $dom->createElement('size');
-		$size_ru->setAttribute('xml:lang', 'ru');
-		$size_ru->setAttribute('value', $size['value']);
-		$size_ru->setAttribute('measure', $size['measure']);
-		$size_ru->appendChild($dom->createCDATASection($size['string']));
-		$node->appendChild($size_ru);
+        $node->setAttribute('uri', $this->getUri());
+        $node->setAttribute('path', $this->getPath());
+        $node->setAttribute('filename', $this->getFileName());
+        $node->setAttribute('name', $this->getName());
+        $node->setAttribute('extension', $this->getExtension());
 
-		$size_en = $dom->createElement('size');
-		$size_en->setAttribute('xml:lang', 'en');
-		$size_en->setAttribute('value', $size['value']);
-		$size_en->setAttribute('measure', $size['measure_en']);
-		$size_en->appendChild($dom->createCDATASection($size['string_en']));
-		$node->appendChild($size_en);
+        $sizeRu = $_dom->createElement('size');
+        $sizeRu->setAttribute('xml:lang', 'ru');
+        $sizeRu->setAttribute('value', $size['value']);
+        $sizeRu->setAttribute('measure', $size['measure']);
+        $sizeRu->appendChild($_dom->createCDATASection($size['string']));
+        $node->appendChild($sizeRu);
 
-		return $node;
-	}
+        $sizeEn = $_dom->createElement('size');
+        $sizeEn->setAttribute('xml:lang', 'en');
+        $sizeEn->setAttribute('value', $size['value']);
+        $sizeEn->setAttribute('measure', $size['measure_en']);
+        $sizeEn->appendChild($_dom->createCDATASection($size['string_en']));
+        $node->appendChild($sizeEn);
+
+        return $node;
+    }
 
 	public function GetPath() {
 		return $this->Path;

@@ -68,30 +68,19 @@ class Image extends File
         return getCdata('img', null, $attrs);
     }
 
-// 	public function GetNode(DOMDocument $dom, $_type_attribute = null)
-// 	{
-// 		$node = $dom->createElement('image');
-//
-// 		if (!empty($_type_attribute)) {
-// 			$node->setAttribute('type', $_type_attribute);
-// 		}
-//
-// 		$node->setAttribute('width', $this->GetWidth());
-// 		$node->setAttribute('height', $this->GetHeight());
-// 		$node->setAttribute('uri', $this->GetUri());
-// 		$node->setAttribute('path', $this->GetPath());
-// 		$node->setAttribute('filename', $this->GetFileName());
-// 		$node->setAttribute('name', $this->GetName());
-// 		$node->setAttribute('extension', $this->GetExtension());
-//
-// 		if ($this->GetText()) {
-// 			$node->appendChild(
-// 				$dom->createCDATASection($this->GetText())
-// 			);
-// 		}
-//
-// 		return $node;
-// 	}
+    public function getNode($_dom, $_name = null, $_attributes = null)
+    {
+        $node = parent::getNode($_dom, $_name, $_attributes);
+
+        $node->setAttribute('width', $this->getWidth());
+        $node->setAttribute('height', $this->getHeight());
+
+        if ($this->getText()) {
+            $node->appendChild($_dom->createCDATASection($this->getText()));
+        }
+
+        return $node;
+    }
 
     public static function resize($_srcImage,
                                   $_dstWidth = null,

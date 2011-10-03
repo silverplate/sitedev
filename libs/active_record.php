@@ -417,13 +417,15 @@ class ActiveRecord {
 		return Db::Get()->Execute('DELETE FROM ' . $this->GetTable() . ' WHERE ' . $this->GetPrimaryKeyStatment());
 	}
 
-	public function DataInit($_data) {
-		foreach ($this->Attributes as $item) {
-			if (isset($_data[$item->GetName()])) {
-				$item->SetValue($_data[$item->GetName()]);
-			}
-		}
-	}
+    public function dataInit($_data)
+    {
+        foreach ($this->Attributes as $item) {
+//             if (isset($_data[$item->GetName()])) {
+            if (key_exists($item->getName(), $_data)) {
+                $item->setValue($_data[$item->getName()]);
+            }
+        }
+    }
 
 	public static function TableInit($_table, $_id = null, $_is_log = false) {
 		$class_name = __CLASS__;

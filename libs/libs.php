@@ -81,10 +81,6 @@ function send_email($_mail_pref, $_email, $_subject, $_body, $_is_html = false, 
 			}
 		}
 
-		foreach (array('FromName', 'Subject', 'Body') as $name) {
-			$mailer->$name = decode($mailer->$name);
-		}
-
         $isEmail = false;
         $emails = is_array($_email) ? $_email : array($_email);
 
@@ -116,6 +112,10 @@ function send_email($_mail_pref, $_email, $_subject, $_body, $_is_html = false, 
             $mailer->Body = '<p>' . $system_body . '</p>' .
                             '<p>Оригинал:</p>' . $mailer->Body;
         }
+
+		foreach (array('FromName', 'Subject', 'Body') as $name) {
+			$mailer->$name = decode($mailer->$name);
+		}
 
 		return $isEmail ? $mailer->Send() : false;
 	}

@@ -703,7 +703,7 @@ class FormEleDatetimePeriod extends FormEle {
             $is_value = true;
 //             foreach (array('from', 'from_hours', 'from_minutes', 'till', 'till_hours', 'till_minutes') as $i) {
             foreach (array('from', 'till') as $i) {
-                if (!empty($_value[$i])) {
+                if (empty($_value[$i])) {
                     $is_value = false;
                     break;
                 }

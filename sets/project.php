@@ -5,9 +5,11 @@ if (is_file($localSettingsFile)) {
     require_once $localSettingsFile;
 }
 
+// setlocale(LC_ALL, 'ru_RU.CP1251');
 date_default_timezone_set('Europe/Moscow');
 
 ini_set('default_charset', 'utf-8');
+ini_set('mbstring.internal_encoding', 'UTF-8');
 ini_set('error_reporting', E_ALL);
 ini_set('magic_quotes_gpc', 0);
 
@@ -110,11 +112,15 @@ $gCustomUrls = array();
 // $g_langs = array('ru' => array('/', 'Русский'),
 //                  'en' => array('/eng/', 'Английский'));
 
-$g_mail = $g_bo_mail = array('subject' => '',
-                             'from' => 'support@sitedev.ru',
-                             'from_name' => SITE_TITLE,
-                             'signature' => "\r\n\n\n--\r\nСлужба поддержки\r\nsupport@sitedev.ru",
-                             'bcc' => 'support@sitedev.ru');
+$g_admin_email = 'support@sitedev.ru';
+$g_mail = $g_bo_mail = array(
+    'subject' => '',
+    'from' => 'support@sitedev.ru',
+    'from_name' => SITE_TITLE,
+    'signature' => "\r\n\n\n--\r\nСлужба поддержки\r\nsupport@sitedev.ru",
+//    'bcc' => 'support@sitedev.ru'
+);
 
 $g_bo_mail['subject'] = 'Система управления / ';
+
 Db::get()->execute('SET names utf8');

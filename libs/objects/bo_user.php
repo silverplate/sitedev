@@ -104,7 +104,7 @@ class BoUser extends ActiveRecord {
 				'Для смены пароля к системе управления сайта http://' .
 				$_SERVER['HTTP_HOST'] . $g_section_start_url . ' загрузите страницу: http://' .
 				$_SERVER['HTTP_HOST'] . $g_section_start_url . '?r=' . $this->GetAttribute('reminder_key') . "\r\n\n" .
-				'Если вы не просили поменять пароль, проигнорируйте это сообщение.'
+				'Если вы не просили поменять пароль, проигнорируйте это сообщение.', null, false
 			);
 		}
 	}
@@ -131,7 +131,7 @@ class BoUser extends ActiveRecord {
 					"Доступ к системе управления сайта http://{$_SERVER['HTTP_HOST']}{$g_section_start_url}.\r\n\n" .
 					'Логин: ' . $this->GetAttribute('login') .
 					"\r\nПароль: " . $password .
-					$ip_restriction
+					$ip_restriction, null, false
 				) ? 0 : 3;
 			} else return 2;
 		} else return 1;

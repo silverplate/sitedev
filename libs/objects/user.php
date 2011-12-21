@@ -124,7 +124,7 @@ class User extends ActiveRecord {
 				'Для смены пароля к сайту http://' .
 				$_SERVER['HTTP_HOST'] . ' загрузите страницу: http://' .
 				$_SERVER['HTTP_HOST'] . '?r=' . $this->GetAttribute('reminder_key') . "\r\n\n" .
-				'Если вы не просили поменять пароль, проигнорируйте это сообщение.'
+				'Если вы не просили поменять пароль, проигнорируйте это сообщение.', null, false
 			);
 		}
 	}
@@ -144,7 +144,7 @@ class User extends ActiveRecord {
 				return send_email($g_mail, $this->GetAttribute('email'), 'Доступ',
 					'Доступ к сайту http://' . $_SERVER['HTTP_HOST'] . ".\r\n\n" .
 					'Логин: ' . $this->GetAttribute('email') .
-					"\r\nПароль: " . $password
+					"\r\nПароль: " . $password, null, false
 				) ? 0 : 3;
 			} else return 2;
 		} else return 1;

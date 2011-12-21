@@ -43,23 +43,42 @@ function get_lang_inner_uri() {
 	return defined('SITE_LANG') && SITE_LANG ? '/' . SITE_LANG . '/' : '/';
 }
 
-function send_email($_mail_pref, $_email, $_subject, $_body) {
-	if (is_array($_mail_pref) && isset($_mail_pref['from']) && $_mail_pref['from']) {
+function send_email($_mail_pref, $_email, $_subject, $_body, $_is_html = false, $_useEnv = true)
+{
+    global $g_admin_email;
+
+    $env = defined('ENV') ? ENV : 'stage';
+
+    if ($_useEnv && $env == 'development') {
+        return false;
+    }
+
+	if (is_array($_mail_pref) && !empty($_mail_pref['from'])) {
 		$mailer = new phpmailer();
 		$mailer->IsMail();
-		$mailer->IsHTML(false);
+		$mailer->IsHTML($_is_html);
 		$mailer->CharSet = 'windows-1251';
 		$mailer->From = $_mail_pref['from'];
 		$mailer->Sender = $mailer->From;
 		$mailer->Subject = $_subject;
 		$mailer->Body = $_body;
 
-		if (isset($_mail_pref['signature'])) $mailer->Body .= $_mail_pref['signature'];
-		if (isset($_mail_pref['from_name'])) $mailer->FromName = $_mail_pref['from_name'];
-		if (isset($_mail_pref['subject'])) $mailer->Subject = $_mail_pref['subject'] . $mailer->Subject;
+		if (isset($_mail_pref['signature'])) {
+		    $mailer->Body .= $_mail_pref['signature'];
+		}
+
+		if (isset($_mail_pref['from_name'])) {
+		    $mailer->FromName = $_mail_pref['from_name'];
+		}
+
+		if (isset($_mail_pref['subject'])) {
+		    $mailer->Subject = $_mail_pref['subject'] . $mailer->Subject;
+		}
 
 		if (isset($_mail_pref['bcc'])) {
-			foreach (list_to_array($_mail_pref['bcc']) as $item) $mailer->AddBCC($item);
+			foreach (list_to_array($_mail_pref['bcc']) as $item) {
+			    $mailer->AddBCC($item);
+			}
 		}
 
 		foreach (array('FromName', 'Subject', 'Body') as $name) {
@@ -74,6 +93,28 @@ function send_email($_mail_pref, $_email, $_subject, $_body) {
                 $isEmail = true;
                 $mailer->AddAddress($email);
             }
+        }
+
+        if ($_useEnv && $env == 'stage') {
+            if (!$g_admin_email) {
+                return false;
+            }
+
+            $system_body = '<p>Письмо направлено:</p>';
+
+            for ($i = 0; $i < count($emails); $i++) {
+                $system_body .= $emails[$i];
+
+                if (count($emails) != $i + 1) {
+                    $system_body .= ', ';
+                }
+            }
+
+            $mailer->ClearAllRecipients();
+            $mailer->AddAddress($g_admin_email);
+            $mailer->IsHTML(true);
+            $mailer->Body = '<p>' . $system_body . '</p>' .
+                            '<p>Оригинал:</p>' . $mailer->Body;
         }
 
 		return $isEmail ? $mailer->Send() : false;

@@ -159,9 +159,20 @@ class DbMysql {
 		$type = ($_options == 'one' || ($_options == 'auto' && mysql_num_fields($result) == 1)) ? 'one' : 'few';
 
 		if ($type == 'one') {
-			while ($row = mysql_fetch_row($result)) array_push($list, $row[0]);
+		    $row = mysql_fetch_row($result);
+
+			while ($row) {
+			    array_push($list, $row[0]);
+			    $row = mysql_fetch_row($result);
+			}
+
 		} else {
-			while ($row = mysql_fetch_assoc($result)) array_push($list, $row);
+		    $row = mysql_fetch_assoc($result);
+
+			while ($row) {
+			    array_push($list, $row);
+			    $row = mysql_fetch_assoc($result);
+			}
 		}
 
 		return $list;

@@ -2,7 +2,9 @@
 
 require('../prepend.php');
 
+global $gCustomUrls;
 $data = $_POST;
+
 if (!empty($data['branches'])) {
 	$changed = array();
 	$parent = array();

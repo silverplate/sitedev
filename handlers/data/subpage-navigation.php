@@ -2,7 +2,6 @@
 
 class       DocumentDataSubpageNavigation
 extends     DocumentDataHandler
-implements  DocumentDataHandlerInterface
 {
     /**
      * Expected content:

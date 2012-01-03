@@ -136,5 +136,5 @@ function getNumberXml($_name, $_number, $_attrs = null, $_decimals = null)
     $attrs['value'] = $value;
     $attrs['comma-value'] = str_replace('.', ',', $value);
 
-    return getCdata($_name, formatNumber(abs($_number), $_decimals), $attrs);
+    return getCdata($_name, format_number(abs($_number), $_decimals), $attrs);
 }

@@ -11,6 +11,8 @@ require_once(SETS . 'project.php');
 $site_lang_type = '';
 $site_lang = null;
 
+global $g_langs;
+
 $host = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != ''
 	? $_SERVER['HTTP_HOST']
 	: false;

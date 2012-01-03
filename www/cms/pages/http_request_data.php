@@ -65,7 +65,9 @@ function data_get_images($_dir, $_exclude_path) {
 
 	if (is_dir($dir)) {
 		$dir_handle = opendir($dir);
-		while ($item = readdir($dir_handle)) {
+		$item = readdir($dir_handle);
+
+		while ($item) {
 			if ($item != '.' && $item != '..') {
 				if (is_dir($dir . $item)) {
 					$result = array_merge($result, data_get_images($dir . $item, $exclude_path));
@@ -73,7 +75,10 @@ function data_get_images($_dir, $_exclude_path) {
 					array_push($result, new Image($dir . $item, DOCUMENT_ROOT, '/'));
 				}
 			}
+
+			$item = readdir($dir_handle);
 		}
+
 		closedir($dir_handle);
 	}
 

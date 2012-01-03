@@ -1,2 +1,6 @@
+/.settings
+/.buildpath
+/.project
+
 /sets/local.php
 /docs/*.mwb.bak

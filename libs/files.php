@@ -38,7 +38,9 @@ function remove_directory($_dir, $_is_self_delete = true, $_is_only_files = fals
 	$dir = rtrim($_dir, '/') . '/';
 	if (is_dir($dir)) {
 		$dir_handle = opendir($dir);
-		while ($item = readdir($dir_handle)) {
+		$item = readdir($dir_handle);
+
+		while ($item) {
 			if ($item != '.' && $item != '..') {
 				if (is_dir($dir . '/' . $item)) {
 					if (!$_is_only_files) remove_directory($dir . '/' . $item);
@@ -46,7 +48,10 @@ function remove_directory($_dir, $_is_self_delete = true, $_is_only_files = fals
 					unlink($dir . '/' . $item);
 				}
 			}
+
+			$item = readdir($dir_handle);
 		}
+
 		if ($_is_self_delete) rmdir($dir);
 		closedir($dir_handle);
 	}
@@ -60,11 +65,16 @@ function is_directory_empty($_dir, $_ignore = null) {
 	if (is_dir($_dir)) {
 		$dir_handle = opendir($_dir);
 		$ignore = (is_null($_ignore)) ? array() : explode(' ', strtolower($_ignore));
-		while ($item = readdir($dir_handle)) {
+		$item = readdir($dir_handle);
+
+		while ($item) {
 			if ($item != '.' && $item != '..' && (!$ignore || !in_array(strtolower($item), $ignore))) {
 				return false;
 			}
+
+			$item = readdir($dir_handle);
 		}
+
 		closedir($dir_handle);
 		return true;
 	}
@@ -79,7 +89,9 @@ function move_directory($_from, $_to) {
 		create_directory($to, true);
 
 		$dir_handle = opendir($from);
-		while ($item = readdir($dir_handle)) {
+		$item = readdir($dir_handle);
+
+		while ($item) {
 			if ($item != '.' && $item != '..' && $to != $from . $item . '/') {
 				if (is_dir($from . $item)) {
 					move_directory($from . $item, $to . $item);
@@ -88,7 +100,10 @@ function move_directory($_from, $_to) {
 					rename($from . $item, $to . $item);
 				}
 			}
+
+			$item = readdir($dir_handle);
 		}
+
 		closedir($dir_handle);
 		if (is_directory_empty($from)) rmdir($from);
 	}

@@ -1,12 +1,5 @@
 <?php
 
-interface DocumentDataHandlerInterface {
-	public function __construct(&$_data, &$_document = null);
-	public function Execute();
-	public function GetContent();
-	public function GetXml();
-}
-
 class DocumentDataHandler {
 	private $DocumentData;
 	protected $Document;

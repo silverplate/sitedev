@@ -32,12 +32,17 @@ class BoUser extends ActiveRecord {
 			$this->Files = array();
 			if ($this->GetFileFolder() && is_dir($this->GetFileFolder())) {
 				$dir_handle = opendir($this->GetFileFolder());
-				while ($item = readdir($dir_handle)) {
+				$item = readdir($dir_handle);
+
+				while ($item) {
 					if ($item != '.' && $item != '..' && is_file($this->GetFileFolder() . $item)) {
 						$file = new File($this->GetFileFolder() . $item, DOCUMENT_ROOT, '/');
 						$this->Files[strtolower($file->GetFileName())] = $file;
 					}
+
+					$item = readdir($dir_handle);
 				}
+
 				closedir($dir_handle);
 			}
 		}
@@ -159,17 +164,10 @@ class BoUser extends ActiveRecord {
 
 		$result = array('tables' => array($self['table']), 'row_conditions' => array());
 
-		if (isset($_conditions['theme_id'])) {
-			if ($_conditions['theme_id']) {
-				array_push($result['tables'], ThemeToUser::GetTbl());
-				array_push($result['row_conditions'], $self['pk_attr'] . ' = ' . ThemeToUser::GetTbl() . '.' . $self['pk'] . ' AND ' . ThemeToUser::GetTbl() . '.' . Theme::GetPri() . ' IN (' . get_db_data($_conditions['theme_id']) . ')');
-			}
-			unset($_conditions['theme_id']);
-		}
-
 		foreach ($_conditions as $attribute => $value) {
 			array_push($result['row_conditions'], $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . Db::Get()->EscapeList($value) . ')' : ' = ' . get_db_data($value)));
 		}
+
 		return $result;
 	}
 

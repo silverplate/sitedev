@@ -2,7 +2,6 @@
 
 class       DocumentDataApplyImages
 extends     DocumentDataHandler
-implements  DocumentDataHandlerInterface
 {
     public function execute()
     {

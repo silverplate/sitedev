@@ -278,3 +278,20 @@ function transformUnderlineToCase($_value, $_isFirstUppercased = false)
     }
     return $result;
 }
+
+function getNumber($_number)
+{
+    $number = str_replace(' ', '', $_number);
+
+    if (stripos($number, 'e') !== false) {
+        $number = round((float) str_replace(',', '.', $number), 2);
+    } else {
+        $number = (float) preg_replace('/^([0-9\-]+)[.,]([0-9]{1,2}).*$/', '\1.\2', $number);
+    }
+
+    if ((float) $number == (int) $number) {
+        $number = (int) $number;
+    }
+
+    return $number;
+}

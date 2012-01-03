@@ -132,9 +132,9 @@ class Form {
 						$element->AddOption($option->getAttribute('value'), $option->nodeValue);
 					}
 
-					if ($options_node->hasAttribute('dynamic_value_type')) {
-						Form::InsertDynamicValues($element, $options_node->getAttribute('dynamic_value_type'));
-					}
+// 					if ($options_node->hasAttribute('dynamic_value_type')) {
+// 						Form::InsertDynamicValues($element, $options_node->getAttribute('dynamic_value_type'));
+// 					}
 				}
 
 				$value_node = dom_get_child($_item, 'value');
@@ -358,25 +358,24 @@ class Form {
 		return false;
 	}
 
-	public static function InsertDynamicValues(&$_element, $_type) {
-		switch ($_type) {
-/*
-			case 'auth_groups':
-				$list = AuthGroup::GetList(array('status_id' => '1'));
-				break;
-*/
-		}
+// 	public static function insertDynamicValues(&$_element, $_type)
+// 	{
+// 		switch ($_type) {
+// 			case 'auth_groups':
+// 				$list = AuthGroup::GetList(array('status_id' => '1'));
+// 				break;
+// 		}
 
-		if (isset($list) && is_array($list)) {
-			foreach ($list as $item) {
-				if (is_object($item)) {
-					$_element->AddOption($item->GetId(), $item->GetTitle());
-				} else {
-					$_element->AddOption($item, $item);
-				}
-			}
-		}
-	}
+// 		if (isset($list) && is_array($list)) {
+// 			foreach ($list as $item) {
+// 				if (is_object($item)) {
+// 					$_element->AddOption($item->GetId(), $item->GetTitle());
+// 				} else {
+// 					$_element->AddOption($item, $item);
+// 				}
+// 			}
+// 		}
+// 	}
 }
 
 ?>

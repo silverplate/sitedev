@@ -190,9 +190,16 @@
 
 				<xsl:call-template name="form_element" />
 
-				<xsl:if test="@update_type != '' and @update_type != 'no_update' and @update_type != 'success'">
+				<xsl:if test="@update_type != '' and
+				              @update_type != 'no_update' and
+				              @update_type != 'success'">
+
 					<div class="field_error_message">
 						<xsl:choose>
+							<xsl:when test="error-message">
+							    <xsl:value-of select="error-message"
+							                  disable-output-escaping="yes" />
+							</xsl:when>
 							<xsl:when test="@update_type = 'error_required'">Поле обязательно для&nbsp;заполнения.</xsl:when>
 							<xsl:when test="@update_type = 'error_spelling'">Некорректное значение.</xsl:when>
 							<xsl:when test="@update_type = 'error_exist'">Значение уже&nbsp;используется.</xsl:when>

@@ -14,6 +14,7 @@ class FormEle implements FormEleInterface {
 	protected $DbValueType;
 	protected $UpdateType;
 	protected $ErrorValue;
+	protected $_errorMessage;
 
 	public function __construct($_name, $_type, $_label = null, $_is_required = false) {
 		$this->Name = $_name;
@@ -175,6 +176,12 @@ class FormEle implements FormEleInterface {
 			$xml .= '</value></error>';
 		}
 
+        if ($this->_errorMessage) {
+            $xml .= '<error-message><![CDATA[' .
+                    $this->_errorMessage .
+                    ']]></error-message>';
+        }
+
 		if ($this->GetAdditionalXml()) {
 			$xml .= '<additional>' . $this->GetAdditionalXml() . '</additional>';
 		}
@@ -182,13 +189,24 @@ class FormEle implements FormEleInterface {
 		return $xml . '</element>';
 	}
 
-	public function GetDescription() {
+	public function getDescription()
+	{
 		return $this->Description;
 	}
 
-	public function SetDescription($_value) {
+	public function setDescription($_value)
+	{
 		$this->Description = $_value;
 	}
+
+    public function addDescription($_value)
+    {
+        $value = $this->getDescription();
+        if ($value) $value .= ' ';
+        $value .= $_value;
+
+        $this->setDescription($value);
+    }
 
 	public function IsUpdateSuccess() {
 		return in_array($this->UpdateType, array(FIELD_NO_UPDATE, FIELD_SUCCESS));
@@ -215,6 +233,16 @@ class FormEle implements FormEleInterface {
 
 	public function SetUpdateType($_type) {
 		$this->UpdateType = $_type;
+	}
+
+	public function getErrorMessage()
+	{
+	    return $this->_errorMessage;
+	}
+
+	public function setErrorMessage($_message)
+	{
+	    $this->_errorMessage = $_message;
 	}
 
 	public function GetAdditionalXml() {
@@ -1154,6 +1182,7 @@ interface FormEleInterface {
 
 define('FIELD_NO_UPDATE', 'no_update');
 define('FIELD_SUCCESS', 'success');
+define('FIELD_ERROR', 'error');
 define('FIELD_ERROR_SPELLING', 'error_spelling');
 define('FIELD_ERROR_REQUIRED', 'error_required');
 define('FIELD_ERROR_EXIST', 'error_exist');

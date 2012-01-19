@@ -124,3 +124,11 @@ $g_mail = $g_bo_mail = array(
 $g_bo_mail['subject'] = 'Система управления / ';
 
 Db::get()->execute('SET names utf8');
+
+if (!isset($gMaxUploadFilesize)) {
+    $gMaxUploadFilesize = 1.5;
+}
+
+if (!isset($gAmountMaxUploadFilesize)) {
+    $gAmountMaxUploadFilesize = (int) ini_get('upload_max_filesize');
+}

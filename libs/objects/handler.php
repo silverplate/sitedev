@@ -61,7 +61,7 @@ class Handler extends ActiveRecord {
 			}
 		}
 
-		return !$attributes || !self::GetList($attributes, array('count' => 1), array(self::GetPri() . ' != ' . get_db_data($this->GetId())));
+		return !$attributes || !self::GetList($attributes, array('count' => 1), array(self::GetPri() . ' != ' . Db::escape($this->GetId())));
 	}
 
 	private function GetPrefix() {
@@ -94,8 +94,8 @@ class Handler extends ActiveRecord {
 	}
 
 	public function Delete() {
-		Db::Get()->Execute('UPDATE ' . Document::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . get_db_data($this->GetId()));
-		Db::Get()->Execute('UPDATE ' . DocumentData::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . get_db_data($this->GetId()));
+		Db::Get()->Execute('UPDATE ' . Document::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . Db::escape($this->GetId()));
+		Db::Get()->Execute('UPDATE ' . DocumentData::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . Db::escape($this->GetId()));
 
 		remove_file($this->GetFilename());
 		parent::Delete();

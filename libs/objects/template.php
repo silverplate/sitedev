@@ -25,7 +25,7 @@ class Template extends DbMapper
     {
         if (!isset($this->_file)) {
             $this->_file = is_file($this->getFilePath())
-                         ? new File($this->getFilePath())
+                         ? new Ext_File($this->getFilePath())
                          : false;
         }
 
@@ -45,7 +45,7 @@ class Template extends DbMapper
         file_put_contents($this->getFilePath(), $_content);
 
         if ($doCreate) {
-            chmod($this->getFilePath(), 0777);
+            @chmod($this->getFilePath(), 0777);
         }
     }
 
@@ -78,14 +78,11 @@ class Template extends DbMapper
     public function getXml($_type = null, $_node = null, $_xml = null, array $_attrs = array())
     {
         $xml = empty($_xml) ? array() : array($_xml);
-        $node = empty($_node) ? self::normalizeXmlName(__CLASS__) : $_node;
+        $node = empty($_node) ? Ext_Xml::normalizeName(__CLASS__) : $_node;
         $attrs = empty($_attrs) ? array() : $_attrs;
 
         $attrs['id'] = $this->id;
-        $xml = array_merge(
-            array(self::getNoEmptyCdataNodeXml('title', $this->getTitle())),
-            $xml
-        );
+        Ext_Xml::append($xml, Ext_Xml::notEmptyCdata('title', $this->getTitle()));
 
         switch ($_type) {
             case 'bo-list':

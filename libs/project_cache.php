@@ -1,7 +1,9 @@
 <?php
 
-class ProjectCache extends Cache {
-	public function __construct($_path = null, $_category = null, $_uri = null) {
+class ProjectCache extends Cache
+{
+	public function __construct($_path = null, $_category = null, $_uri = null)
+	{
 		$path = is_null($_path) ? WD . 'cache/' : $_path;
 		parent::__construct($path, $_category, $_uri);
 

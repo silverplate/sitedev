@@ -12,25 +12,25 @@ function bo_log_filter($_filter) {
 
 	if ($_filter['is_users']) {
 		if ($_filter['users'] && is_array($_filter['users'])) {
-			array_push($row_conditions, BoUser::GetPri() . ' IN (' . get_db_data($_filter['users']) . ')');
+			array_push($row_conditions, BoUser::GetPri() . ' IN (' . Db::escape($_filter['users']) . ')');
 		} else {
-			array_push($row_conditions, BoUser::GetPri() . ' NOT IN (' . get_db_data(array_keys(BoUser::GetList())) . ')');
+			array_push($row_conditions, BoUser::GetPri() . ' NOT IN (' . Db::escape(array_keys(BoUser::GetList())) . ')');
 		}
 	}
 
 	if ($_filter['is_sections']) {
 		if ($_filter['sections'] && is_array($_filter['sections'])) {
-			array_push($row_conditions, BoSection::GetPri() . ' IN (' . get_db_data($_filter['sections']) . ')');
+			array_push($row_conditions, BoSection::GetPri() . ' IN (' . Db::escape($_filter['sections']) . ')');
 		} else {
-			array_push($row_conditions, BoSection::GetPri() . ' NOT IN (' . get_db_data(array_keys(BoSection::GetList())) . ')');
+			array_push($row_conditions, BoSection::GetPri() . ' NOT IN (' . Db::escape(array_keys(BoSection::GetList())) . ')');
 		}
 	}
 
 	if ($_filter['is_actions']) {
 		if ($_filter['actions'] && is_array($_filter['actions'])) {
-			array_push($row_conditions, 'action_id IN (' . get_db_data($_filter['actions']) . ')');
+			array_push($row_conditions, 'action_id IN (' . Db::escape($_filter['actions']) . ')');
 		} else {
-			array_push($row_conditions, 'action_id NOT IN (' . get_db_data(array_keys(BoLog::GetActions())) . ')');
+			array_push($row_conditions, 'action_id NOT IN (' . Db::escape(array_keys(BoLog::GetActions())) . ')');
 		}
 	}
 
@@ -100,5 +100,3 @@ function bo_log_get_filter($_is_parse_post = false) {
 
 	return $result;
 }
-
-?>

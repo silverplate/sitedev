@@ -57,14 +57,26 @@ function getXmlDocumentForRoot($_xml, $_root)
     return getXmlHeader($root) . $_xml;
 }
 
+/**
+ * @param string $_xml
+ * @param string $_root
+ * @return DomDocument
+ */
 function getXmlObject($_xml, $_root = null)
 {
-    return DomDocument::loadXml(getXmlDocument($_xml, $_root), DOM_LOAD_OPTIONS);
+    return DomDocument::loadXml(getXmlDocument($_xml, $_root),
+                                DOM_LOAD_OPTIONS);
 }
 
+/**
+ * @param string $_xml
+ * @param string $_root
+ * @return DomDocument
+ */
 function getXmlObjectForRoot($_xml, $_root)
 {
-    return DomDocument::loadXml(getXmlDocumentForRoot($_xml, $_root), DOM_LOAD_OPTIONS);
+    return DomDocument::loadXml(getXmlDocumentForRoot($_xml, $_root),
+                                DOM_LOAD_OPTIONS);
 }
 
 function loadXmlObject($_path)
@@ -137,4 +149,27 @@ function getNumberXml($_name, $_number, $_attrs = null, $_decimals = null)
     $attrs['comma-value'] = str_replace('.', ',', $value);
 
     return getCdata($_name, format_number(abs($_number), $_decimals), $attrs);
+}
+
+function replaceEntitiesWithSymbols($_content)
+{
+    $matches = array();
+    $content = $_content;
+    preg_match_all('/&[0-9a-zA-Z]+;/', $content, $matches);
+
+    if ($matches) {
+        $xml =  '<entity>' . implode('</entity><entity>', $matches[0]) . '</entity>';
+        $dom = DomDocument::loadXml(getXmlDocument($xml), DOM_LOAD_OPTIONS + LIBXML_NOERROR);
+        $entities = $dom->getElementsByTagName('entity');
+
+        for ($i = 0; $i < $entities->length; $i++) {
+            $value = $entities->item($i)->nodeValue;
+
+            if ($value) {
+                $content = str_replace($matches[0][$i], $value, $content);
+            }
+        }
+    }
+
+    return $content;
 }

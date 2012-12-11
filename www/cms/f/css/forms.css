@@ -239,12 +239,26 @@ div.field_image_replace {
 	clear: left;
 }
 
+img.preview
+{
+    border: 1px solid #eee;
+    margin: 0 10px 10px 0;
+}
+
+img.preview-resized
+{
+    border: 1px dotted #000;
+    margin: 0 10px 10px 0;
+}
+
 input.year {
 	width: 5em;
 	text-align: right;
 }
 
-input.integer {
+input.integer,
+input.float
+{
 	width: 10em;
 	text-align: right;
 }
@@ -253,6 +267,11 @@ td.multiple {
 	vertical-align: top;
 	padding: 0 10px 5px 10px !important;
 	font-size: 0.84em;
+}
+
+td.multiple-first
+{
+    padding-left: 0 !important;
 }
 
 td.multiple table.chooser_item {
@@ -408,3 +427,39 @@ div.sort_item a {
     width: 150px;
 }
 */
+
+
+/*** Список элементов из таблицы с тройным составным первичным ключом
+*********************************************************/
+table.triple-link-item,
+table.orders
+{
+    float: left;
+    margin: 10px 34px 0 -14px;
+}
+
+table.triple-link-item td.system,
+table.orders td.system
+{
+    /* padding-top: 7px; */
+    line-height: 0;
+    width: 14px;
+}
+
+table.triple-link-item td.system div,
+table.orders td.system div
+{
+    cursor: pointer;
+}
+
+table.triple-link-item select,
+table.orders select
+{
+    margin: 0 5px 0 0;
+    width: 150px;
+}
+
+table.orders input.integer
+{
+    width: 3em;
+}

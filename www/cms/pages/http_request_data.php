@@ -71,8 +71,9 @@ function data_get_images($_dir, $_exclude_path) {
 			if ($item != '.' && $item != '..') {
 				if (is_dir($dir . $item)) {
 					$result = array_merge($result, data_get_images($dir . $item, $exclude_path));
-				} elseif ($dir != $exclude_path && Image::IsImageExtension(get_file_extension($item))) {
-					array_push($result, new Image($dir . $item, DOCUMENT_ROOT, '/'));
+
+				} else if ($dir != $exclude_path && Ext_Image::IsImage($item)) {
+				    $result[] = App_Image::factory($dir . $item);
 				}
 			}
 
@@ -84,5 +85,3 @@ function data_get_images($_dir, $_exclude_path) {
 
 	return $result;
 }
-
-?>

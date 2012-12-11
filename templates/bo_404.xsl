@@ -22,10 +22,6 @@
 				</title>
 
 				<link href="/cms/f/css/main.css" type="text/css" rel="stylesheet" />
-				
-				<script src="/cms/f/js/prototype_150.js" type="text/javascript" language="JavaScript" />
-				<script src="/cms/f/tinymce/jscripts/tiny_mce/tiny_mce.js" type="text/javascript" language="javascript" />
-				<script src="/cms/f/js/scriptaculous_170/scriptaculous.js" type="text/javascript" language="JavaScript" />
 			</head>
 			<body>
 				<table width="100%" height="100%">

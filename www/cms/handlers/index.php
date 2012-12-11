@@ -65,7 +65,7 @@ if ($page->IsAuthorized()) {
 					}
 
 					if ($obj->GetAttribute('is_document_main')) {
-						Db::Get()->Execute('UPDATE ' . Handler::GetTbl() . ' SET is_document_main = 0 WHERE is_document_main = 1 AND ' . Handler::GetPri() . ' != ' . get_db_data($obj->GetId()));
+						Db::Get()->Execute('UPDATE ' . Handler::GetTbl() . ' SET is_document_main = 0 WHERE is_document_main = 1 AND ' . Handler::GetPri() . ' != ' . Db::escape($obj->GetId()));
 					}
 
 					reload('?id=' . $obj->GetId() . '&OK');
@@ -120,5 +120,3 @@ if ($page->IsAuthorized()) {
 }
 
 $page->Output();
-
-?>

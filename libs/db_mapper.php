@@ -2,36 +2,37 @@
 
 abstract class DbMapper
 {
+    /**
+     * @var ActiveRecordExtended
+     */
     protected $_db;
+
     protected $_linksParam = array();
     protected $_files;
     protected $_images;
 
-
     public function getXml($_node = null, $_xml = null, array $_attrs = array())
     {
-        $xml = empty($_xml) ? array() : array($_xml);
-        $node = empty($_node) ? 'item' : $_node;
-        $attrs = empty($_attrs) ? array() : $_attrs;
+        return Ext_Xml::node(empty($_node) ? 'item' : $_node, $_xml, $_attrs);
+    }
 
-        $result = '<' . $node;
-        foreach ($attrs as $name => $value) {
-            $result .= ' ' . self::normalizeXmlName($name) . '="' . $value . '"';
-        }
+    public function save()
+    {
+        if ($this->getId()) return $this->update();
+        else                return $this->create();
+    }
 
-        $result .= '>';
-        $result .= implode('', $xml);
-        $result .= '</' . $node . '>';
-
-        return $result;
+    public function truncate()
+    {
+        return Db::get()->execute('TRUNCATE `' . $this->getDb()->getPri() . '`');
     }
 
 
-    /*
+    /**
     *
     * Далее обычно повторяющаяся для большинства объектов часть
     *
-    **/
+    */
 
     public static function getDbClassName($_class = null)
     {
@@ -79,11 +80,11 @@ abstract class DbMapper
     }
 
 
-    /*
-    *
-    * Связи
-    *
-    **/
+    /**
+     *
+     * Связи
+     *
+     */
 
     public function getLinks($_name, $_isPublished = null)
     {
@@ -183,39 +184,12 @@ abstract class DbMapper
         }
     }
 
-    /*
-    *
-    * Далее нужен рефакторинг
-    *
-    **/
 
-    public static function normalizeXmlName($name) {
-        return str_replace('_', '-', self::getUnderlinedStyleName($name));
-    }
-
-    public static function getNoEmptyCdataNodeXml($nodeName, $cdata = null, array $attrs = array()) {
-        return
-            empty($cdata) && !$attrs
-            ? ''
-            : self::getCdataNodeXml($nodeName, $cdata, $attrs);
-    }
-
-    public static function getCdataNodeXml($nodeName, $cdata = null, array $attrs = array()) {
-        $nodeName = self::normalizeXmlName($nodeName);
-
-        $xml = '<' . $nodeName;
-        foreach ($attrs as $name => $value) {
-            $xml .= ' ' . self::normalizeXmlName($name) . '="' . $value . '"';
-        }
-
-        if ($cdata) {
-            $xml .= '><![CDATA[' . $cdata . ']]></' . $nodeName . '>';
-        } else {
-            $xml .= ' />';
-        }
-
-        return $xml;
-    }
+    /**
+     *
+     * Далее нужен рефакторинг
+     *
+     */
 
 //     public function getCamelStyleName($name) {
 //         $result = '';
@@ -246,7 +220,8 @@ abstract class DbMapper
         return $this->_db;
     }
 
-    public function getPrimaryKey() {
+    public function getPrimaryKey()
+    {
         return $this->_db->getPrimaryKey();
     }
 
@@ -353,19 +328,34 @@ abstract class DbMapper
         return $this->_db->getDbId();
     }
 
-    public function uploadFile($name, $tmpName)
+
+    /**
+     *
+     * Работа с файлами объекта.
+     *
+     */
+
+    public function uploadFile($_filename, $_tmpName, $_newName = null)
     {
-        if (!empty($name) && !empty($tmpName)) {
-            $name = File::normalizeName($name);
+        $filename = is_null($_newName)
+                  ? Ext_File::normalizeName($_filename)
+                  : $_newName . '.' . Ext_File::computeExt($_filename);
 
-            if (is_file($this->getFilePath() . $name)) {
-                unlink($this->getFilePath() . $name);
-            } else {
-                create_directory($this->getFilePath(), true);
-            }
+        $path = $this->getFilePath() . $filename;
 
-            move_uploaded_file($tmpName, $this->getFilePath() . $name);
-            chmod($this->getFilePath() . $name, 0777);
+        Ext_File::deleteFile($path);
+        Ext_File::createDir($this->getFilePath());
+
+        move_uploaded_file($_tmpName, $path);
+        @chmod($path, 0777);
+
+        Ext_File_Cache::delete($path);
+    }
+
+    public function cleanFileCache()
+    {
+        foreach ($this->getFiles() as $file) {
+            Ext_File_Cache::delete($file->getPath());
         }
     }
 
@@ -379,25 +369,30 @@ abstract class DbMapper
     {
         if (is_null($this->_files)) {
             $this->_files = array();
+
             if (
                 method_exists($this, 'getFilePath') &&
                 $this->getFilePath() &&
                 is_dir($this->getFilePath())
             ) {
                 $handle = opendir($this->getFilePath());
+
                 while (false !== $item = readdir($handle)) {
-                    if (
-                        $item != '.' &&
-                        $item != '..' &&
-                        is_file($this->getFilePath() . $item)
-                    ) {
-                        $file = new File($this->getFilePath() . $item, DOCUMENT_ROOT, '/');
-                        $this->_files[strtolower($file->getFileName())] = $file;
+                    $filePath = $this->getFilePath() . '/' . $item;
+
+                    if ($item{0} != '.' && is_file($filePath)) {
+                        $file = App_File::factory($filePath);
+
+                        $this->_files[
+                            Ext_String::toLower($file->getFileName())
+                        ] = $file;
                     }
                 }
+
                 closedir($handle);
             }
         }
+
         return $this->_files;
     }
 
@@ -405,65 +400,76 @@ abstract class DbMapper
     {
         if (is_null($this->_images)) {
             $this->_images = array();
-            if ($this->getFiles()) {
-                foreach ($this->getFiles() as $file) {
-                    if (Image::isImageExtension($file->getExtension())) {
-                        $image = new Image(
-                            $file->getPath(),
-                            $file->getPathStartsWith(),
-                            $file->getUriStartsWith()
-                        );
-                        $this->_images[strtolower($image->getFileName())] = $image;
-                    }
+
+            foreach ($this->getFiles() as $key => $file) {
+                if ($file->isImage()) {
+                    $this->_images[$key] = $file;
                 }
             }
         }
+
         return $this->_images;
     }
 
-    public function getIlluByFileName($filename)
+    public function getIlluByFileName($_filename)
     {
         $files = $this->getImages();
-        return 0 < count($files) && isset($files[$filename])
-            ? $files[$filename]
-            : false;
+
+        return $files && key_exists($_filename, $files)
+             ? $files[$_filename]
+             : false;
     }
 
-    public function getIlluByName($name)
+    public function getIlluByName($_name)
     {
         foreach ($this->getImages() as $file) {
-            if ($name == $file->getName()) {
+            if ($_name == $file->getName()) {
                 return $file;
             }
         }
+
         return false;
     }
 
-    public function getIllu($name)
+    public function getIllu($_name)
     {
-        return $this->getIlluByName($name);
+        $illu = $this->getIlluByName($_name);
+
+        if (!$illu) {
+            $illu = $this->getIlluByFileName($_name);
+        }
+
+        return $illu;
     }
 
-    public function getFileByFileName($filename)
+    public function getFileByFileName($_filename)
     {
         $files = $this->getFiles();
-        return 0 < count($files) && isset($files[$filename])
-            ? $files[$filename]
-            : false;
+
+        return $files && key_exists($_filename, $files)
+             ? $files[$_filename]
+             : false;
     }
 
-    public function getFileByName($name)
+    public function getFileByName($_name)
     {
         foreach ($this->getFiles() as $file) {
-            if ($name == $file->getName()) {
+            if ($_name == $file->getName()) {
                 return $file;
             }
         }
+
         return false;
     }
 
-    public function getFile($name)
+    public function getFile($_name)
     {
-        return $this->getFileByName($name);
+        $file = $this->getFileByName($_name);
+
+        if (!$file) {
+            $file = $this->getFileByFileName($_name);
+        }
+
+        return $file;
     }
 }

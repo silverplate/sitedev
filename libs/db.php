@@ -1,25 +1,51 @@
 <?php
 
-class Db {
-	private static $Db;
+class Db
+{
+    /**
+     * @var Ext_Mysqli
+     */
+    private static $_db;
 
-	public static function Get() {
-		if (!isset(self::$Db)) {
-			require_once(LIBRARIES . 'mysql.php');
-			$obj = new DbMysql(DB_CONNECTION_STRING);
-			$obj->IsLog = false;
-			self::$Db = $obj;
-		}
-		return self::$Db;
-	}
+    /**
+     * @return Ext_Mysqli
+     */
+    public static function get()
+    {
+        if (!isset(self::$_db)) {
+            require_once 'ext_mysqli.php';
+            self::$_db = new Ext_Mysqli(DB_CONNECTION_STRING);
+        }
+
+        return self::$_db;
+    }
+
+    /**
+     * @param string|integer|array $_data
+     * @param string $_quote
+     * @return string
+     */
+    public static function escape($_data, $_quote = null)
+    {
+        return self::get()->escape($_data, $_quote);
+    }
+
+    /**
+     * @param string $_where Path to future dump file.
+     * @return string
+     */
+    public static function dump($_where)
+    {
+        $user = self::get()->getUser();
+        $password = self::get()->getPassword();
+        $host = self::get()->getHost();
+        $database = self::get()->getDatabase();
+
+        $connectionParams = "-u$user -p$password -h$host";
+        if (self::get()->getPort()) {
+            $connectionParams .= ' -P' . self::get()->getPort();
+        }
+
+        return exec("mysqldump $connectionParams $database > $_where");
+    }
 }
-
-function get_db_data($_data) {
-	return Db::Get()->Escape($_data);
-}
-
-function dump() {
-	return exec('/usr/local/mysql/bin/mysqldump -u' . Db::Get()->GetUser() . ' -p' . Db::Get()->GetPassword() . ' --compact --add-drop-table --extended-insert ' . Db::Get()->GetDatabase() . ' > ' . SETS . 'dump.sql');
-}
-
-?>

@@ -101,8 +101,12 @@
 				<xsl:text> &middot; </xsl:text>
 				<xsl:value-of select="text()" disable-output-escaping="yes" />
 			</xsl:for-each>
+
 			<xsl:text> &middot; &copy; </xsl:text>
-			<xsl:call-template name="get_date_period"><xsl:with-param name="start_year">2007</xsl:with-param></xsl:call-template>
+
+			<xsl:call-template name="get-date-period">
+                <xsl:with-param name="start-year">2007</xsl:with-param>
+            </xsl:call-template>
 		</div>
 	</xsl:template>
 
@@ -192,80 +196,120 @@
 		</a>
 	</xsl:template>
 
-	<xsl:template match="local_navigation[@type = 'filter' or @type = 'content_filter']" mode="list">
-		<script type="text/javascript" language="JavaScript" src="/cms/f/js/filter.js"></script>
+	<xsl:template
+        match="local-navigation[@type = 'filter' or @type = 'content_filter']|local_navigation[@type = 'filter' or @type = 'content_filter']"
+        mode="list"
+    >
+		<script type="text/javascript" src="/cms/f/js/filter.js" />
 
 		<div id="filter_link">
-			<xsl:if test="@is_open"><xsl:attribute name="style">display: none;</xsl:attribute></xsl:if>
+			<xsl:if test="@is-open or @is_open"><xsl:attribute name="style">display: none;</xsl:attribute></xsl:if>
 			<a onclick="show_filter();">Отфильтровать</a>
 		</div>
 
 		<xsl:variable name="is_sortable">
 			<xsl:choose>
-				<xsl:when test="@is_sortable">true</xsl:when>
+				<xsl:when test="@is-sortable or @is_sortable">true</xsl:when>
 				<xsl:otherwise>false</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
 
 		<xsl:variable name="is_date">
 			<xsl:choose>
-				<xsl:when test="@is_date">true</xsl:when>
+				<xsl:when test="@is-date or @is_date">true</xsl:when>
 				<xsl:otherwise>false</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
 
 		<form id="filter" onsubmit="filter_update('filter_content', true, {$is_sortable}, {$is_date}); return false;">
-			<xsl:if test="@is_open"><xsl:attribute name="style">display: block;</xsl:attribute></xsl:if>
+			<xsl:if test="@is-open or @is_open"><xsl:attribute name="style">display: block;</xsl:attribute></xsl:if>
 			<div class="filter_close"><a onclick="hide_filter();">&times;</a></div>
-			<xsl:if test="@is_date"><xsl:call-template name="date_filter" /></xsl:if>
+			<xsl:if test="$is_date = 'true'">
+                <xsl:call-template name="date_filter" />
+            </xsl:if>
 
-			<xsl:if test="@is_title">
+			<xsl:if test="@is-title or @is_title">
 				<div class="filter_input">
 					<label for="filter_title">Название</label>
-					<input type="text" name="filter_title" id="filter_title" value="{filter_title/text()}" class="string" />
+					<input type="text" name="filter_title" id="filter_title" class="string">
+                        <xsl:attribute name="value"><xsl:choose>
+                            <xsl:when test="filter-title">
+                                <xsl:value-of select="filter-title" />
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="filter_title" />
+                            </xsl:otherwise>
+                        </xsl:choose></xsl:attribute>
+                    </input>
 				</div>
 			</xsl:if>
 
-			<xsl:if test="@is_name">
+			<xsl:if test="@is-name or @is_name">
 				<div class="filter_input">
 					<label for="filter_name">Имя</label>
-					<input type="text" name="filter_name" id="filter_name" value="{filter_name/text()}" class="string" />
+					<input type="text" name="filter_name" id="filter_name" class="string">
+                        <xsl:attribute name="value"><xsl:choose>
+                            <xsl:when test="filter-name">
+                                <xsl:value-of select="filter-name" />
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="filter_name" />
+                            </xsl:otherwise>
+                        </xsl:choose></xsl:attribute>
+                    </input>
 				</div>
 			</xsl:if>
 
-			<xsl:if test="@is_email">
+			<xsl:if test="@is-email or @is_email">
 				<div class="filter_input">
 					<label for="filter_email">Электропочта</label>
-					<input type="text" name="filter_email" id="filter_email" value="{filter_email/text()}" class="string" />
+					<input type="text" name="filter_email" id="filter_email" class="string">
+                        <xsl:attribute name="value"><xsl:choose>
+                            <xsl:when test="filter-email">
+                                <xsl:value-of select="filter-email" />
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="filter_email" />
+                            </xsl:otherwise>
+                        </xsl:choose></xsl:attribute>
+                    </input>
 				</div>
 			</xsl:if>
 
-			<xsl:apply-templates select="filter_param[@name and title/text() and item]" />
+			<xsl:apply-templates select="filter-param[@name and title and item]|filter_param[@name and title and item]" />
+
 			<div style="text-align: right;"><input type="submit" value="Выбрать" /></div>
 			<input type="hidden" name="filter_selected_id" value="{ancestor::node()[name() = 'module']/@id}" />
 		</form>
 		<br clear="all" />
 
 		<xsl:if test="@type = 'filter'">
-			<ul id="filter_content"><xsl:if test="@is_sortable"><xsl:attribute name="class">sortable</xsl:attribute></xsl:if></ul>
+			<ul id="filter_content"><xsl:if test="@is-sortable or @is_sortable"><xsl:attribute name="class">sortable</xsl:attribute></xsl:if></ul>
 			<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('filter_update(&quot;filter_content&quot;, false, ', $is_sortable, ', ', $is_date, ');')" /></script>
 		</xsl:if>
 	</xsl:template>
 
-	<xsl:template match="filter_param[@name and title/text() and item]">
+	<xsl:template match="filter-param|filter_param">
 		<div class="filter_input">
 			<table class="chooser_item">
 				<tr>
 					<td><input type="checkbox" name="is_filter_{@name}" id="is_filter_{@name}" value="1" onclick="change_element_visibility('filter_{@name}_ele', this.checked);">
-						<xsl:if test="@is_selected"><xsl:attribute name="checked">true</xsl:attribute></xsl:if>
+						<xsl:if test="@is-selected or @is_selected">
+                            <xsl:attribute name="checked">true</xsl:attribute>
+                        </xsl:if>
 					</input></td>
 					<td class="chooser_label">
-						<label for="is_filter_{@name}" class="filter_name"><xsl:value-of select="title/text()" disable-output-escaping="yes" /></label>
+						<label for="is_filter_{@name}" class="filter_name"><xsl:value-of select="title" disable-output-escaping="yes" /></label>
 						<table class="chooser_item" id="filter_{@name}_ele">
-							<xsl:if test="not(@is_selected)"><xsl:attribute name="style">display: none;</xsl:attribute></xsl:if>
+							<xsl:if test="not(@is-selected or @is_selected)">
+                                <xsl:attribute name="style">display: none;</xsl:attribute>
+                            </xsl:if>
+
 							<xsl:for-each select="item"><tr>
 								<td><input type="checkbox" name="filter_{parent::node()/@name}[]" id="{generate-id()}" value="{@value}">
-									<xsl:if test="parent::node()/@is_selected and @is_selected"><xsl:attribute name="checked">true</xsl:attribute></xsl:if>
+									<xsl:if test="(parent::node()/@is-selected and @is-selected) or (parent::node()/@is_selected and @is_selected)">
+                                        <xsl:attribute name="checked">true</xsl:attribute>
+                                    </xsl:if>
 								</input></td>
 								<td class="chooser_label"><label for="{generate-id()}"><xsl:value-of select="text()" disable-output-escaping="yes" /></label></td>
 							</tr></xsl:for-each>
@@ -309,14 +353,14 @@
 		</table>
 	</xsl:template>
 
-	<xsl:template match="local_navigation" name="local_navigation" mode="list">
+	<xsl:template match="local-navigation|local_navigation" name="local_navigation" mode="list">
 		<ul id="filter_content">
 			<xsl:if test="@is_sortable"><xsl:attribute name="class">sortable</xsl:attribute></xsl:if>
 			<xsl:choose>
 				<xsl:when test="item">
 					<xsl:apply-templates select="item" mode="local_navigation">
 						<xsl:with-param name="selected_id" select="ancestor::node()[name() = 'module']/@id" />
-						<xsl:with-param name="is_sortable"><xsl:if test="@is_sortable">1</xsl:if></xsl:with-param>
+						<xsl:with-param name="is_sortable"><xsl:if test="@is-sortable or @is_sortable">1</xsl:if></xsl:with-param>
 					</xsl:apply-templates>
 				</xsl:when>
 				<xsl:otherwise>Нет</xsl:otherwise>
@@ -341,7 +385,7 @@
 			<xsl:for-each select="@*[name() = 'xml:lang' or name() = 'prefix']"><xsl:value-of select="concat(., '&nbsp;')" /></xsl:for-each>
 
 			<xsl:choose>
-				<xsl:when test="@is_sort_only">
+				<xsl:when test="@is-sort-only or @is_sort_only">
 					<span>
 						<xsl:attribute name="class">
 							<xsl:text>sort_only</xsl:text>

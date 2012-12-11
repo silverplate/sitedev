@@ -8,7 +8,6 @@
 	<xsl:include href="bo_common.xsl" />
 	<xsl:include href="bo_modules.xsl" />
 	<xsl:include href="bo_forms.xsl" />
-	<xsl:include href="bo_project_forms.xsl" />
 
 	<xsl:template match="page">
 		<html>

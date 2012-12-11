@@ -43,7 +43,7 @@ extends     DocumentDataHandler
                        'is_published' => 1);
 
         foreach ($except as $attr => $value) {
-            array_push($rowConds, $attr . ' != ' . get_db_data($value));
+            array_push($rowConds, $attr . ' != ' . Db::escape($value));
         }
 
         $children = Document::getList($conds, null, $rowConds);
@@ -62,16 +62,8 @@ extends     DocumentDataHandler
                     switch ($type) {
                         case 'filename':
                             foreach ($values as $value) {
-                                $file = $item->getFileByName($value);
-                                if ($file) {
-                                    if (File::isImageExtension($file->getExtension())) {
-                                        $file = new Image($file->getPath(),
-                                                          $file->getPathStartsWith(),
-                                                          $file->getUriStartsWith());
-                                    }
-
-                                    $itemXml .= $file->getXml();
-                                }
+                                $file = $item->getIllu($value);
+                                if ($file) $itemXml .= $file->getXml();
                             }
                             break;
                     }

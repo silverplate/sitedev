@@ -42,9 +42,9 @@ if (is_null($document_id) || !Document::Load($document_id)) {
 	}
 
 	$handler_row_conditions = array();
-	$handler_self_condition = isset($obj) && $obj && $obj->GetAttribute(Handler::GetPri()) ? ' OR ' . Handler::GetPri() . ' = ' . get_db_data($obj->GetAttribute(Handler::GetPri())) : '';
-	$used = Db::Get()->GetList('SELECT ' . Handler::GetPri() . ' FROM ' . DocumentData::GetTbl() . ' WHERE ' . Handler::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . DocumentData::GetPri() . ' != ' . get_db_data($obj->GetId()) : '') . ' GROUP BY ' . Handler::GetPri());
-	if ($used) array_push($handler_row_conditions, '(is_multiple = 1 OR ' . Handler::GetPri() . ' NOT IN (' . get_db_data($used) . ')' . $handler_self_condition . ')');
+	$handler_self_condition = isset($obj) && $obj && $obj->GetAttribute(Handler::GetPri()) ? ' OR ' . Handler::GetPri() . ' = ' . Db::escape($obj->GetAttribute(Handler::GetPri())) : '';
+	$used = Db::Get()->GetList('SELECT ' . Handler::GetPri() . ' FROM ' . DocumentData::GetTbl() . ' WHERE ' . Handler::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . DocumentData::GetPri() . ' != ' . Db::escape($obj->GetId()) : '') . ' GROUP BY ' . Handler::GetPri());
+	if ($used) array_push($handler_row_conditions, '(is_multiple = 1 OR ' . Handler::GetPri() . ' NOT IN (' . Db::escape($used) . ')' . $handler_self_condition . ')');
 	array_push($handler_row_conditions, $handler_self_condition ? '(is_published = 1' . $handler_self_condition . ')' : 'is_published = 1');
 
 	$form->Elements[Handler::GetPri()]->AddOption('', 'Нет');

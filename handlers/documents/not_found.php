@@ -9,7 +9,7 @@ implements  DocumentHandlerInterface
     public function execute()
     {
         parent::execute();
-        $this->setRootNodeName('page_not_found');
+        $this->setRootNodeName('page-not-found');
     }
 
     public function output()

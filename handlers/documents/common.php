@@ -8,6 +8,8 @@ implements  DocumentHandlerInterface
     {
         parent::execute();
 
+        // Шаблон
+
         $template = $this->Document->getTemplate();
         if ($template->getFile()) {
             $this->setTemplate($template->getFile()->getPath());
@@ -16,15 +18,12 @@ implements  DocumentHandlerInterface
             $this->setTemplate(TEMPLATES . 'fo.xsl');
         }
 
+        // Site navigation
 
-        /*
-        * Site navigation
-        */
         $navigationXml = '';
         $navigation = DocumentNavigation::getList(array('is_published' => 1),
                                                   null,
                                                   array('name != "robots_sitemap"'));
-
         foreach ($navigation as $i) {
             $navigationXml .= DocumentNavigation::getNavigationXml($i->getAttribute('name'),
                                                                    $i->getAttribute('type'));

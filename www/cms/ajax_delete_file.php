@@ -1,19 +1,21 @@
 <?php
 
-require('prepend.php');
+require 'prepend.php';
 $result = 0;
 
-if (isset($_POST['f']) && is_file($_POST['f'])) {
-	unlink($_POST['f']);
+global $g_user;
 
-	if (is_directory_empty(dirname($_POST['f']))) {
-		rmdir(dirname($_POST['f']));
-	}
+if (!empty($g_user) && isset($_POST['f']) && is_file($_POST['f'])) {
+    Ext_File::deleteFile($_POST['f']);
+
+    $dir = dirname($_POST['f']);
+
+    if (Ext_File::isDirEmpty($dir)) {
+        Ext_File::removeDir($dir);
+    }
 
 	$result = 1;
 }
 
-header('Content-type: text/html; charset=windows-1251');
+header('Content-type: text/html');
 echo $result;
-
-?>

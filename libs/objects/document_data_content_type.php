@@ -25,7 +25,7 @@ class DocumentDataContentType extends ActiveRecord {
 	}
 
 	public function Delete() {
-		Db::Get()->Execute('UPDATE ' . DocumentData::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . get_db_data($this->GetId()));
+		Db::Get()->Execute('UPDATE ' . DocumentData::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . Db::escape($this->GetId()));
 		parent::Delete();
 	}
 

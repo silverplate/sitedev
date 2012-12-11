@@ -46,7 +46,7 @@
 						<td height="99%" valign="top">
 							<xsl:call-template name="page_navigation" />
 
-							<form method="post">
+							<form action="{/node()/url}" method="post">
 								<table class="auth_form">
 									<tr>
 										<td class="auth_login">

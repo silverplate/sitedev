@@ -24,7 +24,7 @@ class Document extends ActiveRecord {
 			$name = translit($_name);
 			create_directory($this->GetFilePath(), true);
 			move_uploaded_file($_tmp_name, $this->GetFilePath() . $name);
-			chmod($this->GetFilePath() . $name, 0777);
+			@chmod($this->GetFilePath() . $name, 0777);
 		}
 	}
 
@@ -128,7 +128,10 @@ class Document extends ActiveRecord {
 		    $this->getAttribute('parent_id') !== 'NULL'
 		) {
 			$parent = self::load($this->getAttribute('parent_id'));
-			$uri = $parent->getAttribute('uri');
+
+			if ($parent) {
+			    $uri = $parent->getAttribute('uri');
+			}
 		}
 
 		if (!isset($uri)) {
@@ -176,7 +179,7 @@ class Document extends ActiveRecord {
 
 	public function Create() {
 		$this->ComputeUri();
-		parent::Create();
+		return parent::Create();
 	}
 
 	public function Update() {
@@ -240,7 +243,7 @@ class Document extends ActiveRecord {
 
 	public static function GetAncestors($_id) {
 		$result = array();
-		$entry = Db::Get()->GetEntry('SELECT ' . self::GetPri() . ', parent_id FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . get_db_data($_id));
+		$entry = Db::Get()->GetEntry('SELECT ' . self::GetPri() . ', parent_id FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . Db::escape($_id));
 		if ($entry) {
 			array_push($result, $entry[self::GetPri()]);
 			if ($entry['parent_id']) $result = array_merge($result, self::GetAncestors($entry['parent_id']));
@@ -294,12 +297,12 @@ class Document extends ActiveRecord {
 			if ($_conditions['navigations']) {
 				array_push($result['tables'], DocumentToNavigation::GetTbl());
 				array_push($result['row_conditions'], $self['pk_attr'] . ' = ' . DocumentToNavigation::GetTbl() . '.' . $self['pk']);
-				array_push($result['row_conditions'], DocumentToNavigation::GetTbl() . '.' . DocumentNavigation::GetPri() . (is_array($_conditions['navigations']) ? ' IN (' . get_db_data($_conditions['navigations']) . ')' : ' = ' . get_db_data($_conditions['navigations'])));
+				array_push($result['row_conditions'], DocumentToNavigation::GetTbl() . '.' . DocumentNavigation::GetPri() . (is_array($_conditions['navigations']) ? ' IN (' . Db::escape($_conditions['navigations']) . ')' : ' = ' . Db::escape($_conditions['navigations'])));
 
 				if (isset($_conditions['is_published'])) {
 					array_push($result['tables'], DocumentNavigation::GetTbl());
 					array_push($result['row_conditions'], DocumentToNavigation::GetTbl() . '.' . DocumentNavigation::GetPri() . ' = ' . DocumentNavigation::GetPri(true));
-					array_push($result['row_conditions'], DocumentNavigation::GetTbl() . '.is_published = ' . get_db_data($_conditions['is_published']));
+					array_push($result['row_conditions'], DocumentNavigation::GetTbl() . '.is_published = ' . Db::escape($_conditions['is_published']));
 				}
 			}
 			unset($_conditions['navigations']);
@@ -316,13 +319,13 @@ class Document extends ActiveRecord {
                 } else if (is_array($value)) {
                     array_push(
                         $result['row_conditions'],
-                        $self['table'] . '.' . $attribute . ' IN (' . get_db_data($value) . ')'
+                        $self['table'] . '.' . $attribute . ' IN (' . Db::escape($value) . ')'
                     );
 
                 } else {
                     array_push(
                         $result['row_conditions'],
-                        $self['table'] . '.' . $attribute . ' = ' . get_db_data($value)
+                        $self['table'] . '.' . $attribute . ' = ' . Db::escape($value)
                     );
                 }
 			}
@@ -350,7 +353,7 @@ class Document extends ActiveRecord {
 
 	public static function CheckUnique($_parent_id, $_folder, $_except_id = null) {
 		$row_conditions = array();
-		if ($_except_id) array_push($row_conditions, self::GetPri() . ' != ' . get_db_data($_except_id));
+		if ($_except_id) array_push($row_conditions, self::GetPri() . ' != ' . Db::escape($_except_id));
 		return !(self::GetList(array('parent_id' => $_parent_id, 'folder' => $_folder), array('count' => 1), $row_conditions));
 	}
 

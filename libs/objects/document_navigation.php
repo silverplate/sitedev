@@ -28,7 +28,7 @@ class DocumentNavigation extends ActiveRecord {
 				' . DocumentToNavigation::getTbl() . ' AS l
 			WHERE
 			    n.is_published = 1 AND
-				n.name = ' . get_db_data($_name) . ' AND
+				n.name = ' . Db::escape($_name) . ' AND
 				n.' . DocumentNavigation::getPri() . ' = l.' . DocumentNavigation::getPri() . ' AND
 				l.' . Document::getPri() . ' = d.' . Document::getPri() . ' AND
 				d.is_published = 1' .

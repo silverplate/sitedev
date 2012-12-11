@@ -11,75 +11,99 @@ define('OBJECTS',       LIBRARIES . 'objects/');
 
 set_include_path(
     LIBRARIES . PATH_SEPARATOR .
+    OBJECTS . PATH_SEPARATOR .
     get_include_path()
 );
 
-require_once('strings.php');
-require_once('dates.php');
-require_once('files.php');
-require_once('dom.php');
-require_once('db.php');
-require_once('forms.php');
-require_once('form_elements.php');
-require_once('phpmailer.php');
+require_once 'strings.php';
+require_once 'dates.php';
+require_once 'files.php';
+require_once 'dom.php';
+require_once 'db.php';
+require_once 'forms.php';
+require_once 'form_elements.php';
+require_once 'phpmailer.php';
 
-function __autoload($_class_name) {
-	$class_file = '';
+function __autoload($_className)
+{
+    $classFile = '';
 
-	for ($i = 0; $i < strlen($_class_name); $i++) {
-		if ($i != 0 && $_class_name{$i} == strtoupper($_class_name{$i})) {
-			$class_file .= '_';
-		}
-		$class_file .= strtolower($_class_name{$i});
-	}
+    for ($i = 0; $i < strlen($_className); $i++) {
+        if (
+            $i != 0 &&
+            $_className{$i} == strtoupper($_className{$i}) &&
+            $_className{$i} != '_' &&
+            $_className{$i - 1} != '_'
+        ) {
+            $classFile .= '_';
+        }
 
-	$class_file .= '.php';
+        $classFile .= strtolower($_className{$i});
+    }
 
-	if (is_file(LIBRARIES . $class_file)) require_once(LIBRARIES . $class_file);
-	if (is_file(OBJECTS . $class_file)) require_once(OBJECTS . $class_file);
+    $classFile .= '.php';
+
+    // Вариант, когда директории в названии
+    // класса разделены подчеркиванием.
+    if (strpos($_className, '_') !== false) {
+        $classFileAlt = str_replace('_', '/', $_className) . '.php';
+    }
+
+    $paths = array(LIBRARIES, OBJECTS, LIBRARIES . 'Ext');
+
+    foreach ($paths as $path) {
+        if (is_file($path . $classFile)) {
+            require_once $path . $classFile;
+            break;
+
+        } else if (isset($classFileAlt) && is_file($path . $classFileAlt)) {
+            require_once $path . $classFileAlt;
+            break;
+        }
+    }
 }
 
 function get_lang_inner_uri() {
-	return defined('SITE_LANG') && SITE_LANG ? '/' . SITE_LANG . '/' : '/';
+    return defined('SITE_LANG') && SITE_LANG ? '/' . SITE_LANG . '/' : '/';
 }
 
 function send_email($_mail_pref, $_email, $_subject, $_body, $_is_html = false, $_useEnv = true)
 {
-    global $g_admin_email;
+    global $gAdminEmails;
 
-    $env = defined('ENV') ? ENV : 'stage';
+    $env = defined('ENV') ? ENV : 'staging';
 
     if ($_useEnv && $env == 'development') {
         return false;
     }
 
-	if (is_array($_mail_pref) && !empty($_mail_pref['from'])) {
-		$mailer = new phpmailer();
-		$mailer->IsMail();
-		$mailer->IsHTML($_is_html);
-		$mailer->CharSet = 'windows-1251';
-		$mailer->From = $_mail_pref['from'];
-		$mailer->Sender = $mailer->From;
-		$mailer->Subject = $_subject;
-		$mailer->Body = $_body;
+    if (is_array($_mail_pref) && !empty($_mail_pref['from'])) {
+        $mailer = new phpmailer();
+        $mailer->IsMail();
+        $mailer->IsHTML($_is_html);
+        $mailer->CharSet = 'windows-1251';
+        $mailer->From = $_mail_pref['from'];
+        $mailer->Sender = $mailer->From;
+        $mailer->Subject = $_subject;
+        $mailer->Body = $_body;
 
-		if (isset($_mail_pref['signature'])) {
-		    $mailer->Body .= $_mail_pref['signature'];
-		}
+        if (isset($_mail_pref['signature'])) {
+            $mailer->Body .= $_mail_pref['signature'];
+        }
 
-		if (isset($_mail_pref['from_name'])) {
-		    $mailer->FromName = $_mail_pref['from_name'];
-		}
+        if (isset($_mail_pref['from_name'])) {
+            $mailer->FromName = $_mail_pref['from_name'];
+        }
 
-		if (isset($_mail_pref['subject'])) {
-		    $mailer->Subject = $_mail_pref['subject'] . $mailer->Subject;
-		}
+        if (isset($_mail_pref['subject'])) {
+            $mailer->Subject = $_mail_pref['subject'] . $mailer->Subject;
+        }
 
-		if (isset($_mail_pref['bcc'])) {
-			foreach (list_to_array($_mail_pref['bcc']) as $item) {
-			    $mailer->AddBCC($item);
-			}
-		}
+        if (isset($_mail_pref['bcc'])) {
+            foreach (list_to_array($_mail_pref['bcc']) as $item) {
+                $mailer->AddBCC($item);
+            }
+        }
 
         $isEmail = false;
         $emails = is_array($_email) ? $_email : array($_email);
@@ -91,8 +115,8 @@ function send_email($_mail_pref, $_email, $_subject, $_body, $_is_html = false, 
             }
         }
 
-        if ($_useEnv && $env == 'stage') {
-            if (!$g_admin_email) {
+        if ($_useEnv && $env == 'staging') {
+            if (empty($gAdminEmails)) {
                 return false;
             }
 
@@ -107,20 +131,27 @@ function send_email($_mail_pref, $_email, $_subject, $_body, $_is_html = false, 
             }
 
             $mailer->ClearAllRecipients();
-            $mailer->AddAddress($g_admin_email);
+
+            foreach ($gAdminEmails as $adminEmail) {
+                $mailer->addAddress($adminEmail);
+            }
+
+            $mailer->Body =
+                '<p>' . $system_body . '</p>' .
+                '<p>Оригинал:</p>' .
+                ($mailer->ContentType == 'text/plain' ? nl2br($mailer->Body) : $mailer->Body);
+
             $mailer->IsHTML(true);
-            $mailer->Body = '<p>' . $system_body . '</p>' .
-                            '<p>Оригинал:</p>' . $mailer->Body;
         }
 
-		foreach (array('FromName', 'Subject', 'Body') as $name) {
-			$mailer->$name = decode($mailer->$name);
-		}
+        foreach (array('FromName', 'Subject', 'Body') as $name) {
+            $mailer->$name = decode($mailer->$name);
+        }
 
-		return $isEmail ? $mailer->Send() : false;
-	}
+        return $isEmail ? $mailer->Send() : false;
+    }
 
-	return false;
+    return false;
 }
 
 function getAdvParams()

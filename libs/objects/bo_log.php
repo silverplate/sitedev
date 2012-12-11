@@ -120,21 +120,21 @@ class BoLog extends ActiveRecord {
 
 		if (isset($_conditions['from_date'])) {
 			if ($_conditions['from_date']) {
-				array_push($result['row_conditions'], $self['table'] . '.creation_date >= ' . get_db_data(date('Y-m-d 00:00:00', $_conditions['from_date'])));
+				array_push($result['row_conditions'], $self['table'] . '.creation_date >= ' . Db::escape(date('Y-m-d 00:00:00', $_conditions['from_date'])));
 			}
 			unset($_conditions['from_date']);
 		}
 
 		if (isset($_conditions['till_date'])) {
 			if ($_conditions['till_date']) {
-				array_push($result['row_conditions'], $self['table'] . '.creation_date <= ' . get_db_data(date('Y-m-d 23:59:59', $_conditions['till_date'])));
+				array_push($result['row_conditions'], $self['table'] . '.creation_date <= ' . Db::escape(date('Y-m-d 23:59:59', $_conditions['till_date'])));
 			}
 			unset($_conditions['till_date']);
 		}
 
 		if ($_conditions) {
 			foreach ($_conditions as $attribute => $value) {
-				array_push($result['row_conditions'], $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . Db::Get()->EscapeList($value) . ')' : ' = ' . get_db_data($value)));
+				array_push($result['row_conditions'], $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . Db::Get()->EscapeList($value) . ')' : ' = ' . Db::escape($value)));
 			}
 		}
 

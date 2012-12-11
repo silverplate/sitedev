@@ -5,7 +5,9 @@ extends     DocumentDataHandler
 {
     public function execute()
     {
-        $this->setContent(Image::applyXmlImages($this->getContent(),
-                                                $this->Document->getImages()));
+        $this->setContent(App_Image::applyXmlImages(
+            $this->getContent(),
+            $this->Document->getImages()
+        ));
     }
 }

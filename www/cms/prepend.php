@@ -30,7 +30,7 @@ if (isset($_POST['auth_submit'])) {
 		Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_LOGIN_ERROR);
 	}
 
-	reload();
+	reload(empty($_GET['id']) ? null : '?id=' . $_GET['id']);
 
 } elseif (isset($_POST['auth_reminder_submit'])) {
 	$try = isset($_POST['auth_email']) && $_POST['auth_email']

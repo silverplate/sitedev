@@ -8,7 +8,6 @@
 	<xsl:include href="bo_common.xsl" />
 	<xsl:include href="bo_modules.xsl" />
 	<xsl:include href="bo_forms.xsl" />
-	<xsl:include href="bo_project_forms.xsl" />
 
 	<xsl:template match="page">
 		<html>
@@ -29,8 +28,6 @@
 				<link href="/cms/f/css/modules.css" type="text/css" rel="stylesheet" />
 				<link href="/cms/f/css/forms.css" type="text/css" rel="stylesheet" />
 
-				<script src="/cms/f/tinymce/jscripts/tiny_mce/tiny_mce.js" type="text/javascript" language="javascript" />
-				<script src="/cms/f/js/wysiwyg.js" type="text/javascript" language="JavaScript" />
 				<script src="/cms/f/js/module_documents.js" type="text/javascript" language="JavaScript" />
 				<script src="/cms/f/js/cookies.js" type="text/javascript" language="JavaScript" />
 				<script src="/cms/f/js/scripts.js" type="text/javascript" language="JavaScript" />

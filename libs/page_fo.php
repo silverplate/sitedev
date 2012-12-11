@@ -11,7 +11,7 @@ class FoPage extends Page {
 
 	public function __construct() {
 		parent::__construct();
-		$this->IsShowHidden = IS_SHOW_HIDDEN;
+		$this->IsShowHidden = defined('IS_SHOW_HIDDEN') && IS_SHOW_HIDDEN;
 		if ($this->IsShowHidden) $this->AddSystemAttribute('is_show_hidden');
 	}
 
@@ -23,21 +23,23 @@ class FoPage extends Page {
 		return parent::GetXml();
 	}
 
-	public function Output($_is_404 = false) {
+	public function output($_is_404 = false)
+	{
 		global $gCache;
 
-		if ((isset($_GET['xml']) && IS_ADMIN_MODE)) {
+		if (isset($_GET['xml']) && defined('IS_ADMIN_MODE') && IS_ADMIN_MODE) {
 			// header('Content-type: text/xml; charset=' . ini_get('default_charset'));
 			header('Content-type: text/xml; charset=utf-8');
 			echo getXmlDocumentForRoot($this->getXml(), $this->getRootNodeName());
 
-		} elseif ($this->Template) {
+		} else if ($this->Template) {
 			$content = $this->GetHtml();
 			echo $content;
 
 			if ($gCache && $gCache->isAvailable() && !$_is_404) {
 				$gCache->set($content);
 			}
+
 		} else {
 			documentNotFound();
 		}
@@ -73,11 +75,11 @@ class DocumentHandler extends FoPage {
 
 			if ($ancestors) {
 				array_push($params,
-					'((' . Document::GetPri() . ' IN (' . get_db_data($ancestors) . ') AND apply_type_id IN (2, 3)) OR (' .
-					Document::GetPri() . ' = ' . get_db_data($this->Document->GetId()) . ' AND apply_type_id IN (1, 3)))'
+					'((' . Document::GetPri() . ' IN (' . Db::escape($ancestors) . ') AND apply_type_id IN (2, 3)) OR (' .
+					Document::GetPri() . ' = ' . Db::escape($this->Document->GetId()) . ' AND apply_type_id IN (1, 3)))'
 				);
 			} else {
-				array_push($params, '(' . Document::GetPri() . ' = ' . get_db_data($this->Document->GetId()) . ' AND apply_type_id IN (1, 3))');
+				array_push($params, '(' . Document::GetPri() . ' = ' . Db::escape($this->Document->GetId()) . ' AND apply_type_id IN (1, 3))');
 			}
 
 			if (!is_null(User::GetAuthGroup())) {
@@ -94,10 +96,10 @@ class DocumentHandler extends FoPage {
 							if (strpos($item->GetAttribute('content'), '://') !== true) {
 								$image_file_path = DOCUMENT_ROOT . ltrim($item->GetAttribute('content'), '/');
 								if (is_file($image_file_path)) {
-									$image_file = new File($image_file_path, DOCUMENT_ROOT, '/');
-									if (Image::IsImageExtension($image_file->GetExtension())) {
-										$image = new Image($image_file_path, DOCUMENT_ROOT, '/');
-										$item->SetAttribute('content', $image->GetXml());
+									$image_file = App_File::factory($image_file_path);
+
+									if ($image_file->isImage()) {
+										$item->SetAttribute('content', $image_file->getXml());
 										$item->SetTypeId('xml');
 									}
 								}
@@ -121,7 +123,7 @@ class DocumentHandler extends FoPage {
 										);
 
 										if ($filepath) {
-											$image = new Image($filepath, DOCUMENT_ROOT, '/');
+											$image = App_Image::factory($filepath);
 										}
 
 									} else {
@@ -143,7 +145,7 @@ class DocumentHandler extends FoPage {
 										);
 
 										if ($filepath) {
-											$file = new File($file, DOCUMENT_ROOT, '/');
+											$file = App_File::factory($file);
 										}
 
 									} else {

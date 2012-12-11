@@ -2,6 +2,8 @@
 <!DOCTYPE xsl:stylesheet SYSTEM "character_entities.dtd">
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:include href="bo_project_forms.xsl" />
+
 	<xsl:template match="form">
 		<xsl:if test="not(@status) or @status != 'updated'">
 			<xsl:if test="group and count(group) > 1">
@@ -160,23 +162,32 @@
 			              not(ancestor::node()[2][group]) and
 			              count(parent::node()/element) = 1)">
 				<td class="label">
-					<label>
-					    <xsl:attribute name="for">
-                            <xsl:choose>
-                                <xsl:when test="@type = 'calendar'">
-                                    <xsl:value-of select="@name" />
-                                    <xsl:text>_input</xsl:text>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:text>form_ele_</xsl:text>
-                                    <xsl:value-of select="@name" />
-                                </xsl:otherwise>
-                            </xsl:choose>
-					    </xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="@is-readonly">
+                            <xsl:attribute name="style">padding-top: 0;</xsl:attribute>
+                            <xsl:value-of select="label" disable-output-escaping="yes" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <label>
+                                <xsl:attribute name="for">
+                                    <xsl:choose>
+                                        <xsl:when test="@type = 'calendar'">
+                                            <xsl:value-of select="@name" />
+                                            <xsl:text>_input</xsl:text>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:text>form_ele_</xsl:text>
+                                            <xsl:value-of select="@name" />
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:attribute>
 
-						<xsl:value-of select="label" disable-output-escaping="yes" />
-						<xsl:if test="@is_required"><sup class="required">&bull;</sup></xsl:if>
-					</label>
+                                <xsl:value-of select="label" disable-output-escaping="yes" />
+                                <xsl:if test="@is_required"><sup class="required">&bull;</sup></xsl:if>
+                            </label>
+                        </xsl:otherwise>
+                    </xsl:choose>
+
 					<xsl:if test="description/text() and (@type = 'image' or @type = 'text' or @type = 'large_text' or string-length(description/text()) &lt;= 50) and not(@type = 'adding_files')">
 						<div class="description"><xsl:value-of select="description/text()" disable-output-escaping="yes" /></div>
 					</xsl:if>
@@ -219,6 +230,14 @@
 
 	<xsl:template name="form_element">
 		<xsl:choose>
+            <xsl:when test="@type = 'boolean' and @is-readonly and value[text() = '1']">
+                <div class="form_float_ele" title="Да">&bull;</div>
+            </xsl:when>
+
+            <xsl:when test="@type = 'boolean' and @is-readonly">
+                <div class="form_float_ele">Нет</div>
+            </xsl:when>
+
 			<xsl:when test="@type = 'boolean'">
 				<div class="form_float_ele">
 					<input type="checkbox" name="{@name}" id="form_ele_{@name}" value="1">
@@ -228,18 +247,27 @@
 					</input>
 				</div>
 			</xsl:when>
+
 			<xsl:when test="@type = 'email' or @type = 'string' or @type = 'folder' or @type = 'filename' or @type = 'word' or @type = 'uri' or @type = 'login'">
-				<div class="form_float_ele">
-					<input name="{@name}" id="form_ele_{@name}" type="text" maxlength="255" class="{@type}">
-						<xsl:attribute name="value">
-							<xsl:choose>
-								<xsl:when test="error/value/text()"><xsl:value-of select="error/value/text()" /></xsl:when>
-								<xsl:otherwise><xsl:value-of select="value/text()" /></xsl:otherwise>
-							</xsl:choose>
-						</xsl:attribute>
-					</input>
-				</div>
+                <div class="form_float_ele">
+                    <xsl:choose>
+                        <xsl:when test="@is-readonly">
+                            <xsl:value-of select="value" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <input name="{@name}" id="form_ele_{@name}" type="text" maxlength="255" class="{@type}">
+                                <xsl:attribute name="value">
+                                    <xsl:choose>
+                                        <xsl:when test="error/value/text()"><xsl:value-of select="error/value/text()" /></xsl:when>
+                                        <xsl:otherwise><xsl:value-of select="value/text()" /></xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:attribute>
+                            </input>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </div>
 			</xsl:when>
+
 			<xsl:when test="@type = 'name'">
 				<table class="form_name form_float_ele">
 					<tr>
@@ -372,7 +400,7 @@
 				</script>
 			</xsl:when>
 
-			<xsl:when test="@type = 'chooser' or @type = 'select'">
+			<xsl:when test="@type = 'chooser' or @type = 'select' or @type = 'radio'">
 				<xsl:variable name="value">
 					<xsl:choose>
 						<xsl:when test="error/value/text()"><xsl:value-of select="error/value/text()" /></xsl:when>
@@ -401,7 +429,10 @@
 							<xsl:if test="$value = options/item/@value">&bull; </xsl:if>
 							<xsl:value-of select="options/item/text()" disable-output-escaping="yes" />
 						</xsl:when>
-						<xsl:when test="count(options/item) > 3 or @type = 'select'">
+						<xsl:when test="
+                            @type = 'select' or
+                            (count(options/item) > 3 and @type != 'radio')
+                        ">
 							<select name="{@name}" id="form_ele_{@name}" class="simple">
 								<xsl:for-each select="options/item">
 									<option value="{@value}">
@@ -441,7 +472,7 @@
 								<col width="25%" />
 								<xsl:for-each select="options/item[position() mod 4 = 1]">
 									<tr>
-										<td class="multiple multiple_small"><xsl:apply-templates select="self::node()" mode="checkbox" /></td>
+										<td class="multiple multiple_small multiple-first"><xsl:apply-templates select="self::node()" mode="checkbox" /></td>
 										<td class="multiple multiple_small"><xsl:apply-templates select="following-sibling::node()[name() = 'item'][1]" mode="checkbox" /></td>
 										<td class="multiple multiple_small"><xsl:apply-templates select="following-sibling::node()[name() = 'item'][2]" mode="checkbox" /></td>
 										<td class="multiple multiple_small"><xsl:apply-templates select="following-sibling::node()[name() = 'item'][3]" mode="checkbox" /></td>
@@ -454,7 +485,7 @@
 							<table>
 								<xsl:for-each select="options/item[position() mod 2 = 1]">
 									<tr>
-										<td class="multiple"><xsl:apply-templates select="self::node()" mode="checkbox" /></td>
+										<td class="multiple multiple-first"><xsl:apply-templates select="self::node()" mode="checkbox" /></td>
 										<td class="multiple"><xsl:apply-templates select="following-sibling::node()[name() = 'item'][1]" mode="checkbox" /></td>
 									</tr>
 								</xsl:for-each>
@@ -774,7 +805,38 @@
 										<td class="chooser_label">
 											<label for="{generate-id()}">
 												<xsl:text>Удалить</xsl:text><br />
-												<a href="{value/url/text()}" target="_blank">Загруженное изображение</a><br />
+
+												<a href="{value/url/text()}" target="_blank">Загруженное изображение</a>
+                                                <br /><br />
+
+                                                <xsl:variable name="max-length">300</xsl:variable>
+
+                                                <img src="{value/url/text()}" align="left">
+                                                    <xsl:choose>
+                                                        <xsl:when test="value[width &lt;= $max-length and height &lt;= $max-length]">
+                                                            <xsl:attribute name="class">preview</xsl:attribute>
+                                                            <xsl:attribute name="width">
+                                                                <xsl:value-of select="value/width" />
+                                                            </xsl:attribute>
+                                                            <xsl:attribute name="height">
+                                                                <xsl:value-of select="value/height" />
+                                                            </xsl:attribute>
+                                                        </xsl:when>
+                                                        <xsl:when test="value[width > height]">
+                                                            <xsl:attribute name="class">preview-resized</xsl:attribute>
+                                                            <xsl:attribute name="width">
+                                                                <xsl:value-of select="$max-length" />
+                                                            </xsl:attribute>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:attribute name="class">preview-resized</xsl:attribute>
+                                                            <xsl:attribute name="height">
+                                                                <xsl:value-of select="$max-length" />
+                                                            </xsl:attribute>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
+                                                </img>
+
 												<xsl:value-of select="concat(value/width/text(), '&times;', value/height/text(), ' ', value/size/text(), '&nbsp;КБ')" />
 											</label>
 										</td>
@@ -806,7 +868,13 @@
 				</div>
 			</xsl:when>
 
-			<xsl:when test="@type = 'integer'">
+            <xsl:when test="(@type = 'integer' or @type = 'float') and @is-readonly">
+                <div class="form_float_ele">
+                    <xsl:value-of select="value" />
+                </div>
+            </xsl:when>
+
+			<xsl:when test="@type = 'integer' or @type = 'float'">
 				<div class="form_float_ele">
 					<input name="{@name}" id="form_ele_{@name}" type="text" maxlength="10" class="{@type}">
 						<xsl:attribute name="value">
@@ -828,9 +896,9 @@
 					<div id="add_form_files_{@name}" class="add_files" onclick="add_form_file_inputs('{@name}');">Добавить</div>
 				</div>
 
-				<xsl:for-each select="additional[file]">
+				<xsl:for-each select="additional[*[@path]]">
 					<div class="files">
-						<xsl:for-each select="file">
+						<xsl:for-each select="*[@path]">
 							<div class="file">
 								<span onclick="delete_file(this, '{@path}');" title="Удалить файл немедленно?">&times;</span>
 								<xsl:text>&nbsp;</xsl:text>
@@ -1057,7 +1125,7 @@
                 ...
             </options>
         </content>
-    </additional>
+    </http-request>
     -->
     <xsl:template name="triple-link-item">
         <xsl:variable name="name"

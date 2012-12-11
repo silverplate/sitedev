@@ -19,7 +19,7 @@ class BoSection extends ActiveRecord {
 		$url = parse_url($_SERVER['REQUEST_URI']);
 		$path = explode('/', trim(str_replace($g_section_start_url, '', $url['path']), '/'));
 
-		$entry = Db::Get()->GetEntry('SELECT ' . implode(',', self::GetBase()->GetAttributes()) . ' FROM ' . self::GetTbl() . ' WHERE uri = ' . get_db_data($path[0]));
+		$entry = Db::Get()->GetEntry('SELECT ' . implode(',', self::GetBase()->GetAttributes()) . ' FROM ' . self::GetTbl() . ' WHERE uri = ' . Db::escape($path[0]));
 		if ($entry) {
 			$cname = __CLASS__;
 			$obj = new $cname;

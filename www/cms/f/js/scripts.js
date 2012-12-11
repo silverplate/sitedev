@@ -162,22 +162,45 @@ function addTripleLink(_name)
     if (containerEle) {
         var count = containerEle.getElementsByTagName("table").length;
 
-/*
-        new Ajax.Request('ajax_' + _name + '.php', {
-            method: 'post',
-            postBody: 'name=' + _name + '&position=' + tripleLinkCounter + '&count=' + count,
-            onSuccess: function(_r) {
-                if (_r.responseText) {
-                    var ele = document.createElement('ins');
-                    ele.innerHTML = _r.responseText;
+        $.post(
+            "ajax_" + _name + ".php",
+            "name=" + _name + "&position=" + tripleLinkCounter + "&count=" + count,
+            function (_response) {
+                if (_response) {
+                    var ele = document.createElement("ins");
+                    ele.innerHTML = _response;
                     containerEle.appendChild(ele);
                     tripleLinkCounter++;
                 }
 
                 hideLoadingBar();
             }
-        });
- */
+        );
+    }
+}
+
+function deleteTripleLink(_button)
+{
+    var ele = getParentElement(_button.parentNode, 'ins');
+    if (!ele) {
+        ele = getParentElement(_button.parentNode, 'table');
+    }
+
+    if (ele) {
+        removeElement(ele);
+    }
+}
+
+var orderItemsCounter = 0;
+
+function addTripleLink(_name)
+{
+    showLoadingBar();
+
+    var containerEle = document.getElementById(_name);
+    if (containerEle) {
+        var count = containerEle.getElementsByTagName("table").length;
+
         $.post(
             "ajax_" + _name + ".php",
             "name=" + _name + "&position=" + tripleLinkCounter + "&count=" + count,

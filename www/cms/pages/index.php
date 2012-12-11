@@ -45,9 +45,9 @@ if ($page->IsAuthorized()) {
 		unset($tmp);
 
 		$handler_row_conditions = array();
-		$handler_self_condition = isset($obj) && $obj && $obj->GetAttribute(Handler::GetPri()) ? ' OR ' . Handler::GetPri() . ' = ' . get_db_data($obj->GetAttribute(Handler::GetPri())) : '';
-		$used = Db::Get()->GetList('SELECT ' . Handler::GetPri() . ' FROM ' . Document::GetTbl() . ' WHERE ' . Handler::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . Document::GetPri() . ' != ' . get_db_data($obj->GetId()) : '') . ' GROUP BY ' . Handler::GetPri());
-		if ($used) array_push($handler_row_conditions, '(is_multiple = 1 OR ' . Handler::GetPri() . ' NOT IN (' . get_db_data($used) . ')' . $handler_self_condition . ')');
+		$handler_self_condition = isset($obj) && $obj && $obj->GetAttribute(Handler::GetPri()) ? ' OR ' . Handler::GetPri() . ' = ' . Db::escape($obj->GetAttribute(Handler::GetPri())) : '';
+		$used = Db::Get()->GetList('SELECT ' . Handler::GetPri() . ' FROM ' . Document::GetTbl() . ' WHERE ' . Handler::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . Document::GetPri() . ' != ' . Db::escape($obj->GetId()) : '') . ' GROUP BY ' . Handler::GetPri());
+		if ($used) array_push($handler_row_conditions, '(is_multiple = 1 OR ' . Handler::GetPri() . ' NOT IN (' . Db::escape($used) . ')' . $handler_self_condition . ')');
 		array_push($handler_row_conditions, $handler_self_condition ? '(is_published = 1' . $handler_self_condition . ')' : 'is_published = 1');
 
 		foreach (Handler::GetList(array('type_id' => 1), null, $handler_row_conditions) as $item) {
@@ -145,13 +145,20 @@ if ($page->IsAuthorized()) {
 						}
 					}
 
+					$filesHaveBeenChanged = false;
 					$files = &$form->Elements['files']->GetValue();
+
 					if ($files && is_array($files) && isset($files[0])) {
 						foreach ($files as $file) {
 							if (isset($file['name']) && isset($file['tmp_name'])) {
+							    $filesHaveBeenChanged = true;
 								$obj->UploadFile($file['name'], $file['tmp_name']);
 							}
 						}
+					}
+
+					if ($filesHaveBeenChanged) {
+					    $obj->cleanFileCache();
 					}
 
 					$obj->UpdateLinks('navigations', $form->Elements['navigations']->GetValue());

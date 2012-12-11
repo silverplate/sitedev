@@ -23,47 +23,8 @@ class BoUser extends ActiveRecord {
 			$name = translit($_name);
 			create_directory($this->GetFileFolder(), true);
 			move_uploaded_file($_tmp_name, $this->GetFileFolder() . $name);
-			chmod($this->GetFileFolder() . $name, 0777);
+			@chmod($this->GetFileFolder() . $name, 0777);
 		}
-	}
-
-	public function GetFiles() {
-		if (is_null($this->Files)) {
-			$this->Files = array();
-			if ($this->GetFileFolder() && is_dir($this->GetFileFolder())) {
-				$dir_handle = opendir($this->GetFileFolder());
-				$item = readdir($dir_handle);
-
-				while ($item) {
-					if ($item != '.' && $item != '..' && is_file($this->GetFileFolder() . $item)) {
-						$file = new File($this->GetFileFolder() . $item, DOCUMENT_ROOT, '/');
-						$this->Files[strtolower($file->GetFileName())] = $file;
-					}
-
-					$item = readdir($dir_handle);
-				}
-
-				closedir($dir_handle);
-			}
-		}
-		return $this->Files;
-	}
-
-	public function GetImages() {
-		if (is_null($this->Images)) {
-			$this->Images = array();
-
-			if ($this->GetFiles()) {
-				foreach ($this->GetFiles() as $file) {
-					if (Image::IsImageExtension($file->GetExtension())) {
-						$image = new Image($file->GetPath(), $file->GetPathStartsWith(), $file->GetUriStartsWith());
-						$this->Images[strtolower($image->GetFileName())] = $image;
-					}
-				}
-			}
-
-		}
-		return $this->Images;
 	}
 
 	public static function CheckUnique($_value, $_exclude = null) {
@@ -72,10 +33,10 @@ class BoUser extends ActiveRecord {
 
 	public static function Auth() {
 		if (func_num_args() == 1) {
-			$try = Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . get_db_data(func_get_arg(0)) . ' AND status_id = 1');
+			$try = Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . Db::escape(func_get_arg(0)) . ' AND status_id = 1');
 
 		} elseif (func_num_args() == 2) {
-			$try = Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE login = ' . get_db_data(func_get_arg(0)) . ' AND passwd = ' . get_db_data(md5(func_get_arg(1))) . ' AND status_id = 1');
+			$try = Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE login = ' . Db::escape(func_get_arg(0)) . ' AND passwd = ' . Db::escape(md5(func_get_arg(1))) . ' AND status_id = 1');
 		}
 
 		if (isset($try) && $try && (!$try['ip_restriction'] || in_array($_SERVER['REMOTE_ADDR'], list_to_array($try['ip_restriction'])))) {
@@ -165,7 +126,7 @@ class BoUser extends ActiveRecord {
 		$result = array('tables' => array($self['table']), 'row_conditions' => array());
 
 		foreach ($_conditions as $attribute => $value) {
-			array_push($result['row_conditions'], $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . Db::Get()->EscapeList($value) . ')' : ' = ' . get_db_data($value)));
+			array_push($result['row_conditions'], $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . Db::Get()->EscapeList($value) . ')' : ' = ' . Db::escape($value)));
 		}
 
 		return $result;

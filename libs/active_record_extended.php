@@ -2,11 +2,11 @@
 
 class ActiveRecordExtended extends ActiveRecord
 {
-    /*
-    *
-    * Обычно повторяющаяся для большинства объектов часть
-    *
-    **/
+    /**
+     *
+     * Обычно повторяющаяся для большинства объектов часть
+     *
+     */
 
     public static function getList($_conds = array(), $_params = array(), $_rowConds = array())
     {

@@ -37,11 +37,11 @@
 		</xsl:for-each>
 	</xsl:template>
 
-	<xsl:template name="get_date_period">
-		<xsl:param name="start_year" />
+	<xsl:template name="get-date-period">
+		<xsl:param name="start-year" />
 
-		<xsl:if test="$start_year != /node()/date/@year">
-			<xsl:value-of select="$start_year" />
+		<xsl:if test="$start-year != /node()/date/@year">
+			<xsl:value-of select="$start-year" />
 			<xsl:text>&mdash;</xsl:text>
 		</xsl:if>
 
@@ -418,4 +418,37 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
+
+    <xsl:template name="get-number-label">
+        <xsl:param name="number" />
+        <xsl:param name="case1" />
+        <xsl:param name="case2" />
+        <xsl:param name="case3" />
+
+        <xsl:variable name="base"
+                      select="$number - floor($number div 100) * 100" />
+
+        <xsl:value-of select="concat($number, '&nbsp;')" />
+
+        <xsl:choose>
+            <xsl:when test="$base > 9 and $base &lt; 20">
+                <xsl:value-of select="$case1" />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:variable name="remainder"
+                              select="$number - floor($number div 10) * 10" />
+                <xsl:choose>
+                    <xsl:when test="$remainder = 1">
+                        <xsl:value-of select="$case2" />
+                    </xsl:when>
+                    <xsl:when test="$remainder > 0 and $remainder &lt; 5">
+                        <xsl:value-of select="$case3" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$case1" />
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
 </xsl:stylesheet>

@@ -5,8 +5,7 @@ if (is_file($localSettingsFile)) {
     require_once $localSettingsFile;
 }
 
-// setlocale(LC_ALL, 'ru_RU.CP1251');
-date_default_timezone_set('Europe/Moscow');
+date_default_timezone_set('Etc/GMT-4');
 
 ini_set('default_charset', 'utf-8');
 ini_set('mbstring.internal_encoding', 'UTF-8');
@@ -14,11 +13,25 @@ ini_set('error_reporting', E_ALL);
 ini_set('magic_quotes_gpc', 0);
 
 define('SITE_KEY', 'sitekey');
-define('SITE_TITLE', 'Sitedev');
-define('SITE_URL', 'http://sitedev.ru');
-define('IS_CACHE', false);
+define('SITE_TITLE', 'SiteDev');
+
+if (!defined('HTTP_HOST')) {
+    define(
+        'HTTP_HOST',
+        empty($_SERVER['HTTP_HOST']) ? 'sitedev.ru' : $_SERVER['HTTP_HOST']
+    );
+}
+
+if (!defined('SITE_URL')) {
+    define('SITE_URL', 'http://' . HTTP_HOST);
+}
+
+if (!defined('IS_CACHE')) {
+    define('IS_CACHE', false);
+}
+
 define('IS_USERS', false);
-define('DB_PREFIX', 'sitedev_');
+define('DB_PREFIX', '');
 define('DOM_LOAD_OPTIONS', LIBXML_DTDLOAD + LIBXML_COMPACT + LIBXML_NOENT);
 
 if (defined('ENV')) {
@@ -27,7 +40,7 @@ if (defined('ENV')) {
 } else {
     $env = null;
     $developmentSites = array('sitedev');
-    $stageSites = array('dev.sitedev.ru');
+    $stagingSites = array('dev.sitedev.ru');
     $productionSites = array('sitedev.ru', 'www.sitedev.ru');
 
     if (empty($_SERVER['HTTP_HOST'])) {
@@ -37,9 +50,9 @@ if (defined('ENV')) {
                 $script . '/' . $_SERVER['SCRIPT_FILENAME'];
             }
 
-            foreach ($stageSites as $item) {
+            foreach ($stagingSites as $item) {
                 if (strpos($script, '/' . $item . '/') !== false) {
-                    $env = 'stage';
+                    $env = 'staging';
                     break;
                 }
             }
@@ -66,8 +79,8 @@ if (defined('ENV')) {
     } else if (in_array(strtolower($_SERVER['HTTP_HOST']), $developmentSites)) {
         $env = 'development';
 
-    } else if (in_array(strtolower($_SERVER['HTTP_HOST']), $stageSites)) {
-        $env = 'stage';
+    } else if (in_array(strtolower($_SERVER['HTTP_HOST']), $stagingSites)) {
+        $env = 'staging';
 
     } else if (in_array(strtolower($_SERVER['HTTP_HOST']), $productionSites)) {
         $env = 'production';
@@ -83,7 +96,7 @@ switch ($env) {
         ini_set('display_errors', 1);
         break;
 
-    case 'stage':
+    case 'staging':
         if (!defined('DB_CONNECTION_STRING')) {
             define('DB_CONNECTION_STRING', 'mysql://user:password@host/dbname/');
         }
@@ -112,7 +125,15 @@ $gCustomUrls = array();
 // $g_langs = array('ru' => array('/', 'Русский'),
 //                  'en' => array('/eng/', 'Английский'));
 
-$g_admin_email = 'support@sitedev.ru';
+
+// Почта
+
+global $gAdminEmails;
+
+if (!isset($gAdminEmails)) {
+    $gAdminEmails = array('support@sitedev.ru');
+}
+
 $g_mail = $g_bo_mail = array(
     'subject' => '',
     'from' => 'support@sitedev.ru',
@@ -121,9 +142,16 @@ $g_mail = $g_bo_mail = array(
 //    'bcc' => 'support@sitedev.ru'
 );
 
+// if (!empty($gAdminEmails)) {
+//     $g_mail['bcc'] = $g_bo_mail['bcc'] = implode(', ', $gAdminEmails);
+// }
+
 $g_bo_mail['subject'] = 'Система управления / ';
 
-Db::get()->execute('SET names utf8');
+
+// Загрузка файлов
+
+global $gMaxUploadFilesize, $gAmountMaxUploadFilesize;
 
 if (!isset($gMaxUploadFilesize)) {
     $gMaxUploadFilesize = 1.5;

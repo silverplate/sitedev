@@ -30,7 +30,7 @@ class BoUserToSection extends ActiveRecord {
 			if (is_array($_attributes[self::GetFirstKey()])) {
 				array_push($row_conditions, self::GetTbl() . '.' . self::GetFirstKey() . ' IN (' . Db::Get()->EscapeList($_attributes[self::GetFirstKey()]) . ')');
 			} else {
-				array_push($row_conditions, self::GetTbl() . '.' . self::GetFirstKey() . ' = ' . get_db_data($_attributes[self::GetFirstKey()]));
+				array_push($row_conditions, self::GetTbl() . '.' . self::GetFirstKey() . ' = ' . Db::escape($_attributes[self::GetFirstKey()]));
 			}
 			unset($attributes[self::GetFirstKey()]);
 		}
@@ -39,7 +39,7 @@ class BoUserToSection extends ActiveRecord {
 			if (is_array($_attributes[self::GetSecondKey()])) {
 				array_push($row_conditions, self::GetTbl() . '.' . self::GetSecondKey() . ' IN (' . Db::Get()->EscapeList($_attributes[self::GetSecondKey()]) . ')');
 			} else {
-				array_push($row_conditions, self::GetTbl() . '.' . self::GetSecondKey() . ' = ' . get_db_data($_attributes[self::GetSecondKey()]));
+				array_push($row_conditions, self::GetTbl() . '.' . self::GetSecondKey() . ' = ' . Db::escape($_attributes[self::GetSecondKey()]));
 			}
 			unset($attributes[self::GetSecondKey()]);
 		}
@@ -50,7 +50,7 @@ class BoUserToSection extends ActiveRecord {
 			array_push($row_conditions, self::GetFirstKey(true) . ' = ' . self::GetTbl() . '.' . self::GetFirstKey());
 
 			array_push($tables, self::GetSecondKeyTable());
-			array_push($row_conditions, self::GetSecondKeyTable() . '.is_published = ' . get_db_data($attributes['is_published']));
+			array_push($row_conditions, self::GetSecondKeyTable() . '.is_published = ' . Db::escape($attributes['is_published']));
 			array_push($row_conditions, self::GetSecondKey(true) . ' = ' . self::GetTbl() . '.' . self::GetSecondKey());
 
 			unset($attributes['is_published']);

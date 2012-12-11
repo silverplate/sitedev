@@ -1,22 +1,41 @@
 <?php
 
-function d($_var)
+function d()
 {
-    return debug($_var);
+    $args = func_get_args();
+    $count = count($args);
+
+    if ($count == 1) {
+        debug($args[0]);
+
+    } else {
+        foreach ($args as $i => $var) {
+            if ($i != 0) echo PHP_EOL;
+            echo $i + 1 . ':';
+            echo PHP_EOL;
+
+            debug($var);
+        }
+    }
+
+	die();
 }
 
 function debug($_var)
 {
     if (PHP_SAPI == 'cli') {
-        var_dump($_var);
+        print_r($_var);
+        echo PHP_EOL;
 
     } else {
         echo '<pre>';
-        if (is_string($_var))   echo htmlspecialchars($_var);
-        else                    var_dump($_var);
-    }
 
-	die();
+        if (is_string($_var))   echo htmlspecialchars($_var);
+        else                    print_r($_var);
+
+        echo '</pre>';
+        echo PHP_EOL;
+    }
 }
 
 function format_number($_number, $_decimals = 2) {
@@ -158,7 +177,7 @@ function detect_cyr_charset($_str) {
 }
 
 function is_number($_try) {
-	return preg_match('/^\-?[1-9][0-9]*$/', $_try);
+    return Ext_String::isNumber($_try);
 }
 
 function cut_string($_string, $_length) {

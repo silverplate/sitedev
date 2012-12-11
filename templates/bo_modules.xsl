@@ -65,15 +65,15 @@
 							</script>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:apply-templates select="local_navigation" mode="list" />
+							<xsl:apply-templates select="local-navigation|local_navigation" mode="list" />
 						</xsl:otherwise>
-					</xsl:choose>					
+					</xsl:choose>
 				</td>
 				<td class="content">
-					<xsl:for-each select="local_navigation[@type = 'content_filter']">
+					<xsl:for-each select="local-navigation[@type = 'content_filter']|local_navigation[@type = 'content_filter']">
 						<xsl:variable name="is_date">
 							<xsl:choose>
-								<xsl:when test="@is_date">true</xsl:when>
+								<xsl:when test="@is-date or @is_date">true</xsl:when>
 								<xsl:otherwise>false</xsl:otherwise>
 							</xsl:choose>
 						</xsl:variable>

@@ -56,7 +56,7 @@
 				<td class="tree_title">
 					<xsl:for-each select="@*[name() = 'xml:lang' or name() = 'prefix']"><xsl:value-of select="concat(., '&nbsp;')" /></xsl:for-each>
 					<label for="{generate-id()}">
-						<xsl:if test="not(@is_published)"><xsl:attribute name="class">hidden</xsl:attribute></xsl:if>
+						<xsl:if test="not(@is_published) and not(@is-published)"><xsl:attribute name="class">hidden</xsl:attribute></xsl:if>
 						<xsl:value-of select="title/text()" disable-output-escaping="yes" />
 					</label>
 				</td>
@@ -93,7 +93,7 @@
 						<a href="?id={@id}">
 							<xsl:choose>
 								<xsl:when test="/node()/content/selected/text() = @id"><xsl:attribute name="class">selected</xsl:attribute></xsl:when>
-								<xsl:when test="not(@is_published)"><xsl:attribute name="class">hidden</xsl:attribute></xsl:when>
+								<xsl:when test="not(@is_published) and not(@is-published)"><xsl:attribute name="class">hidden</xsl:attribute></xsl:when>
 							</xsl:choose>
 							<xsl:value-of select="title/text()" disable-output-escaping="yes" />
 						</a>
@@ -124,7 +124,7 @@
 		<a onclick="open_window('data.php?parent_id={/node()/@parent_id}&amp;id={@id}')">
 			<xsl:attribute name="class">
 				<xsl:text>new_window_link</xsl:text>
-				<xsl:if test="not(@is_published)"> hidden</xsl:if>
+				<xsl:if test="not(@is_published) and not(@is-published)"> hidden</xsl:if>
 			</xsl:attribute>
 			<xsl:value-of select="title/text()" disable-output-escaping="yes" />
 		</a>
@@ -136,7 +136,7 @@
 				<a onclick="open_window('data.php?parent_id={/node()/@parent_id}&amp;id={@id}')">
 					<xsl:attribute name="class">
 						<xsl:text>new_window_link</xsl:text>
-						<xsl:if test="not(@is_published)"> hidden</xsl:if>
+						<xsl:if test="not(@is_published) and not(@is-published)"> hidden</xsl:if>
 					</xsl:attribute>
 					<xsl:value-of select="title/text()" disable-output-escaping="yes" />
 				</a>
@@ -227,10 +227,18 @@
 					<xsl:with-param name="is_sortable" select="$is_sortable" />
 				</xsl:apply-templates>
 
-				<xsl:for-each select="content/list_navigation">
+				<xsl:for-each select="content/list-navigation|content/list_navigation">
 					<xsl:call-template name="list_navigation">
 						<xsl:with-param name="total" select="@total" />
-						<xsl:with-param name="per_page" select="@per_page" />
+						<xsl:with-param name="per_page"><xsl:choose>
+						    <xsl:when test="@per-page">
+                                <xsl:value-of select="@per-page" />
+                            </xsl:when>
+						    <xsl:otherwise>
+                                <xsl:value-of select="@per_page" />
+                            </xsl:otherwise>
+						</xsl:choose>
+                        </xsl:with-param>
 						<xsl:with-param name="page" select="@page" />
 						<xsl:with-param name="type">query</xsl:with-param>
 						<xsl:with-param name="separator">&middot;</xsl:with-param>

@@ -48,20 +48,20 @@ class Session {
 			FROM
 				' . self::PREFIX . 'session
 			WHERE
-				' . self::PREFIX . 'session_id = ' . get_db_data(self::GetId()) . ' AND
-				user_agent = ' . get_db_data(md5($http_user_agent)) . ' AND (
+				' . self::PREFIX . 'session_id = ' . Db::escape(self::GetId()) . ' AND
+				user_agent = ' . Db::escape(md5($http_user_agent)) . ' AND (
 					ISNULL(valid_date) OR NOW() < valid_date
 				) AND (
 					life_span <= 0 OR DATE_ADD(creation_date, INTERVAL life_span MINUTE) < NOW()
 				) AND (
 					timeout <= 0 OR (NOT(ISNULL(last_impression_date)) AND DATE_ADD(last_impression_date, INTERVAL timeout MINUTE) < NOW())
 				) AND (
-					is_ip_match = 0 OR user_ip = ' . get_db_data($_SERVER['REMOTE_ADDR']) . '
+					is_ip_match = 0 OR user_ip = ' . Db::escape($_SERVER['REMOTE_ADDR']) . '
 				)
 		');
 
 		if ($session) {
-			foreach (Db::Get()->GetList('SELECT name, value FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . get_db_data(self::GetId())) as $item) {
+			foreach (Db::Get()->GetList('SELECT name, value FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . Db::escape(self::GetId())) as $item) {
 				$this->Params[$item['name']] = unserialize($item['value']);
 			}
 
@@ -72,12 +72,12 @@ class Session {
 			self::Clean();
 
 			Db::Get()->Execute('INSERT INTO ' . self::PREFIX . 'session' . Db::Get()->GetQueryFields(array(
-				self::PREFIX . 'session_id' => get_db_data(self::GetId()),
+				self::PREFIX . 'session_id' => Db::escape(self::GetId()),
 				'is_ip_match' => 0,
 				'is_logged_in' => 0,
 				'user_id' => '\'\'',
-				'user_agent' => get_db_data(md5($http_user_agent)),
-				'user_ip' => get_db_data($_SERVER['REMOTE_ADDR']),
+				'user_agent' => Db::escape(md5($http_user_agent)),
+				'user_ip' => Db::escape($_SERVER['REMOTE_ADDR']),
 				'life_span' => 0,
 				'timeout' => 0,
 				'creation_date' => 'NOW()',
@@ -149,11 +149,11 @@ class Session {
 		Db::Get()->Execute('UPDATE ' . self::PREFIX . 'session' . Db::Get()->GetQueryFields(array(
 			'is_ip_match' => ($_is_ip_match) ? 1 : 0,
 			'is_logged_in' => 1,
-			'user_id' => get_db_data($_user_id),
+			'user_id' => Db::escape($_user_id),
 			'life_span' => $_life_span ? $_life_span : 0,
 			'timeout' => $_timeout ? $_timeout : 0,
-			'valid_date' => $_valid_date ? get_db_data(date('Y-m-d H:i:s', $_valid_date)) : 'NULL'
-		), 'update', true) . 'WHERE ' . self::PREFIX . 'session_id = ' . get_db_data(self::GetId()));
+			'valid_date' => $_valid_date ? Db::escape(date('Y-m-d H:i:s', $_valid_date)) : 'NULL'
+		), 'update', true) . 'WHERE ' . self::PREFIX . 'session_id = ' . Db::escape(self::GetId()));
 	}
 
 	public function Logout() {
@@ -164,11 +164,11 @@ class Session {
 			'is_logged_in' => 0,
 			'user_id' => '\'\'',
 			'valid_date' => 'NULL'
-		), 'update', true) . 'WHERE ' . self::PREFIX . 'session_id = ' . get_db_data(self::GetId()));
+		), 'update', true) . 'WHERE ' . self::PREFIX . 'session_id = ' . Db::escape(self::GetId()));
 	}
 
 	private function Impress() {
-		DB::Get()->Execute('UPDATE ' . self::PREFIX . 'session' . Db::Get()->GetQueryFields(array('last_impression_date' => 'NOW()'), 'update', true) . 'WHERE ' . self::PREFIX . 'session_id = ' . get_db_data(self::GetId()));
+		DB::Get()->Execute('UPDATE ' . self::PREFIX . 'session' . Db::Get()->GetQueryFields(array('last_impression_date' => 'NOW()'), 'update', true) . 'WHERE ' . self::PREFIX . 'session_id = ' . Db::escape(self::GetId()));
 	}
 
 	private function InitParam($_name, $_value) {
@@ -176,7 +176,7 @@ class Session {
 	}
 
 	public function DeleteParam($_name) {
-		Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . get_db_data(self::GetId()) . ' AND name = ' . get_db_data($_name));
+		Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . Db::escape(self::GetId()) . ' AND name = ' . Db::escape($_name));
 		unset($this->Params[$_name]);
 	}
 
@@ -194,7 +194,7 @@ class Session {
 
 	public function GetParam($_name) {
 		if (!isset($this->Params[$_name])) {
-			$param = Db::Get()->GetEntry('SELECT value FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . get_db_data(self::GetId()) . ' AND name = ' . get_db_data($_name));
+			$param = Db::Get()->GetEntry('SELECT value FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . Db::escape(self::GetId()) . ' AND name = ' . Db::escape($_name));
 			$this->Params[$_name] = $param ? unserialize($param['value']) : null;
 		}
 
@@ -202,8 +202,8 @@ class Session {
 	}
 
 	private function Destroy() {
-		Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session WHERE ' . self::PREFIX . 'session_id = ' . get_db_data(self::GetId()));
-		Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . get_db_data(self::GetId()));
+		Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session WHERE ' . self::PREFIX . 'session_id = ' . Db::escape(self::GetId()));
+		Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . Db::escape(self::GetId()));
 	}
 
 	public static function Clean($_user_id = null) {
@@ -211,7 +211,7 @@ class Session {
 			DELETE FROM
 				' . self::PREFIX . 'session
 			WHERE
-				' . ($_user_id ? 'user_id = ' . get_db_data($_user_id) . ' OR ' : '') . '
+				' . ($_user_id ? 'user_id = ' . Db::escape($_user_id) . ' OR ' : '') . '
 				(NOT(ISNULL(valid_date)) AND valid_date < NOW()) OR
 				(ISNULL(valid_date) AND DATE_ADD(last_impression_date, INTERVAL 1 DAY) < NOW()) OR
 				(life_span > 0 AND DATE_ADD(creation_date, INTERVAL life_span MINUTE) < NOW()) OR
@@ -223,7 +223,7 @@ class Session {
 
 		$sessions = Db::Get()->GetList('SELECT ' . self::PREFIX . 'session_id FROM ' . self::PREFIX . 'session');
 		if ($sessions) {
-			Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id NOT IN (' . get_db_data($sessions) . ')');
+			Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id NOT IN (' . Db::escape($sessions) . ')');
 		} else {
 			Db::Get()->Execute('TRUNCATE ' . self::PREFIX . 'session_param');
 		}
@@ -269,7 +269,7 @@ class Session {
 				WHERE
 					DATE_ADD(s.last_impression_date, INTERVAL 15 MINUTE) > NOW() AND
 					s.user_id != \'\' AND
-					s.' . self::PREFIX . 'session_id != ' . get_db_data($this->GetId()) . ' AND
+					s.' . self::PREFIX . 'session_id != ' . Db::escape($this->GetId()) . ' AND
 					s.user_id = u.' . self::PREFIX . 'bo_user_id
 			');
 		}

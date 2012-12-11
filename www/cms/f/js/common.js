@@ -66,6 +66,13 @@ function getClassName(ele, exeptClassName)
     return className;
 }
 
+function removeElement(_ele)
+{
+    if (_ele.parentNode) {
+        _ele.parentNode.removeChild(_ele);
+    }
+}
+
 
 /*** Loading bar
 *********************************************************/

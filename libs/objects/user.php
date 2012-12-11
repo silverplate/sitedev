@@ -95,10 +95,10 @@ class User extends ActiveRecord {
 
 	public static function Auth() {
 		if (func_num_args() == 1) {
-			$try = Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . get_db_data(func_get_arg(0)) . ' AND status_id = 1');
+			$try = Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . Db::escape(func_get_arg(0)) . ' AND status_id = 1');
 
 		} elseif (func_num_args() == 2) {
-			$try = Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE email = ' . get_db_data(func_get_arg(0)) . ' AND passwd = ' . get_db_data(md5(func_get_arg(1))) . ' AND status_id = 1');
+			$try = Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE email = ' . Db::escape(func_get_arg(0)) . ' AND passwd = ' . Db::escape(md5(func_get_arg(1))) . ' AND status_id = 1');
 		}
 
 		if (isset($try) && $try) {

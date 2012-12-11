@@ -55,6 +55,27 @@ class Form {
 		}
 	}
 
+	public function deleteGroup($_name)
+	{
+	    if (isset($this->Groups[$_name])) {
+	        foreach ($this->Groups[$_name]->getElements() as $ele) {
+	            $this->deleteElement($ele->getName());
+	        }
+
+	        unset($this->Groups[$_name]);
+	    }
+	}
+
+	public function DeleteElement($_name) {
+		if (isset($this->Elements[$_name])) {
+			unset($this->Elements[$_name]);
+
+			foreach ($this->Groups as $group) {
+				$group->DeleteElement($_name);
+			}
+		}
+	}
+
 	public function CreateButton($_label, $_name = null, $_image_url = null) {
 		$name = $_name ? $_name : 'submit';
 		$this->Buttons[$_name] = new FormButton($name, $_label, $_image_url);
@@ -117,6 +138,10 @@ class Form {
 			$element = $this->CreateElement($_item->getAttribute('name'), $_item->getAttribute('type'), $label, $_item->hasAttribute('is_required'));
 
 			if ($element) {
+			    if ($_item->hasAttribute('is-readonly')) {
+			        $element->isReadOnly(true);
+			    }
+
 				if ($_group_name) {
 					$this->Groups[$_group_name]->AddElement($element);
 				}
@@ -227,7 +252,7 @@ class Form {
 		return $xml . '</' . $this->NodeName . '>';
 	}
 
-	public function Execute() {
+	public function execute(array $_data = null) {
 		$is_submited = false;
 
 		foreach ($this->Buttons as $button) {
@@ -237,21 +262,24 @@ class Form {
 			}
 		}
 
-		if ($is_submited) {
+		if ($is_submited || $_data) {
 			$is_error = false;
 
 			foreach ($this->Elements as $name => $item) {
-				if (
-				    $item->GetType() == 'image' ||
-				    $item->GetType() == 'adding_files'
+			    if ($_data) {
+			        $item->getUpdateType($_data);
+
+			    } else if (
+				    $item->getType() == 'image' ||
+				    $item->getType() == 'adding_files'
 				) {
-					$item->GetUpdateType($_FILES);
+					$item->getUpdateType($_FILES);
 
 				} else if ($this->Method == FORM_GET) {
-					$item->GetUpdateType($_GET);
+					$item->getUpdateType($_GET);
 
 				} else {
-					$item->GetUpdateType($_POST);
+					$item->getUpdateType($_POST);
 				}
 
 				if ($item->IsUpdateError()) {
@@ -289,7 +317,7 @@ class Form {
 		$result = array();
 
 		foreach ($this->Elements as $item) {
-			if ($item->GetSqlValue()) {
+			if (!$item->isReadonly() && $item->GetSqlValue()) {
 				$result = array_merge($result, $item->GetSqlValue());
 			}
 		}
@@ -337,12 +365,12 @@ class Form {
 
 							case 'real':
 							default:
-								$fileName = File::normalizeName($value['name']);
+								$fileName = Ext_File::normalizeName($value['name']);
 								break;
 						}
 
 						move_uploaded_file($value['tmp_name'], $uploadDir . $fileName);
-						chmod($uploadDir . $fileName, 0777);
+						@chmod($uploadDir . $fileName, 0777);
 						$uploaded[$item->getName()] = $uploadDir . $fileName;
 					}
 

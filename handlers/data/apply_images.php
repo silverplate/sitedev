@@ -1,13 +1,1 @@
-<?php
-
-class       DocumentDataApplyImages
-extends     DocumentDataHandler
-{
-    public function execute()
-    {
-        $this->setContent(App_Image::applyXmlImages(
-            $this->getContent(),
-            $this->Document->getImages()
-        ));
-    }
-}
+../../core/handlers/data/apply_images.php

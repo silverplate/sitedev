@@ -1,19 +1,37 @@
 <?php
 
-define('WD', realpath(dirname(__FILE__) . '/..') . '/');
+/**
+ * @todo Убрать у путей последний слеш, чтобы было
+ * по аналогии со значениями, возвращаемыми методами PHP?
+ */
+define('WD', realpath(dirname(__FILE__) . '/../..') . '/');
+define('CORE_PATH', WD . 'core/');
 
 define('DOCUMENT_ROOT', WD . 'www/');
-define('SETS',          WD . 'sets/');
-define('TEMPLATES',     WD . 'templates/');
-define('HANDLERS',      WD . 'handlers/');
-define('LIBRARIES',     WD . 'libs/');
-define('OBJECTS',       LIBRARIES . 'objects/');
+define('CORE_DOCUMENT_ROOT', CORE_PATH . 'www/');
 
-set_include_path(
-    LIBRARIES . PATH_SEPARATOR .
-    OBJECTS . PATH_SEPARATOR .
-    get_include_path()
-);
+define('SETS', WD . 'sets/');
+define('CORE_SETS', CORE_PATH . 'sets/');
+
+define('TEMPLATES', WD . 'templates/');
+define('CORE_TEMPLATES', CORE_PATH . 'templates/');
+
+define('HANDLERS', WD . 'handlers/');
+define('CORE_HANDLERS', CORE_PATH . 'handlers/');
+
+define('LIBRARIES', WD . 'libs/');
+define('CORE_LIBRARIES', CORE_PATH . 'libs/');
+
+define('OBJECTS', LIBRARIES . 'objects/');
+define('CORE_OBJECTS', CORE_LIBRARIES . 'objects/');
+
+set_include_path(implode(PATH_SEPARATOR, array(
+    get_include_path(),
+    LIBRARIES,
+    CORE_LIBRARIES,
+    OBJECTS,
+    CORE_OBJECTS
+)));
 
 require_once 'strings.php';
 require_once 'dates.php';
@@ -49,7 +67,7 @@ function __autoload($_className)
         $classFileAlt = str_replace('_', '/', $_className) . '.php';
     }
 
-    $paths = array(LIBRARIES, OBJECTS, LIBRARIES . 'Ext');
+    $paths = array(LIBRARIES, CORE_LIBRARIES, OBJECTS, CORE_OBJECTS);
 
     foreach ($paths as $path) {
         if (is_file($path . $classFile)) {

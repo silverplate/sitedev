@@ -1,7 +1,6 @@
 <?php
 
-class       DocumentDataSubpageNavigation
-extends     DocumentDataHandler
+abstract class Core_DocumentDataSubpageNavigation extends DocumentDataHandler
 {
     /**
      * Expected content:

@@ -6,8 +6,8 @@
 // $l = count($p);
 // require_once CORE_PATH . $p[$l - 2] . $s . $p[$l - 1] . $s . basename($f);
 
-require_once '../core/handlers/documents/common.php';
+require_once '../core/handlers/data/apply-images.php';
 
-class DocumentCommon extends Core_DocumentCommon
+class DocumentDataApplyImages extends Core_DocumentDataApplyImages
 {
 }

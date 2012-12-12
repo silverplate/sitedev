@@ -6,8 +6,8 @@
 // $l = count($p);
 // require_once CORE_PATH . $p[$l - 2] . $s . $p[$l - 1] . $s . basename($f);
 
-require_once '../core/handlers/documents/common.php';
+require_once '../core/handlers/documents/not-found.php';
 
-class DocumentCommon extends Core_DocumentCommon
+class DocumentNotFound extends Core_DocumentCommon
 {
 }

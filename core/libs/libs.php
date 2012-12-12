@@ -45,26 +45,28 @@ require_once 'phpmailer.php';
 function __autoload($_className)
 {
     $classFile = '';
+    $className = preg_replace('/^Core_/', '', $_className);
 
-    for ($i = 0; $i < strlen($_className); $i++) {
+    for ($i = 0; $i < strlen($className); $i++) {
         if (
             $i != 0 &&
-            $_className{$i} == strtoupper($_className{$i}) &&
-            $_className{$i} != '_' &&
-            $_className{$i - 1} != '_'
+            $className{$i} == strtoupper($className{$i}) &&
+            $className{$i} != '_' &&
+            $className{$i - 1} != '_'
         ) {
             $classFile .= '_';
         }
 
-        $classFile .= strtolower($_className{$i});
+        $classFile .= strtolower($className{$i});
     }
 
     $classFile .= '.php';
 
     // Вариант, когда директории в названии
     // класса разделены подчеркиванием.
-    if (strpos($_className, '_') !== false) {
-        $classFileAlt = str_replace('_', '/', $_className) . '.php';
+
+    if (strpos($className, '_') !== false) {
+        $classFileAlt = str_replace('_', '/', $className) . '.php';
     }
 
     $paths = array(LIBRARIES, CORE_LIBRARIES, OBJECTS, CORE_OBJECTS);

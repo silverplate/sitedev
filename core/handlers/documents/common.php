@@ -1,8 +1,7 @@
 <?php
 
-class       DocumentCommon
-extends     DocumentHandler
-implements  DocumentHandlerInterface
+abstract class Core_DocumentCommon
+extends Core_DocumentHandler
 {
     public function execute()
     {
@@ -21,12 +20,17 @@ implements  DocumentHandlerInterface
         // Site navigation
 
         $navigationXml = '';
-        $navigation = DocumentNavigation::getList(array('is_published' => 1),
-                                                  null,
-                                                  array('name != "robots_sitemap"'));
+        $navigation = DocumentNavigation::getList(
+            array('is_published' => 1),
+            null,
+            array('name != "robots-sitemap"')
+        );
+
         foreach ($navigation as $i) {
-            $navigationXml .= DocumentNavigation::getNavigationXml($i->getAttribute('name'),
-                                                                   $i->getAttribute('type'));
+            $navigationXml .= DocumentNavigation::getNavigationXml(
+                $i->getAttribute('name'),
+                $i->getAttribute('type')
+            );
         }
 
         if ($navigationXml != '') {

@@ -23,7 +23,9 @@ $boUsers = array(
 
 $foHandlers = array(
     'common' => array('title' => 'Страница сайта', 'type_id' => 1, 'filename' => 'common.php', 'is_document_main' => 1, 'is_multiple' => 1),
-    'not_found' => array('title' => 'Документ не найден', 'type_id' => 1, 'filename' => 'not_found.php', 'is_document_main' => 0, 'is_multiple' => 0)
+    'not-found' => array('title' => 'Документ не найден', 'type_id' => 1, 'filename' => 'not-found.php', 'is_document_main' => 0, 'is_multiple' => 0),
+    'apply-images' => array('title' => 'Подставить изображения', 'type_id' => 2, 'filename' => 'apply-images.php', 'is_document_main' => 0, 'is_multiple' => 1),
+    'subpage-navigation' => array('title' => 'Вложенная навигация', 'type_id' => 2, 'filename' => 'subpage-navigation.php', 'is_document_main' => 0, 'is_multiple' => 1)
 );
 
 $templates = array(
@@ -37,9 +39,9 @@ $foDocuments = array(
                        'handler' => 'common',
                        'template' => 'common',
                        'navigations' => array('main'))),
-    array('/not_found/' => array('title' => 'Документ не найден',
-                                 'folder' => 'not_found',
-                                 'handler' => 'not_found',
+    array('/not-found/' => array('title' => 'Документ не найден',
+                                 'folder' => 'not-found',
+                                 'handler' => 'not-found',
                                  'template' => 'common'))
 );
 
@@ -67,7 +69,7 @@ $foData = array(
     '/' => array(
         array('title' => 'Содержание', 'tag' => 'html', DocumentDataContentType::GetPri() => 'text', 'content' => $content1),
     ),
-    '/not_found/' => array(
+    '/not-found/' => array(
         array('title' => 'Содержание', 'tag' => 'html', DocumentDataContentType::GetPri() => 'text', 'content' => $content2)
     )
 );

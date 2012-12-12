@@ -1,1 +1,0 @@
-../../core/handlers/documents/robots_sitemap.php

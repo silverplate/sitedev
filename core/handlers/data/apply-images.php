@@ -1,7 +1,6 @@
 <?php
 
-class       DocumentDataApplyImages
-extends     DocumentDataHandler
+abstract class Core_DocumentDataApplyImages extends DocumentDataHandler
 {
     public function execute()
     {

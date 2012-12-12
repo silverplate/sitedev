@@ -2,9 +2,8 @@
 
 require_once 'common.php';
 
-class       DocumentNotFound
-extends     DocumentCommon
-implements  DocumentHandlerInterface
+abstract class Core_DocumentNotFound
+extends Core_DocumentCommon
 {
     public function execute()
     {

@@ -1,6 +1,7 @@
 <?php
 
-class DocumentHandler extends FoPage {
+class Core_DocumentHandler extends FoPage
+{
     /**
      * @var Document
      */

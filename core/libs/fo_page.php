@@ -1,11 +1,5 @@
 <?php
 
-interface DocumentHandlerInterface {
-	public function __construct(&$_document);
-	public function Execute();
-	public function Output();
-}
-
 class FoPage extends Page {
 	protected $IsShowHidden;
 

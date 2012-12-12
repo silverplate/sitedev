@@ -184,11 +184,8 @@ function documentNotFound()
     header('HTTP/1.0 404 Not Found');
 
     if (class_exists('Document')) {
-        require_once LIBRARIES . 'page.php';
-        require_once LIBRARIES . 'page_fo.php';
-
         $realUrl = parse_url($_SERVER['REQUEST_URI']);
-        $document = Document::load(get_lang_inner_uri() . 'not_found/', 'uri');
+        $document = Document::load(get_lang_inner_uri() . 'not-found/', 'uri');
 
         if ($document) {
             if (

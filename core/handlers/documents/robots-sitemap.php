@@ -1,8 +1,7 @@
 <?php
 
-class       DocumentRobotsSitemap
-extends     DocumentHandler
-implements  DocumentHandlerInterface
+abstract class Core_DocumentRobotsSitemap
+extends Core_DocumentHandler
 {
     public function output()
     {
@@ -15,7 +14,7 @@ implements  DocumentHandlerInterface
         parent::execute();
         $this->setTemplate(TEMPLATES . 'robots_sitemap.xsl');
 
-        $type = DocumentNavigation::load('robots_sitemap', 'name');
+        $type = DocumentNavigation::load('robots-sitemap', 'name');
         if ($type && $type->is_published) {
             $documents = DocumentNavigation::getDocuments($type->name);
             $handlers = array();

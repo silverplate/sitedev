@@ -41,7 +41,7 @@ function getXmlHeader($_root)
 {
     return '<?xml version="1.0" encoding="utf-8"?>' .
            "\r\n" .
-           '<!DOCTYPE ' . $_root . ' SYSTEM "' . TEMPLATES . 'character_entities.dtd">' .
+           '<!DOCTYPE ' . $_root . ' SYSTEM "' . CORE_TEMPLATES . 'character_entities.dtd">' .
            "\r\n";
 }
 

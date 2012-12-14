@@ -2,7 +2,7 @@
 
 require('prepend.php');
 
-$page = new BoPage();
+$page = new App_Cms_Bo_Page();
 $page->SetTitle('Система управления');
 
 if ($page->IsAllowed()) {

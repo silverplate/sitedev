@@ -7,9 +7,9 @@
 // require_once(LIBRARIES . 'page_bo_404.php');
 // require_once(LIBRARIES . 'libs_bo.php');
 
-require_once realpath(dirname(__FILE__) . '/../../../core/libs') . '/libs.php';
+require_once realpath(dirname(__FILE__) . '/../../../core/library') . '/libs.php';
 require_once CORE_SETS . 'project.php';
-require_once CORE_LIBRARIES . 'libs_bo.php';
+require_once CORE_LIBRARIES . 'libs-bo.php';
 
 $g_section_start_url = '/cms/';
 
@@ -17,9 +17,9 @@ $g_section_start_url = '/cms/';
 /*** Authorization
 *********************************************************/
 if (isset($_POST['auth_submit'])) {
-	$try = BoUser::Auth($_POST['auth_login'], $_POST['auth_password']);
+	$try = App_Cms_Bo_User::Auth($_POST['auth_login'], $_POST['auth_password']);
 	if ($try) {
-		Session::Get()->Login(
+		App_Cms_Session::Get()->Login(
 			$try->GetId(),
 			isset($_POST['auth_is_ip_match']),
 			isset($_POST['auth_life_span']) ? (int) $_POST['auth_life_span'] : null,
@@ -27,63 +27,63 @@ if (isset($_POST['auth_submit'])) {
 			isset($_POST['auth_is_remember_me']) ? strtotime('+3 month') : null
 		);
 
-		Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_LOGIN);
+		App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGIN);
 		BoLog::Log(BoLog::ACT_LOGIN, array('user' => $try));
 
 	} else {
-		Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_LOGIN_ERROR);
+		App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGIN_ERROR);
 	}
 
 	reload(empty($_GET['id']) ? null : '?id=' . $_GET['id']);
 
 } elseif (isset($_POST['auth_reminder_submit'])) {
 	$try = isset($_POST['auth_email']) && $_POST['auth_email']
-		? BoUser::GetList(array('email' => $_POST['auth_email'], 'status_id' => 1))
+		? App_Cms_Bo_User::GetList(array('email' => $_POST['auth_email'], 'status_id' => 1))
 		: false;
 
 	if ($try) {
 		foreach ($try as $user) {
-			Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_REMIND_PWD);
+			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_REMIND_PWD);
 			BoLog::Log(BoLog::ACT_REMIND_PWD, array('user' => $user));
 			$user->RemindPassword();
 		}
 	} else {
-		Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_REMIND_PWD_ERROR);
+		App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_REMIND_PWD_ERROR);
 	}
 
 	reload();
 
-} elseif (isset($_GET['r']) || (isset($_GET['e']) && Session::Get()->IsLoggedIn())) {
-	if (Session::Get()->IsLoggedIn()) {
-		BoLog::Log(BoLog::ACT_LOGOUT, array('user' => BoUser::Auth(Session::Get()->GetUserId())));
-		Session::Get()->Logout();
+} elseif (isset($_GET['r']) || (isset($_GET['e']) && App_Cms_Session::Get()->IsLoggedIn())) {
+	if (App_Cms_Session::Get()->IsLoggedIn()) {
+		BoLog::Log(BoLog::ACT_LOGOUT, array('user' => App_Cms_Bo_User::Auth(App_Cms_Session::Get()->GetUserId())));
+		App_Cms_Session::Get()->Logout();
 	}
 
 	if (isset($_GET['r'])) {
-		$try = $_GET['r'] ? BoUser::Load($_GET['r'], 'reminder_key') : false;
+		$try = $_GET['r'] ? App_Cms_Bo_User::Load($_GET['r'], 'reminder_key') : false;
 		if ($try && $try->ChangePassword() == 0) {
-			Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_CHANGE_PWD);
+			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CHANGE_PWD);
 			BoLog::Log(BoLog::ACT_CHANGE_PWD, array('user' => $try));
 
 		} else {
-			Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_CHANGE_PWD_ERROR);
+			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CHANGE_PWD_ERROR);
 		}
 
 	} else {
-		Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_LOGOUT);
+		App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGOUT);
 	}
 
 	reload();
 
 } else {
-	Session::Get()->SetParam(Session::ACT_PARAM, Session::Get()->GetParam(Session::ACT_PARAM_NEXT) ? Session::Get()->GetParam(Session::ACT_PARAM_NEXT) : Session::ACT_START);
-	Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_CONTINUE);
+	App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM, App_Cms_Session::Get()->GetParam(App_Cms_Session::ACT_PARAM_NEXT) ? App_Cms_Session::Get()->GetParam(App_Cms_Session::ACT_PARAM_NEXT) : App_Cms_Session::ACT_START);
+	App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CONTINUE);
 
 	/* User */
-	$g_user = Session::Get()->IsLoggedIn() ? BoUser::Auth(Session::Get()->GetUserId()) : false;
+	$g_user = App_Cms_Session::Get()->IsLoggedIn() ? App_Cms_Bo_User::Auth(App_Cms_Session::Get()->GetUserId()) : false;
 
 	/* Section */
-	$g_section = BoSection::Compute();
+	$g_section = App_Cms_Bo_Section::Compute();
 }
 
 ?>

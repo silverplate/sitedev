@@ -1,7 +1,7 @@
 <?php
 
 abstract class Core_DocumentCommon
-extends Core_DocumentHandler
+extends Core_Cms_Document_Handler
 {
     public function execute()
     {
@@ -20,14 +20,14 @@ extends Core_DocumentHandler
         // Site navigation
 
         $navigationXml = '';
-        $navigation = DocumentNavigation::getList(
+        $navigation = App_Cms_Document_Navigation::getList(
             array('is_published' => 1),
             null,
             array('name != "robots-sitemap"')
         );
 
         foreach ($navigation as $i) {
-            $navigationXml .= DocumentNavigation::getNavigationXml(
+            $navigationXml .= App_Cms_Document_Navigation::getNavigationXml(
                 $i->getAttribute('name'),
                 $i->getAttribute('type')
             );

@@ -8,6 +8,6 @@
 
 require_once '../core/handlers/documents/common.php';
 
-class DocumentCommon extends Core_DocumentCommon
+class App_DocumentCommon extends Core_DocumentCommon
 {
 }

@@ -3,20 +3,20 @@
 require_once('../prepend.php');
 require_once('filter_lib.php');
 
-$page = new BoPage();
+$page = new App_Cms_Bo_Page();
 $page->SetTitle($g_section->GetTitle());
 
 if ($page->IsAuthorized()) {
 	if (isset($_GET['id'])) {
-		$obj = User::Load($_GET['id']);
+		$obj = App_Cms_User::Load($_GET['id']);
 		if (!$obj) unset($obj);
 
 	} elseif (isset($_GET['NEW'])) {
-		$obj = new User;
+		$obj = new App_Cms_User;
 	}
 
 	if (isset($obj)) {
-		$form = new Form();
+		$form = new App_Form();
 		$form->Load('form.xml');
 
 		if ($obj->GetId()) {
@@ -40,11 +40,11 @@ if ($page->IsAuthorized()) {
 		if ($form->UpdateStatus == FORM_UPDATED) {
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 				$obj->Delete();
-				BoLog::LogModule(BoLog::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
+				App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
 				goToUrl($page->Url['path'] . '?DEL');
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
-				if (User::CheckUnique($form->Elements['email']->GetValue(), $obj->GetId())) {
+				if (App_Cms_User::CheckUnique($form->Elements['email']->GetValue(), $obj->GetId())) {
 					$obj->DataInit($form->GetSqlValues());
 
 					$password = $form->Elements['passwd']->GetValue();
@@ -58,10 +58,10 @@ if ($page->IsAuthorized()) {
 
 					if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
 						$obj->Create();
-						BoLog::LogModule(BoLog::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
 					} else {
 						$obj->Update();
-						BoLog::LogModule(BoLog::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
 					}
 
 					goToUrl($page->Url['path'] . '?id=' . $obj->GetId() . '&OK');
@@ -99,7 +99,7 @@ if ($page->IsAuthorized()) {
 	foreach (array('name', 'email') as $item) {
 		if (isset($filter[$item]) && $filter[$item]) {
 			$list_xml .= '<filter_' . $item . '><![CDATA[' . $filter[$item] . ']]></filter_' . $item . '>';
-		}	
+		}
 	}
 
 	$list_xml .= '</local_navigation>';

@@ -9,7 +9,7 @@ if (isset($_POST['items']) && $_POST['items']) {
 	}
 
 	$current_sort_order = array();
-	$objects = BoSection::GetList(array(BoSection::GetPri() => $_POST['items']));
+	$objects = App_Cms_Bo_Section::GetList(array(App_Cms_Bo_Section::GetPri() => $_POST['items']));
 	foreach ($objects as $item) {
 		array_push($current_sort_order, $item->GetAttribute('sort_order'));
 	}
@@ -21,7 +21,7 @@ if (isset($_POST['items']) && $_POST['items']) {
 		}
 	}
 
-	BoLog::LogModule(BoLog::ACT_MODIFY, null, 'Сортировка');
+	App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, null, 'Сортировка');
 }
 
 ?>

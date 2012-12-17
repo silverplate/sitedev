@@ -28,7 +28,7 @@ if (isset($_POST['auth_submit'])) {
 		);
 
 		App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGIN);
-		BoLog::Log(BoLog::ACT_LOGIN, array('user' => $try));
+		App_Cms_Bo_Log::Log(App_Cms_Bo_Log::ACT_LOGIN, array('user' => $try));
 
 	} else {
 		App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGIN_ERROR);
@@ -44,7 +44,7 @@ if (isset($_POST['auth_submit'])) {
 	if ($try) {
 		foreach ($try as $user) {
 			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_REMIND_PWD);
-			BoLog::Log(BoLog::ACT_REMIND_PWD, array('user' => $user));
+			App_Cms_Bo_Log::Log(App_Cms_Bo_Log::ACT_REMIND_PWD, array('user' => $user));
 			$user->RemindPassword();
 		}
 	} else {
@@ -55,7 +55,7 @@ if (isset($_POST['auth_submit'])) {
 
 } elseif (isset($_GET['r']) || (isset($_GET['e']) && App_Cms_Session::Get()->IsLoggedIn())) {
 	if (App_Cms_Session::Get()->IsLoggedIn()) {
-		BoLog::Log(BoLog::ACT_LOGOUT, array('user' => App_Cms_Bo_User::Auth(App_Cms_Session::Get()->GetUserId())));
+		App_Cms_Bo_Log::Log(App_Cms_Bo_Log::ACT_LOGOUT, array('user' => App_Cms_Bo_User::Auth(App_Cms_Session::Get()->GetUserId())));
 		App_Cms_Session::Get()->Logout();
 	}
 
@@ -63,7 +63,7 @@ if (isset($_POST['auth_submit'])) {
 		$try = $_GET['r'] ? App_Cms_Bo_User::Load($_GET['r'], 'reminder_key') : false;
 		if ($try && $try->ChangePassword() == 0) {
 			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CHANGE_PWD);
-			BoLog::Log(BoLog::ACT_CHANGE_PWD, array('user' => $try));
+			App_Cms_Bo_Log::Log(App_Cms_Bo_Log::ACT_CHANGE_PWD, array('user' => $try));
 
 		} else {
 			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CHANGE_PWD_ERROR);
@@ -83,7 +83,5 @@ if (isset($_POST['auth_submit'])) {
 	$g_user = App_Cms_Session::Get()->IsLoggedIn() ? App_Cms_Bo_User::Auth(App_Cms_Session::Get()->GetUserId()) : false;
 
 	/* Section */
-	$g_section = App_Cms_Bo_Section::Compute();
+	$g_section = App_Cms_Bo_Section::compute();
 }
-
-?>

@@ -2,23 +2,23 @@
 
 require('../prepend.php');
 
-$page = new BoPage();
+$page = new App_Cms_Bo_Page();
 $page->SetTitle($g_section->GetTitle());
 
 if ($page->IsAuthorized()) {
 	if (isset($_GET['id'])) {
-		$obj = BoSection::Load($_GET['id']);
+		$obj = App_Cms_Bo_Section::Load($_GET['id']);
 		if (!$obj) unset($obj);
 
 	} elseif (isset($_GET['NEW'])) {
-		$obj = new BoSection;
+		$obj = new App_Cms_Bo_Section;
 	}
 
 	if (isset($obj)) {
-		$form = new Form();
+		$form = new App_Form();
 		$form->Load('form.xml');
 
-		foreach (BoUser::GetList() as $item) {
+		foreach (App_Cms_Bo_User::GetList() as $item) {
 			$form->Elements['users']->AddOption($item->GetId(), $item->GetTitle());
 		}
 
@@ -37,19 +37,19 @@ if ($page->IsAuthorized()) {
 		if ($form->UpdateStatus == FORM_UPDATED) {
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 				$obj->Delete();
-				BoLog::LogModule(BoLog::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
+				App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
 				goToUrl($page->Url['path'] . '?DEL');
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
-				if (BoSection::CheckUnique($form->Elements['uri']->GetValue(), $obj->GetId())) {
+				if (App_Cms_Bo_Section::CheckUnique($form->Elements['uri']->GetValue(), $obj->GetId())) {
 					$obj->DataInit($form->GetSqlValues());
 
 					if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
 						$obj->Create();
-						BoLog::LogModule(BoLog::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
 					} else {
 						$obj->Update();
-						BoLog::LogModule(BoLog::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
 					}
 
 					if (isset($form->Elements['users'])) {
@@ -80,7 +80,7 @@ if ($page->IsAuthorized()) {
 	}
 
 	$list_xml = '<local_navigation is_sortable="true">';
-	foreach (BoSection::GetList() as $item) {
+	foreach (App_Cms_Bo_Section::GetList() as $item) {
 		$list_xml .= $item->GetXml('bo_list', 'item');
 	}
 	$list_xml .= '</local_navigation>';

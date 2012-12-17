@@ -104,7 +104,7 @@ class Ext_File
         $dir = rtrim($_dir, '/') . '/';
 
         if (is_dir($dir)) {
-            $class = is_null($_class) ? __CLASS__ : $_class;
+            $class = is_null($_class) ? get_called_class() : $_class;
 
             foreach (array('.*', '*') as $try) {
                 $search = glob($dir . $_name . $try);

@@ -39,7 +39,7 @@ abstract class Core_BackOffice
                 }
             }
 
-            BoLog::logModule(BoLog::ACT_MODIFY, null, 'Сортировка');
+            App_Cms_Bo_Log::logModule(App_Cms_Bo_Log::ACT_MODIFY, null, 'Сортировка');
         }
     }
 }

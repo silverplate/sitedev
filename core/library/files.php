@@ -185,7 +185,7 @@ function documentNotFound()
 
     if (class_exists('Document')) {
         $realUrl = parse_url($_SERVER['REQUEST_URI']);
-        $document = Document::load(get_lang_inner_uri() . 'not-found/', 'uri');
+        $document = App_Cms_Document::load(get_lang_inner_uri() . 'not-found/', 'uri');
 
         if ($document) {
             if (
@@ -200,7 +200,7 @@ function documentNotFound()
                     (defined('IS_SHOW_HIDDEN') && IS_SHOW_HIDDEN)
                 )
             ) {
-                $handler = Document::initHandler($document->getHandler(), $document);
+                $handler = App_Cms_Document::initHandler($document->getHandler(), $document);
                 $handler->execute();
                 $handler->output();
                 exit();

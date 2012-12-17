@@ -7,7 +7,7 @@ abstract class Core_Cms_TemplateDb extends App_ActiveRecord_Extended
 
     public function delete()
     {
-        Db::get()->execute('UPDATE ' . Document::getTbl() . ' ' .
+        App_Db::get()->execute('UPDATE ' . App_Cms_Document::getTbl() . ' ' .
                            'SET ' . $this->getPri() . ' = NULL ' .
                            'WHERE ' . $this->getPri() . ' = ' . $this->getDbId());
 

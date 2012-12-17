@@ -11,10 +11,10 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 	}
 
 	public static function CheckUnique($_value, $_exclude = null) {
-		return self::IsUnique(__CLASS__, self::GetTbl(), self::GetPri(), 'uri', $_value, $_exclude);
+		return self::IsUnique(get_called_class(), self::GetTbl(), self::GetPri(), 'uri', $_value, $_exclude);
 	}
 
-	public static function Compute() {
+	public static function compute() {
 		global $g_section_start_url;
 
 		$url = parse_url($_SERVER['REQUEST_URI']);
@@ -22,8 +22,8 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 
 		$entry = App_Db::Get()->GetEntry('SELECT ' . implode(',', self::GetBase()->GetAttributes()) . ' FROM ' . self::GetTbl() . ' WHERE uri = ' . App_Db::escape($path[0]));
 		if ($entry) {
-			$cname = __CLASS__;
-			$obj = new $cname;
+			$class = get_called_class();
+			$obj = new $class;
 			$obj->DataInit($entry);
 			return $obj;
 		}
@@ -36,7 +36,7 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 	}
 
 	public function GetXml($_type, $_node_name = null, $_append_xml = null, $_append_attributes = null) {
-		$node_name = ($_node_name) ? $_node_name : strtolower(__CLASS__);
+		$node_name = ($_node_name) ? $_node_name : strtolower(get_called_class());
 		$result = '';
 
 		switch ($_type) {
@@ -77,7 +77,7 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 
 			switch ($_name) {
 				case 'users':
-					$this->Links[$_name] = BoUserToSection::GetList($conditions);
+					$this->Links[$_name] = App_Cms_Bo_UserToSection::GetList($conditions);
 					break;
 			}
 		}
@@ -90,7 +90,7 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 
 		switch ($_name) {
 			case 'users':
-				$keys = array(BoUserToSection::GetFirstKey(), BoUserToSection::GetSecondKey());
+				$keys = array(App_Cms_Bo_UserToSection::GetFirstKey(), App_Cms_Bo_UserToSection::GetSecondKey());
 				break;
 		}
 
@@ -113,8 +113,8 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 
 		switch ($_name) {
 			case 'users':
-				$class_name = 'BoUserToSection';
-				$keys = array(BoUserToSection::GetFirstKey(), BoUserToSection::GetSecondKey());
+				$class_name = 'App_Cms_Bo_UserToSection';
+				$keys = array(App_Cms_Bo_UserToSection::GetFirstKey(), App_Cms_Bo_UserToSection::GetSecondKey());
 				break;
 		}
 

@@ -37,7 +37,7 @@ class Ext_File_Cache
         self::cleanExpired();
         $map = array();
 
-        foreach (Db::get()->getList('SELECT * FROM ' . self::_getDataTable()) as $item) {
+        foreach (App_Db::get()->getList('SELECT * FROM ' . self::_getDataTable()) as $item) {
             $map[$item['file_path']] = $item;
         }
 
@@ -50,7 +50,7 @@ class Ext_File_Cache
     public static function clean()
     {
         self::$_cache = null;
-        return Db::get()->execute('TRUNCATE ' . self::_getDataTable());
+        return App_Db::get()->execute('TRUNCATE ' . self::_getDataTable());
     }
 
     /**
@@ -63,7 +63,7 @@ class Ext_File_Cache
         $tbl = self::_getDataTable();
         $past = time() - self::EXPIRE;
 
-        return Db::get()->execute("DELETE FROM `$tbl` WHERE `creation_time` <= $past");
+        return App_Db::get()->execute("DELETE FROM `$tbl` WHERE `creation_time` <= $past");
     }
 
     /**
@@ -79,7 +79,7 @@ class Ext_File_Cache
             $key = $tbl . '_id';
 
             unset(self::$_cache[$_path]);
-            return Db::get()->execute("DELETE FROM `$tbl` WHERE `$key` = $instance[$key]");
+            return App_Db::get()->execute("DELETE FROM `$tbl` WHERE `$key` = $instance[$key]");
 
         } else {
             return false;
@@ -129,12 +129,12 @@ class Ext_File_Cache
 
         self::delete($instance['file_path']);
 
-        Db::get()->execute(
+        App_Db::get()->execute(
             'INSERT INTO ' . self::_getDataTable() .
-            Db::get()->getQueryFields($instance, 'insert')
+            App_Db::get()->getQueryFields($instance, 'insert')
         );
 
-        $instance[self::_getDataTable() . '_id'] = Db::get()->getLastInsertedId();
+        $instance[self::_getDataTable() . '_id'] = App_Db::get()->getLastInsertedId();
         self::$_cache[$instance['file_path']] = $instance;
 
         return $instance;

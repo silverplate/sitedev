@@ -62,7 +62,7 @@ abstract class Core_Cms_Handler extends App_ActiveRecord
 			}
 		}
 
-		return !$attributes || !self::GetList($attributes, array('count' => 1), array(self::GetPri() . ' != ' . Db::escape($this->GetId())));
+		return !$attributes || !self::GetList($attributes, array('count' => 1), array(self::GetPri() . ' != ' . App_Db::escape($this->GetId())));
 	}
 
 	private function GetPrefix() {
@@ -77,7 +77,7 @@ abstract class Core_Cms_Handler extends App_ActiveRecord
 	}
 
 	public function GetXml($_type, $_node_name = null, $_append_xml = null) {
-		$node_name = ($_node_name) ? $_node_name : strtolower(__CLASS__);
+		$node_name = ($_node_name) ? $_node_name : strtolower(get_called_class());
 		$result = '';
 
 		switch ($_type) {
@@ -95,8 +95,8 @@ abstract class Core_Cms_Handler extends App_ActiveRecord
 	}
 
 	public function Delete() {
-		Db::Get()->Execute('UPDATE ' . Document::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . Db::escape($this->GetId()));
-		Db::Get()->Execute('UPDATE ' . DocumentData::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . Db::escape($this->GetId()));
+		App_Db::Get()->Execute('UPDATE ' . App_Cms_Document::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . App_Db::escape($this->GetId()));
+		App_Db::Get()->Execute('UPDATE ' . App_Cms_Document_Data::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . App_Db::escape($this->GetId()));
 
 		remove_file($this->GetFilename());
 		parent::Delete();
@@ -156,7 +156,7 @@ abstract class Core_Cms_Handler extends App_ActiveRecord
 		}
 
 		return parent::GetList(
-			__CLASS__,
+			get_called_class(),
 			self::GetTbl(),
 			self::GetBase()->GetAttributes(),
 			$_attributes,

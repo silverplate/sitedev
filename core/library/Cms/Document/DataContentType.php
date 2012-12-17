@@ -28,7 +28,7 @@ abstract class Core_Cms_Document_DataContentType extends App_ActiveRecord
 	}
 
 	public function Delete() {
-		Db::Get()->Execute('UPDATE ' . DocumentData::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . Db::escape($this->GetId()));
+		App_Db::Get()->Execute('UPDATE ' . App_Cms_Document_Data::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . App_Db::escape($this->GetId()));
 		parent::Delete();
 	}
 

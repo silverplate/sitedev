@@ -78,7 +78,7 @@ abstract class Core_Cms_Template extends App_DbMapper
     public function getXml($_type = null, $_node = null, $_xml = null, array $_attrs = array())
     {
         $xml = empty($_xml) ? array() : array($_xml);
-        $node = empty($_node) ? Ext_Xml::normalizeName(__CLASS__) : $_node;
+        $node = empty($_node) ? Ext_Xml::normalizeName(get_called_class()) : $_node;
         $attrs = empty($_attrs) ? array() : $_attrs;
 
         $attrs['id'] = $this->id;

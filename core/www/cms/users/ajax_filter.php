@@ -11,7 +11,7 @@ if (!$result_items['items'] && $result_items['total'] > 0 && $filter['page'] != 
 	$result_items = obj_filter($filter);
 }
 
-$page = new Page();
+$page = new App_Cms_Page();
 $page->SetRootNodeName('http_request');
 $page->SetRootNodeAttribute('type', 'filter');
 

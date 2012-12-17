@@ -2,23 +2,23 @@
 
 require('../prepend.php');
 
-$page = new BoPage();
+$page = new App_Cms_Bo_Page();
 $page->SetTitle($g_section->GetTitle());
 
 if ($page->IsAuthorized()) {
 	if (isset($_GET['id'])) {
-		$obj = DocumentNavigation::Load($_GET['id']);
+		$obj = App_Cms_Document_Navigation::Load($_GET['id']);
 		if (!$obj) unset($obj);
 
 	} elseif (isset($_GET['NEW'])) {
-		$obj = new DocumentNavigation;
+		$obj = new App_Cms_Document_Navigation();
 	}
 
 	if (isset($obj)) {
-		$form = new Form();
+		$form = new App_Form();
 		$form->Load('form.xml');
 
-		foreach (DocumentNavigation::GetTypes() as $id => $params) {
+		foreach (App_Cms_Document_Navigation::GetTypes() as $id => $params) {
 			$form->Elements['type']->AddOption($id, strtolower_utf8($params['title']));
 		}
 
@@ -37,16 +37,16 @@ if ($page->IsAuthorized()) {
 
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 				$obj->Delete();
-				BoLog::LogModule(BoLog::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
+				App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
 				goToUrl($page->Url['path'] . '?DEL');
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
 				if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
 					$obj->Create();
-					BoLog::LogModule(BoLog::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+					App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
 				} else {
 					$obj->Update();
-					BoLog::LogModule(BoLog::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
+					App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
 				}
 
 				goToUrl($page->Url['path'] . '?id=' . $obj->GetId() . '&OK');
@@ -65,7 +65,7 @@ if ($page->IsAuthorized()) {
 	}
 
 	$list_xml = '<local_navigation>';
-	foreach (DocumentNavigation::GetList() as $item) {
+	foreach (App_Cms_Document_Navigation::GetList() as $item) {
 		$list_xml .= $item->GetXml('bo_list', 'item');
 	}
 	$list_xml .= '</local_navigation>';

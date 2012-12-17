@@ -24,7 +24,7 @@ abstract class Core_DbMapper
 
     public function truncate()
     {
-        return Db::get()->execute('TRUNCATE `' . $this->getDb()->getPri() . '`');
+        return App_Db::get()->execute('TRUNCATE `' . $this->getDb()->getPri() . '`');
     }
 
 

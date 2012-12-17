@@ -95,6 +95,6 @@ function set_admin_param($_name, $_is_on) {
 
 /*** Authorization
 *********************************************************/
-if (IS_USERS) User::StartSession();
+if (IS_USERS) App_Cms_User::StartSession();
 
 ?>

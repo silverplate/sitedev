@@ -1,6 +1,6 @@
 <?php
 
-abstract class Core_Cms_Bo_Page404 extends Core_Cms_BoPage
+abstract class Core_Cms_Bo_Page404 extends Core_Cms_Bo_Page
 {
     public function __construct()
     {

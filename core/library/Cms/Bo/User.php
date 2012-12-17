@@ -29,7 +29,7 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 	}
 
 	public static function CheckUnique($_value, $_exclude = null) {
-		return self::IsUnique(__CLASS__, self::GetTbl(), self::GetPri(), 'login', $_value, $_exclude);
+		return self::IsUnique(get_called_class(), self::GetTbl(), self::GetPri(), 'login', $_value, $_exclude);
 	}
 
 	public static function Auth() {

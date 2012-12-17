@@ -71,7 +71,7 @@ abstract class Core_ActiveRecord
             return true;
 
         } else {
-            throw new Exception('call to undefined class member: ' . __CLASS__ . '::' . $_attribute);
+            throw new Exception('call to undefined class member: ' . get_called_class() . '::' . $_attribute);
 
         }
     }
@@ -458,13 +458,13 @@ abstract class Core_ActiveRecord
     }
 
     public static function TableInit($_table, $_id = null, $_is_log = false) {
-        $class_name = __CLASS__;
+        $class_name = get_called_class();
         $obj = new $class_name($_table);
 
         if ($_is_log) {
             $log_file = LIBRARIES . get_file_name(__FILE__) . '.txt';
             write_file($log_file, $_table . "\r\r", 'append');
-            write_file($log_file, 'self::$Base = new ActiveRecord(self::TABLE);' . "\r", 'append');
+            write_file($log_file, 'self::$Base = new App_ActiveRecord(self::TABLE);' . "\r", 'append');
         }
 
         $attributes = App_Db::Get()->GetList('SHOW COLUMNS FROM ' . $_table);

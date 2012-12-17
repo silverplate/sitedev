@@ -12,31 +12,31 @@ function bo_log_filter($_filter) {
 
 	if ($_filter['is_users']) {
 		if ($_filter['users'] && is_array($_filter['users'])) {
-			array_push($row_conditions, BoUser::GetPri() . ' IN (' . Db::escape($_filter['users']) . ')');
+			array_push($row_conditions, App_Cms_Bo_User::GetPri() . ' IN (' . App_Db::escape($_filter['users']) . ')');
 		} else {
-			array_push($row_conditions, BoUser::GetPri() . ' NOT IN (' . Db::escape(array_keys(BoUser::GetList())) . ')');
+			array_push($row_conditions, App_Cms_Bo_User::GetPri() . ' NOT IN (' . App_Db::escape(array_keys(App_Cms_Bo_User::GetList())) . ')');
 		}
 	}
 
 	if ($_filter['is_sections']) {
 		if ($_filter['sections'] && is_array($_filter['sections'])) {
-			array_push($row_conditions, BoSection::GetPri() . ' IN (' . Db::escape($_filter['sections']) . ')');
+			array_push($row_conditions, App_Cms_Bo_Section::GetPri() . ' IN (' . App_Db::escape($_filter['sections']) . ')');
 		} else {
-			array_push($row_conditions, BoSection::GetPri() . ' NOT IN (' . Db::escape(array_keys(BoSection::GetList())) . ')');
+			array_push($row_conditions, App_Cms_Bo_Section::GetPri() . ' NOT IN (' . App_Db::escape(array_keys(App_Cms_Bo_Section::GetList())) . ')');
 		}
 	}
 
 	if ($_filter['is_actions']) {
 		if ($_filter['actions'] && is_array($_filter['actions'])) {
-			array_push($row_conditions, 'action_id IN (' . Db::escape($_filter['actions']) . ')');
+			array_push($row_conditions, 'action_id IN (' . App_Db::escape($_filter['actions']) . ')');
 		} else {
-			array_push($row_conditions, 'action_id NOT IN (' . Db::escape(array_keys(BoLog::GetActions())) . ')');
+			array_push($row_conditions, 'action_id NOT IN (' . App_Db::escape(array_keys(App_Cms_Bo_Log::GetActions())) . ')');
 		}
 	}
 
 	return array(
-		'items' => BoLog::GetList($conditions, $parameters, $row_conditions),
-		'total' => BoLog::GetCount($conditions, $row_conditions)
+		'items' => App_Cms_Bo_Log::GetList($conditions, $parameters, $row_conditions),
+		'total' => App_Cms_Bo_Log::GetCount($conditions, $row_conditions)
 	);
 }
 

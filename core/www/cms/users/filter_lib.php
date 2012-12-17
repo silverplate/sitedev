@@ -14,8 +14,8 @@ function obj_filter($_filter) {
 	}
 
 	return array(
-		'items' => User::GetList(null, $parameters, $row_conditions),
-		'total' => User::GetCount(null, $row_conditions)
+		'items' => App_Cms_User::GetList(null, $parameters, $row_conditions),
+		'total' => App_Cms_User::GetCount(null, $row_conditions)
 	);
 }
 

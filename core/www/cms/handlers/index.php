@@ -2,20 +2,20 @@
 
 require('../prepend.php');
 
-$page = new BoPage();
+$page = new App_Cms_Bo_Page();
 $page->SetTitle($g_section->GetTitle());
 
 if ($page->IsAuthorized()) {
 	if (isset($_GET['id'])) {
-		$obj = Handler::Load($_GET['id']);
+		$obj = App_Cms_Handler::Load($_GET['id']);
 		if (!$obj) unset($obj);
 
 	} elseif (isset($_GET['NEW'])) {
-		$obj = new Handler;
+		$obj = new App_Cms_Handler();
 	}
 
 	if (isset($obj)) {
-		$form = new Form();
+		$form = new App_Form();
 		$form->Load('form.xml');
 
 		if ($obj->GetId()) {
@@ -44,7 +44,7 @@ if ($page->IsAuthorized()) {
 
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 				$obj->Delete();
-				BoLog::LogModule(BoLog::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
+				App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
 				goToUrl($page->Url['path'] . '?DEL');
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
@@ -57,15 +57,15 @@ if ($page->IsAuthorized()) {
 								$form->Elements['content']->GetValue()
 							);
 						}
-						BoLog::LogModule(BoLog::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
 					} else {
 						$obj->Update();
 						write_file($obj->GetFilename(), $form->Elements['content']->GetValue());
-						BoLog::LogModule(BoLog::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
 					}
 
 					if ($obj->GetAttribute('is_document_main')) {
-						Db::Get()->Execute('UPDATE ' . Handler::GetTbl() . ' SET is_document_main = 0 WHERE is_document_main = 1 AND ' . Handler::GetPri() . ' != ' . Db::escape($obj->GetId()));
+						App_Db::Get()->Execute('UPDATE ' . App_Cms_Handler::GetTbl() . ' SET is_document_main = 0 WHERE is_document_main = 1 AND ' . App_Cms_Handler::GetPri() . ' != ' . App_Db::escape($obj->GetId()));
 					}
 
 					reload('?id=' . $obj->GetId() . '&OK');
@@ -91,7 +91,7 @@ if ($page->IsAuthorized()) {
 	}
 
 	$list_xml = '<local_navigation>';
-	foreach (Handler::GetList() as $item) {
+	foreach (App_Cms_Handler::GetList() as $item) {
 		$list_xml .= $item->GetXml('bo_list', 'item');
 	}
 	$list_xml .= '</local_navigation>';

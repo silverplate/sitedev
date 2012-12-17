@@ -79,7 +79,7 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 			$result .= '<content>' . get_cdata($this->GetAttribute('content')) . '</content>';
 		}
 
-		if (IS_USERS && $this->GetAttribute('auth_status_id') != User::AUTH_GROUP_ALL && App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))) {
+		if (IS_USERS && $this->GetAttribute('auth_status_id') != App_Cms_User::AUTH_GROUP_ALL && App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))) {
 			$result .= '<auth_group>' . get_cdata(App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))) . '</auth_group>';
 		}
 

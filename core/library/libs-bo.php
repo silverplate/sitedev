@@ -8,7 +8,7 @@ function bo_ajax_tree_output($_class_name) {
     $g_selected_ids = isset($data['selected_ids']) && is_array($data['selected_ids']) ? $data['selected_ids'] : array();
     $current_id = isset($data['current_object_id']) ? $data['current_object_id'] : '';
 
-    $page = new Page;
+    $page = new App_Cms_Page();
     $page->SetTemplate(TEMPLATES . 'bo_http_requests.xsl');
     $page->SetRootNodeName('http_request');
     if (isset($data['type'])) $page->SetRootNodeAttribute('type', 'tree_' . $data['type']);
@@ -83,7 +83,7 @@ function bo_ajax_get_branch_xml($_class_name, $_parent_id, $_exclude_id) {
     if ($_exclude_id) {
         array_push(
             $row_conditions,
-            call_user_func($_class_name . '::GetPri') . ' != ' . Db::escape($_exclude_id)
+            call_user_func($_class_name . '::GetPri') . ' != ' . App_Db::escape($_exclude_id)
         );
     }
 

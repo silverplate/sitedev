@@ -34,39 +34,39 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 		);
 
 		if (isset($_params['section'])) {
-			$params[BoSection::GetPri()] = $_params['section']->GetId();
+			$params[App_Cms_Bo_Section::GetPri()] = $_params['section']->GetId();
 			$params['section_name'] = $_params['section']->GetTitle();
 
 		} elseif ($g_section) {
-			$params[BoSection::GetPri()] = $g_section->GetId();
+			$params[App_Cms_Bo_Section::GetPri()] = $g_section->GetId();
 			$params['section_name'] = $g_section->GetTitle();
 
 		} elseif (isset($_params['section_id']) && isset($_params['section_name'])) {
-			$params[BoSection::GetPri()] = $_params['section_id'];
+			$params[App_Cms_Bo_Section::GetPri()] = $_params['section_id'];
 			$params['section_name'] = $_params['section_name'];
 
 		} else {
-			$section = BoSection::Compute();
+			$section = App_Cms_Bo_Section::Compute();
 			if ($section) {
-				$params[BoSection::GetPri()] = $section->GetId();
+				$params[App_Cms_Bo_Section::GetPri()] = $section->GetId();
 				$params['section_name'] = $section->GetTitle();
 			}
 		}
 
 		if (isset($_params['user'])) {
-			$params[BoUser::GetPri()] = $_params['user']->GetId();
+			$params[App_Cms_Bo_User::GetPri()] = $_params['user']->GetId();
 			$params['user_name'] = $_params['user']->GetTitle();
 
 		} elseif ($g_user) {
-			$params[BoUser::GetPri()] = $g_user->GetId();
+			$params[App_Cms_Bo_User::GetPri()] = $g_user->GetId();
 			$params['user_name'] = $g_user->GetTitle();
 
 		} elseif (isset($_params['user_id']) && isset($_params['user_name'])) {
-			$params[BoUser::GetPri()] = $_params['user_id'];
+			$params[App_Cms_Bo_User::GetPri()] = $_params['user_id'];
 			$params['user_name'] = $_params['user_name'];
 		}
 
-		$class_name = __CLASS__;
+		$class_name = get_called_class();
 		$obj = new $class_name;
 		$obj->DataInit($params);
 		$obj->Create();
@@ -76,18 +76,18 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 
 	public static function GetActions() {
 		return array(
-			BoLog::ACT_LOGIN => 'Авторизация',
-			BoLog::ACT_LOGOUT => 'Окончание работы',
-			BoLog::ACT_CREATE => 'Создание',
-			BoLog::ACT_MODIFY => 'Изменение',
-			BoLog::ACT_DELETE => 'Удаление',
-			BoLog::ACT_REMIND_PWD => 'Напоминание пароля',
-			BoLog::ACT_CHANGE_PWD => 'Смена пароля'
+			self::ACT_LOGIN => 'Авторизация',
+			self::ACT_LOGOUT => 'Окончание работы',
+			self::ACT_CREATE => 'Создание',
+			self::ACT_MODIFY => 'Изменение',
+			self::ACT_DELETE => 'Удаление',
+			self::ACT_REMIND_PWD => 'Напоминание пароля',
+			self::ACT_CHANGE_PWD => 'Смена пароля'
 		);
 	}
 
 	public function GetXml($_type, $_node_name = null, $_append_xml = null) {
-		$node_name = ($_node_name) ? $_node_name : __CLASS__;
+		$node_name = ($_node_name) ? $_node_name : get_called_class();
 		$result = '';
 
 		switch ($_type) {
@@ -121,21 +121,21 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 
 		if (isset($_conditions['from_date'])) {
 			if ($_conditions['from_date']) {
-				array_push($result['row_conditions'], $self['table'] . '.creation_date >= ' . Db::escape(date('Y-m-d 00:00:00', $_conditions['from_date'])));
+				array_push($result['row_conditions'], $self['table'] . '.creation_date >= ' . App_Db::escape(date('Y-m-d 00:00:00', $_conditions['from_date'])));
 			}
 			unset($_conditions['from_date']);
 		}
 
 		if (isset($_conditions['till_date'])) {
 			if ($_conditions['till_date']) {
-				array_push($result['row_conditions'], $self['table'] . '.creation_date <= ' . Db::escape(date('Y-m-d 23:59:59', $_conditions['till_date'])));
+				array_push($result['row_conditions'], $self['table'] . '.creation_date <= ' . App_Db::escape(date('Y-m-d 23:59:59', $_conditions['till_date'])));
 			}
 			unset($_conditions['till_date']);
 		}
 
 		if ($_conditions) {
 			foreach ($_conditions as $attribute => $value) {
-				array_push($result['row_conditions'], $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . Db::Get()->EscapeList($value) . ')' : ' = ' . Db::escape($value)));
+				array_push($result['row_conditions'], $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . App_Db::Get()->EscapeList($value) . ')' : ' = ' . App_Db::escape($value)));
 			}
 		}
 
@@ -155,7 +155,7 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 			$row_conditions = array_merge($row_conditions, $_row_conditions);
 		}
 
-		return parent::GetList(__CLASS__, $conditions['tables'], self::GetBase()->GetAttributes(true), null, $parameters, $row_conditions);
+		return parent::GetList(get_called_class(), $conditions['tables'], self::GetBase()->GetAttributes(true), null, $parameters, $row_conditions);
 	}
 
 
@@ -167,7 +167,7 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 			$row_conditions = array_merge($row_conditions, $_row_conditions);
 		}
 
-		return parent::GetCount(__CLASS__, $conditions['tables'], null, $row_conditions);
+		return parent::GetCount(get_called_class(), $conditions['tables'], null, $row_conditions);
 	}
 
 	public function __construct() {
@@ -179,10 +179,10 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 
 	public static function GetBase() {
 		if (!isset(self::$Base)) {
-			self::$Base = new ActiveRecord(self::ComputeTblName());
+			self::$Base = new App_ActiveRecord(self::ComputeTblName());
 			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'int', 10, true);
-			self::$Base->AddForeignKey(BoUser::GetBase());
-			self::$Base->AddForeignKey(BoSection::GetBase());
+			self::$Base->AddForeignKey(App_Cms_Bo_User::GetBase());
+			self::$Base->AddForeignKey(App_Cms_Bo_Section::GetBase());
 			self::$Base->AddAttribute('section_name', 'varchar', 255);
 			self::$Base->AddAttribute('user_name', 'varchar', 255);
 			self::$Base->AddAttribute('user_ip', 'varchar', 15);
@@ -210,7 +210,7 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 	}
 
 	public static function Load($_value, $_attribute = null) {
-		return parent::Load(__CLASS__, $_value, $_attribute);
+		return parent::Load(get_called_class(), $_value, $_attribute);
 	}
 
 	public static function ComputeTblName()  {

@@ -109,7 +109,7 @@ abstract class Core_ActiveRecord_Attribute
                 case 'varchar':
                 case 'string':
                 default:
-                    return ($_is_escape) ? Db::escape($this->Value) : $this->Value;
+                    return ($_is_escape) ? App_Db::escape($this->Value) : $this->Value;
             }
         }
     }

@@ -123,7 +123,7 @@ abstract class Core_Cms_Document_Handler extends Core_Cms_FoPage
                 }
 
                 if ($item->GetHandlerFile()) {
-                    $handler = App_Cms_DocumentData::initHandler(
+                    $handler = App_Cms_Document_Data::initHandler(
                         $item->getHandler(),
                         $item,
                         $this->Document

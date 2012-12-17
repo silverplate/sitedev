@@ -3,7 +3,7 @@
 require_once('../prepend.php');
 require_once('filter_lib.php');
 
-$page = new BoPage();
+$page = new App_Cms_Bo_Page();
 $page->SetTitle($g_section->GetTitle());
 
 if ($page->IsAuthorized()) {
@@ -20,7 +20,7 @@ if ($page->IsAuthorized()) {
 	$list_xml .= '<filter_param type="multiple" name="users"';
 	if ($filter['is_users']) $list_xml .= ' is_selected="true"';
 	$list_xml .= '><title><![CDATA[Пользователь]]></title>';
-	foreach (BoUser::GetList() as $item) {
+	foreach (App_Cms_Bo_User::GetList() as $item) {
 		$list_xml .= '<item value="' . $item->GetId() . '"';
 		if (is_array($filter['users']) && in_array($item->GetId(), $filter['users'])) {
 			$list_xml .= ' is_selected="true"';
@@ -32,7 +32,7 @@ if ($page->IsAuthorized()) {
 	$list_xml .= '<filter_param type="multiple" name="sections"';
 	if ($filter['is_sections']) $list_xml .= ' is_selected="true"';
 	$list_xml .= '><title><![CDATA[Раздел]]></title>';
-	foreach (BoSection::GetList() as $item) {
+	foreach (App_Cms_Bo_Section::GetList() as $item) {
 		$list_xml .= '<item value="' . $item->GetId() . '"';
 		if (is_array($filter['sections']) && in_array($item->GetId(), $filter['sections'])) {
 			$list_xml .= ' is_selected="true"';
@@ -44,7 +44,7 @@ if ($page->IsAuthorized()) {
 	$list_xml .= '<filter_param type="multiple" name="actions"';
 	if ($filter['is_actions']) $list_xml .= ' is_selected="true"';
 	$list_xml .= '><title><![CDATA[Действие]]></title>';
-	foreach (BoLog::GetActions() as $id => $title) {
+	foreach (App_Cms_Bo_Log::GetActions() as $id => $title) {
 		$list_xml .= '<item value="' . $id . '"';
 		if (is_array($filter['actions']) && in_array($id, $filter['actions'])) {
 			$list_xml .= ' is_selected="true"';

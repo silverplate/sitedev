@@ -14,11 +14,11 @@ extends Core_DocumentHandler
         parent::execute();
         $this->setTemplate(TEMPLATES . 'robots_sitemap.xsl');
 
-        $type = DocumentNavigation::load('robots-sitemap', 'name');
+        $type = App_Cms_Document_Navigation::load('robots-sitemap', 'name');
         if ($type && $type->is_published) {
-            $documents = DocumentNavigation::getDocuments($type->name);
+            $documents = App_Cms_Document_Navigation::getDocuments($type->name);
             $handlers = array();
-            $handlerKey = Handler::getPri();
+            $handlerKey = App_Cms_Handler::getPri();
             $sitemap = array();
             $sitemapXml = '';
 

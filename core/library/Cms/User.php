@@ -16,59 +16,59 @@ abstract class Core_Cms_User extends App_ActiveRecord
 
 	public static function StartSession() {
 		if (isset($_POST['auth_submit']) || isset($_POST['auth_submit_x'])) {
-			$try = User::Auth($_POST['auth_login'], $_POST['auth_password']);
+			$try = App_Cms_User::Auth($_POST['auth_login'], $_POST['auth_password']);
 			if ($try) {
-				Session::Get()->Login($try->GetId());
-				Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_LOGIN);
+				App_Cms_Session::Get()->Login($try->GetId());
+				App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGIN);
 			} else {
-				Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_LOGIN_ERROR);
+				App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGIN_ERROR);
 			}
 
 			reload();
 
 		} elseif (isset($_POST['auth_reminder_submit']) || isset($_POST['auth_reminder_submit_x'])) {
 			$try = isset($_POST['auth_email']) && $_POST['auth_email']
-				? User::GetList(array('email' => $_POST['auth_email'], 'status_id' => 1))
+				? App_Cms_User::GetList(array('email' => $_POST['auth_email'], 'status_id' => 1))
 				: false;
 
 			if ($try) {
 				foreach ($try as $user) {
-					Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_REMIND_PWD);
+					App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_REMIND_PWD);
 					$user->RemindPassword();
 				}
 			} else {
-				Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_REMIND_PWD_ERROR);
+				App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_REMIND_PWD_ERROR);
 			}
 
 			reload();
 
-		} elseif (isset($_GET['r']) || (isset($_GET['e']) && Session::Get()->IsLoggedIn())) {
-			if (Session::Get()->IsLoggedIn()) {
-				Session::Get()->Logout();
+		} elseif (isset($_GET['r']) || (isset($_GET['e']) && App_Cms_Session::Get()->IsLoggedIn())) {
+			if (App_Cms_Session::Get()->IsLoggedIn()) {
+				App_Cms_Session::Get()->Logout();
 			}
 
 			if (isset($_GET['r'])) {
-				$try = $_GET['r'] ? User::Load($_GET['r'], 'reminder_key') : false;
+				$try = $_GET['r'] ? App_Cms_User::Load($_GET['r'], 'reminder_key') : false;
 				if ($try && $try->ChangePassword() == 0) {
-					Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_CHANGE_PWD);
+					App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CHANGE_PWD);
 				} else {
-					Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_CHANGE_PWD_ERROR);
+					App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CHANGE_PWD_ERROR);
 				}
 			} else {
-				Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_LOGOUT);
+				App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGOUT);
 			}
 
 			reload();
 
-		} elseif (isset($_GET['e']) && Session::Get()->IsLoggedIn()) {
-			Session::Get()->Logout();
-			Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_LOGOUT);
+		} elseif (isset($_GET['e']) && App_Cms_Session::Get()->IsLoggedIn()) {
+			App_Cms_Session::Get()->Logout();
+			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGOUT);
 			reload();
 
 		} else {
-			Session::Get()->SetParam(Session::ACT_PARAM, Session::Get()->GetParam(Session::ACT_PARAM_NEXT) ? Session::Get()->GetParam(Session::ACT_PARAM_NEXT) : Session::ACT_START);
-			Session::Get()->SetParam(Session::ACT_PARAM_NEXT, Session::ACT_CONTINUE);
-			self::$SiteUser = Session::Get()->IsLoggedIn() ? User::Auth(Session::Get()->GetUserId()) : false;
+			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM, App_Cms_Session::Get()->GetParam(App_Cms_Session::ACT_PARAM_NEXT) ? App_Cms_Session::Get()->GetParam(App_Cms_Session::ACT_PARAM_NEXT) : App_Cms_Session::ACT_START);
+			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CONTINUE);
+			self::$SiteUser = App_Cms_Session::Get()->IsLoggedIn() ? App_Cms_User::Auth(App_Cms_Session::Get()->GetUserId()) : false;
 		}
 	}
 
@@ -91,19 +91,19 @@ abstract class Core_Cms_User extends App_ActiveRecord
 	}
 
 	public static function CheckUnique($_value, $_exclude = null) {
-		return self::IsUnique(__CLASS__, self::GetTbl(), self::GetPri(), 'email', $_value, $_exclude);
+		return self::IsUnique(get_called_class(), self::GetTbl(), self::GetPri(), 'email', $_value, $_exclude);
 	}
 
 	public static function Auth() {
 		if (func_num_args() == 1) {
-			$try = Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . Db::escape(func_get_arg(0)) . ' AND status_id = 1');
+			$try = App_Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . App_Db::escape(func_get_arg(0)) . ' AND status_id = 1');
 
 		} elseif (func_num_args() == 2) {
-			$try = Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE email = ' . Db::escape(func_get_arg(0)) . ' AND passwd = ' . Db::escape(md5(func_get_arg(1))) . ' AND status_id = 1');
+			$try = App_Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE email = ' . App_Db::escape(func_get_arg(0)) . ' AND passwd = ' . App_Db::escape(md5(func_get_arg(1))) . ' AND status_id = 1');
 		}
 
 		if (isset($try) && $try) {
-			$cname = __CLASS__;
+			$cname = get_called_class();
 			$obj = new $cname;
 			$obj->DataInit($try);
 
@@ -117,7 +117,7 @@ abstract class Core_Cms_User extends App_ActiveRecord
 		global $g_mail;
 
 		if ($this->GetAttribute('email')) {
-			$this->SetAttribute('reminder_key', Db::Get()->GetUnique(self::GetTbl(), 'reminder_key', 30));
+			$this->SetAttribute('reminder_key', App_Db::Get()->GetUnique(self::GetTbl(), 'reminder_key', 30));
 			$this->SetAttribute('reminder_date', date('Y-m-d H:i:s'));
 			$this->Update();
 
@@ -201,7 +201,7 @@ abstract class Core_Cms_User extends App_ActiveRecord
 
 	public static function GetBase() {
 		if (!isset(self::$Base)) {
-			self::$Base = new ActiveRecord(self::ComputeTblName());
+			self::$Base = new App_ActiveRecord(self::ComputeTblName());
 			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'varchar', 30, true);
 			self::$Base->AddAttribute('status_id', 'int');
 			self::$Base->AddAttribute('first_name', 'varchar', 255);
@@ -228,12 +228,12 @@ abstract class Core_Cms_User extends App_ActiveRecord
 	}
 
 	public static function Load($_value, $_attribute = null) {
-		return parent::Load(__CLASS__, $_value, $_attribute);
+		return parent::Load(get_called_class(), $_value, $_attribute);
 	}
 
 	public static function GetList($_attributes = array(), $_parameters = array(), $_row_conditions = array()) {
 		return parent::GetList(
-			__CLASS__,
+			get_called_class(),
 			self::GetTbl(),
 			self::GetBase()->GetAttributes(),
 			$_attributes,
@@ -243,7 +243,7 @@ abstract class Core_Cms_User extends App_ActiveRecord
 	}
 
 	public static function GetCount($_attributes = array(), $_row_conditions = array()) {
-		return parent::GetCount(__CLASS__, self::GetTbl(), $_attributes, $_row_conditions);
+		return parent::GetCount(get_called_class(), self::GetTbl(), $_attributes, $_row_conditions);
 	}
 
 	public static function ComputeTblName()  {

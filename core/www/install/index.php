@@ -30,7 +30,7 @@ $foHandlers = array(
 
 $templates = array(
     'common' => array('title' => 'Основной', 'filename' => 'fo.xsl'),
-    'modules' => array('title' => 'Модули', 'filename' => 'fo_modules.xsl', 'is_document_main' => 0)
+    'modules' => array('title' => 'Общее', 'filename' => 'fo-common.xsl', 'is_document_main' => 0)
 );
 
 $foDocuments = array(
@@ -67,10 +67,10 @@ $content2  = '<p>Неправильно набран адрес, или&nbsp;т�
 
 $foData = array(
     '/' => array(
-        array('title' => 'Содержание', 'tag' => 'html', DocumentDataContentType::GetPri() => 'text', 'content' => $content1),
+        array('title' => 'Содержание', 'tag' => 'html', App_Cms_Document_DataContentType::GetPri() => 'text', 'content' => $content1),
     ),
     '/not-found/' => array(
-        array('title' => 'Содержание', 'tag' => 'html', DocumentDataContentType::GetPri() => 'text', 'content' => $content2)
+        array('title' => 'Содержание', 'tag' => 'html', App_Cms_Document_DataContentType::GetPri() => 'text', 'content' => $content2)
     )
 );
 
@@ -78,14 +78,14 @@ $foData = array(
 // Create tables
 $sqlTables = file_get_contents('tables.sql');
 $sqlTables = str_replace('~db prefix~', DB_PREFIX, $sqlTables);
-Db::get()->multiExecute($sqlTables);
+App_Db::get()->multiExecute($sqlTables);
 
 
 // Insert start entries
 // Sections
 $boSectionObjs = array();
 foreach ($boSections as $i) {
-    $obj = new BoSection;
+    $obj = new App_Cms_Bo_Section;
     $obj->dataInit($i);
     $obj->setAttribute('is_published', isset($i['is_published']) ? $i['is_published'] : 1);
     $obj->create();
@@ -99,7 +99,7 @@ $result['BO sections'] = count($boSectionObjs);
 // Users and user to section links
 $boUserObjs = array();
 foreach ($boUsers as $i) {
-    $obj = new BoUser;
+    $obj = new App_Cms_Bo_User;
     $obj->dataInit($i);
     $obj->setPassword($i['passwd']);
 
@@ -111,9 +111,9 @@ foreach ($boUsers as $i) {
 
     $boUserObjs[$obj->GetId()] = $obj;
     foreach (array_keys($boSectionObjs) as $j) {
-        $link = new BoUserToSection;
-        $link->setAttribute(BoUser::getPri(), $obj->getId());
-        $link->setAttribute(BoSection::getPri(), $j);
+        $link = new App_Cms_Bo_UserToSection;
+        $link->setAttribute(App_Cms_Bo_User::getPri(), $obj->getId());
+        $link->setAttribute(App_Cms_Bo_Section::getPri(), $j);
         $link->create();
     }
 }
@@ -124,7 +124,7 @@ $result['BO users'] = count($boUserObjs);
 // Handlers
 $foHandlerObjs = array();
 foreach ($foHandlers as $key => $i) {
-    $obj = new Handler;
+    $obj = new App_Cms_Handler;
     $obj->dataInit($i);
     $obj->setAttribute('is_published', isset($i['is_published']) ? $i['is_published'] : 1);
     $obj->create();
@@ -138,7 +138,7 @@ $result['FO handlers'] = count($foHandlerObjs);
 // Templates
 $templatesObjs = array();
 foreach ($templates as $key => $i) {
-    $obj = new Template();
+    $obj = new App_Cms_Template();
     $obj->getDb()->dataInit($i);
     $obj->isPublished = isset($i['is_published']) ? $i['is_published'] : 1;
     $obj->isMultiple = isset($i['is_multiple']) ? $i['is_multiple'] : 1;
@@ -154,7 +154,7 @@ $result['FO templates'] = count($templatesObjs);
 // Navigation
 $foNavigationObjs = array();
 foreach ($foNavigations as $key => $i) {
-    $obj = new DocumentNavigation;
+    $obj = new App_Cms_Document_Navigation;
     $obj->dataInit($i);
     $obj->setAttribute('is_published', isset($i['is_published']) ? $i['is_published'] : 1);
     $obj->create();
@@ -169,17 +169,17 @@ $result['FO navigation'] = count($foNavigationObjs);
 $foDocumentObjs = array();
 foreach ($foDocuments as $level) {
     foreach ($level as $uri => $i) {
-        $obj = new Document;
+        $obj = new App_Cms_Document();
         $obj->dataInit($i);
         $obj->setAttribute('is_published', isset($i['is_published']) ? $i['is_published'] : 1);
 
         if (isset($i['handler']) && isset($foHandlerObjs[$i['handler']])) {
-            $obj->setAttribute(Handler::getPri(),
+            $obj->setAttribute(App_Cms_Handler::getPri(),
                                $foHandlerObjs[$i['handler']]->getId());
         }
 
         if (isset($i['template']) && isset($templatesObjs[$i['template']])) {
-            $obj->setAttribute(TemplateDb::getPri(),
+            $obj->setAttribute(App_Cms_TemplateDb::getPri(),
                                $templatesObjs[$i['template']]->getId());
         }
 
@@ -213,7 +213,7 @@ $result['FO documents'] = count($foDocumentObjs);
 // Data content type
 $foDataContentTypeObjs = array();
 foreach ($foDataContentType as $id => $i) {
-    $obj = new DocumentDataContentType;
+    $obj = new App_Cms_Document_DataContentType();
     $obj->dataInit($i);
     $obj->setId($id);
     $obj->setAttribute('is_published', isset($i['is_published']) ? $i['is_published'] : 1);
@@ -230,9 +230,9 @@ $foDataObjs = array();
 foreach ($foData as $uri => $blocks) {
     if (isset($foDocumentObjs[$uri])) {
         foreach ($blocks as $i) {
-            $obj = new DocumentData;
+            $obj = new App_Cms_Document_Data;
             $obj->dataInit($i);
-            $obj->setAttribute(Document::getPri(),
+            $obj->setAttribute(App_Cms_Document::getPri(),
                               $foDocumentObjs[$uri]->getId());
 
             $obj->setAttribute('is_published', isset($i['is_published']) ? $i['is_published'] : 1);
@@ -242,7 +242,7 @@ foreach ($foData as $uri => $blocks) {
                 isset($i['handler']) &&
                 isset($foHandlerObjs[$i['handler']])
             ) {
-                $obj->setAttribute(Handler::getPri(),
+                $obj->setAttribute(App_Cms_Handler::getPri(),
                                    $foHandlerObjs[$i['handler']]->getId());
             }
 

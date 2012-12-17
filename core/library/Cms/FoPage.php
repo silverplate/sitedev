@@ -12,7 +12,7 @@ abstract class Core_Cms_FoPage extends Core_Cms_Page
 
 	public function GetXml() {
 		if (SITE_TITLE) $this->AddSystem('<title><![CDATA[' . SITE_TITLE . ']]></title>');
-		if (IS_USERS && App_Cms_User::Get()) $this->AddSystem(User::Get()->GetXml('page_system'));
+		if (IS_USERS && App_Cms_User::Get()) $this->AddSystem(App_Cms_User::Get()->GetXml('page_system'));
 		$this->AddSystem(App_Cms_Session::Get()->GetXml());
 
 		return parent::GetXml();

@@ -2,34 +2,34 @@
 
 require('../prepend.php');
 
-$page = new BoPage();
+$page = new App_Cms_Bo_Page();
 $page->SetTitle($g_section->GetTitle());
 
 if ($page->IsAuthorized()) {
 	if (isset($_GET['id'])) {
-		$obj = Document::Load($_GET['id']);
+		$obj = App_Cms_Document::Load($_GET['id']);
 		if (!$obj) unset($obj);
 
 	} elseif (isset($_GET['NEW'])) {
-		$obj = new Document;
+		$obj = new App_Cms_Document();
 	}
 
 	if (isset($obj)) {
-	    $templateKey = TemplateDb::getPri();
-	    $documentTbl = Document::getTbl();
-	    $documentKey = Document::getPri();
+	    $templateKey = App_Cms_TemplateDb::getPri();
+	    $documentTbl = App_Cms_Document::getTbl();
+	    $documentKey = App_Cms_Document::getPri();
 
-		$form = new Form();
+		$form = new App_Form();
 		$form->Load('document_form.xml');
 
-		foreach (DocumentNavigation::GetList(array('is_published' => 1)) as $item) {
+		foreach (App_Cms_Document_Navigation::GetList(array('is_published' => 1)) as $item) {
 			$form->Elements['navigations']->AddOption($item->GetId(), $item->GetTitle());
 		}
 
 		$tmp = array();
 		foreach ($form->Elements as $name => $ele) {
 			if ($name == 'fo_handler_id') {
-			    $key = Handler::getPri();
+			    $key = App_Cms_Handler::getPri();
 				$tmp[$key] = $ele;
 				$tmp[$key]->SetName($key);
 
@@ -45,13 +45,13 @@ if ($page->IsAuthorized()) {
 		unset($tmp);
 
 		$handler_row_conditions = array();
-		$handler_self_condition = isset($obj) && $obj && $obj->GetAttribute(Handler::GetPri()) ? ' OR ' . Handler::GetPri() . ' = ' . Db::escape($obj->GetAttribute(Handler::GetPri())) : '';
-		$used = Db::Get()->GetList('SELECT ' . Handler::GetPri() . ' FROM ' . Document::GetTbl() . ' WHERE ' . Handler::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . Document::GetPri() . ' != ' . Db::escape($obj->GetId()) : '') . ' GROUP BY ' . Handler::GetPri());
-		if ($used) array_push($handler_row_conditions, '(is_multiple = 1 OR ' . Handler::GetPri() . ' NOT IN (' . Db::escape($used) . ')' . $handler_self_condition . ')');
+		$handler_self_condition = isset($obj) && $obj && $obj->GetAttribute(App_Cms_Handler::GetPri()) ? ' OR ' . App_Cms_Handler::GetPri() . ' = ' . App_Db::escape($obj->GetAttribute(App_Cms_Handler::GetPri())) : '';
+		$used = App_Db::Get()->GetList('SELECT ' . App_Cms_Handler::GetPri() . ' FROM ' . App_Cms_Document::GetTbl() . ' WHERE ' . App_Cms_Handler::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . App_Cms_Document::GetPri() . ' != ' . App_Db::escape($obj->GetId()) : '') . ' GROUP BY ' . App_Cms_Handler::GetPri());
+		if ($used) array_push($handler_row_conditions, '(is_multiple = 1 OR ' . App_Cms_Handler::GetPri() . ' NOT IN (' . App_Db::escape($used) . ')' . $handler_self_condition . ')');
 		array_push($handler_row_conditions, $handler_self_condition ? '(is_published = 1' . $handler_self_condition . ')' : 'is_published = 1');
 
-		foreach (Handler::GetList(array('type_id' => 1), null, $handler_row_conditions) as $item) {
-			$form->Elements[Handler::GetPri()]->AddOption($item->GetId(), $item->GetTitle());
+		foreach (App_Cms_Handler::GetList(array('type_id' => 1), null, $handler_row_conditions) as $item) {
+			$form->Elements[App_Cms_Handler::GetPri()]->AddOption($item->GetId(), $item->GetTitle());
 		}
 
         $usedCond = '';
@@ -60,13 +60,13 @@ if ($page->IsAuthorized()) {
         }
 
         $mainTemplateId = null;
-        $used = Db::get()->getList("SELECT $templateKey
+        $used = App_Db::get()->getList("SELECT $templateKey
                                     FROM $documentTbl
                                     $usedCond
                                     GROUP BY $templateKey");
         $templates = array();
         $templatesParams = array('sort_order' => 'is_document_main DESC, title');
-        foreach (Template::getList(null, $templatesParams) as $id => $item) {
+        foreach (App_Cms_Template::getList(null, $templatesParams) as $id => $item) {
             if (
                 ($obj->getId() && $obj->$templateKey == $id) ||
                 ($item->isPublished && ($item->isMultiple || !in_array($id, $used)))
@@ -85,7 +85,7 @@ if ($page->IsAuthorized()) {
 
 		if (IS_USERS) {
 			$form->Groups['system']->AddElement($form->CreateElement('auth_status_id', 'chooser', 'Страница доступна'));
-			foreach (User::GetAuthGroups() as $id => $params) {
+			foreach (App_Cms_User::GetAuthGroups() as $id => $params) {
 				$form->Elements['auth_status_id']->AddOption($id, strtolower_utf8($params['title1']));
 			}
 		}
@@ -116,7 +116,7 @@ if ($page->IsAuthorized()) {
 
 		if ($form->UpdateStatus == FORM_UPDATED) {
 			$is_root = (!isset($form->Elements['folder']) || $form->Elements['folder']->GetValue() != '/' || $form->Elements['parent_id']->GetValue() == '');
-			$is_unique = (!isset($form->Elements['parent_id']) || Document::CheckUnique($form->Elements['parent_id']->GetValue(), $form->Elements['folder']->GetValue(), $obj->GetId()));
+			$is_unique = (!isset($form->Elements['parent_id']) || App_Cms_Document::CheckUnique($form->Elements['parent_id']->GetValue(), $form->Elements['folder']->GetValue(), $obj->GetId()));
 
 			if ($is_root && $is_unique) {
 				$obj->DataInit($form->GetSqlValues());
@@ -126,21 +126,21 @@ if ($page->IsAuthorized()) {
 
 				if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 					$obj->Delete();
-					BoLog::LogModule(BoLog::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
+					App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
 					reload('?DEL');
 
 				} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
 					if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
 						$obj->Create();
-						BoLog::LogModule(BoLog::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
 					} else {
 						$obj->Update();
-						BoLog::LogModule(BoLog::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
 
-						foreach (DocumentData::GetList(array(Document::GetPri() => $obj->GetId(), 'is_mount' => 1)) as $data) {
+						foreach (App_Cms_Document_Data::GetList(array(App_Cms_Document::GetPri() => $obj->GetId(), 'is_mount' => 1)) as $data) {
 							if (isset($_POST['document_data_form_ele_' . $data->GetId()])) {
 								$data->UpdateAttribute('content', $data->GetParsedContent($_POST['document_data_form_ele_' . $data->GetId()]));
-								BoLog::LogModule(BoLog::ACT_MODIFY, $data->GetId(), 'Блоки данных. Документ ' . $obj->GetId());
+								App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $data->GetId(), 'Блоки данных. Документ ' . $obj->GetId());
 							}
 						}
 					}

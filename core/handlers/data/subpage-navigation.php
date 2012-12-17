@@ -42,10 +42,10 @@ abstract class Core_DocumentDataSubpageNavigation extends DocumentDataHandler
                        'is_published' => 1);
 
         foreach ($except as $attr => $value) {
-            array_push($rowConds, $attr . ' != ' . Db::escape($value));
+            array_push($rowConds, $attr . ' != ' . App_Db::escape($value));
         }
 
-        $children = Document::getList($conds, null, $rowConds);
+        $children = App_Cms_Document::getList($conds, null, $rowConds);
         $xml = '';
 
         foreach ($children as $item) {

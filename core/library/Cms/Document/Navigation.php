@@ -67,7 +67,7 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
         $data = self::getRowDocuments($_name);
 
         foreach ($data as $row) {
-            $document = new Document;
+            $document = new App_Cms_Document();
             $document->dataInit($row);
             $documents[$document->getId()] = $document;
         }
@@ -118,7 +118,7 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 	}
 
 	public function GetXml($_type, $_node_name = null, $_append_xml = null) {
-		$node_name = ($_node_name) ? $_node_name : strtolower(__CLASS__);
+		$node_name = ($_node_name) ? $_node_name : strtolower(get_called_class());
 		$result = '';
 
 		switch ($_type) {

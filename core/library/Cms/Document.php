@@ -30,15 +30,15 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 	}
 
 	public function GetXml($_type, $_node_name = null, $_append_xml = null, $_append_attributes = null) {
-		$node_name = ($_node_name) ? $_node_name : strtolower(__CLASS__);
+		$node_name = ($_node_name) ? $_node_name : strtolower(get_called_class());
 		$result = '';
 
 		switch ($_type) {
 			case 'bo_list':
 				$result .= '<' . $node_name . ' id="' . $this->GetId() . '"';
 				if ($this->GetAttribute('is_published') == 1) $result .= ' is_published="true"';
-				if (IS_USERS && $this->GetAttribute('auth_status_id') != User::AUTH_GROUP_ALL && User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))) {
-					$result .= ' prefix="' . strtolower_utf8(substr_utf8(User::GetAuthGroupTitle($this->GetAttribute('auth_status_id')), 0, 1)) . '"';
+				if (IS_USERS && $this->GetAttribute('auth_status_id') != App_Cms_User::AUTH_GROUP_ALL && App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))) {
+					$result .= ' prefix="' . strtolower_utf8(substr_utf8(App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id')), 0, 1)) . '"';
 				}
 
 				if ($_append_attributes) {
@@ -199,7 +199,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 			$item->Delete();
 		}
 
-		foreach (DocumentData::GetList(array(self::GetPri() => $this->GetId())) as $item) {
+		foreach (App_Cms_Document_Data::GetList(array(self::GetPri() => $this->GetId())) as $item) {
 			$item->Delete();
 		}
 
@@ -297,14 +297,14 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 		if (isset($_conditions['navigations'])) {
 			if ($_conditions['navigations']) {
-				array_push($result['tables'], DocumentToNavigation::GetTbl());
-				array_push($result['row_conditions'], $self['pk_attr'] . ' = ' . DocumentToNavigation::GetTbl() . '.' . $self['pk']);
-				array_push($result['row_conditions'], DocumentToNavigation::GetTbl() . '.' . DocumentNavigation::GetPri() . (is_array($_conditions['navigations']) ? ' IN (' . App_Db::escape($_conditions['navigations']) . ')' : ' = ' . App_Db::escape($_conditions['navigations'])));
+				array_push($result['tables'], App_Cms_Document_ToNavigation::GetTbl());
+				array_push($result['row_conditions'], $self['pk_attr'] . ' = ' . App_Cms_Document_ToNavigation::GetTbl() . '.' . $self['pk']);
+				array_push($result['row_conditions'], App_Cms_Document_ToNavigation::GetTbl() . '.' . App_Cms_Document_Navigation::GetPri() . (is_array($_conditions['navigations']) ? ' IN (' . App_Db::escape($_conditions['navigations']) . ')' : ' = ' . App_Db::escape($_conditions['navigations'])));
 
 				if (isset($_conditions['is_published'])) {
-					array_push($result['tables'], DocumentNavigation::GetTbl());
-					array_push($result['row_conditions'], DocumentToNavigation::GetTbl() . '.' . DocumentNavigation::GetPri() . ' = ' . DocumentNavigation::GetPri(true));
-					array_push($result['row_conditions'], DocumentNavigation::GetTbl() . '.is_published = ' . App_Db::escape($_conditions['is_published']));
+					array_push($result['tables'], App_Cms_Document_Navigation::GetTbl());
+					array_push($result['row_conditions'], App_Cms_Document_ToNavigation::GetTbl() . '.' . App_Cms_Document_Navigation::GetPri() . ' = ' . App_Cms_Document_Navigation::GetPri(true));
+					array_push($result['row_conditions'], App_Cms_Document_Navigation::GetTbl() . '.is_published = ' . App_Db::escape($_conditions['is_published']));
 				}
 			}
 			unset($_conditions['navigations']);
@@ -344,7 +344,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		}
 
 		return parent::GetList(
-			__CLASS__,
+			get_called_class(),
 			$conditions['tables'],
 			self::GetBase()->GetAttributes(true),
 			null,
@@ -366,7 +366,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 			switch ($_name) {
 				case 'navigations':
-					$this->Links[$_name] = DocumentToNavigation::GetList($conditions);
+					$this->Links[$_name] = App_Cms_Document_ToNavigation::GetList($conditions);
 					break;
 			}
 		}
@@ -379,7 +379,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 		switch ($_name) {
 			case 'navigations':
-				$keys = array(DocumentToNavigation::GetFirstKey(), DocumentToNavigation::GetSecondKey());
+				$keys = array(App_Cms_Document_ToNavigation::GetFirstKey(), App_Cms_Document_ToNavigation::GetSecondKey());
 				break;
 		}
 
@@ -403,7 +403,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		switch ($_name) {
 			case 'navigations':
 				$class_name = 'DocumentToNavigation';
-				$keys = array(DocumentToNavigation::GetFirstKey(), DocumentToNavigation::GetSecondKey());
+				$keys = array(App_Cms_Document_ToNavigation::GetFirstKey(), App_Cms_Document_ToNavigation::GetSecondKey());
 				break;
 		}
 

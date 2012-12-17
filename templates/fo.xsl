@@ -11,8 +11,7 @@
                 doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" />
 
     <xsl:include href="../core/templates/common.xsl" />
-    <xsl:include href="fo_common.xsl" />
-    <xsl:include href="fo_modules.xsl" />
+    <xsl:include href="fo-common.xsl" />
 
     <xsl:template match="page|page_not_found">
         <html xml:lang="ru" lang="ru">

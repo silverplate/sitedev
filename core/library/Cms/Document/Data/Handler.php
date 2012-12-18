@@ -1,6 +1,6 @@
 <?php
 
-abstract class Core_Cms_Document_DataHandler
+abstract class Core_Cms_Document_Data_Handler
 {
 	private $DocumentData;
 	protected $Document;

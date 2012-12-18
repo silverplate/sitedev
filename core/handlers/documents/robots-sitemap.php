@@ -1,7 +1,6 @@
 <?php
 
-abstract class Core_DocumentRobotsSitemap
-extends Core_DocumentHandler
+abstract class Core_DocumentRobotsSitemap extends App_Cms_Document_Handler
 {
     public function output()
     {

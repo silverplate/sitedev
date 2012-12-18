@@ -1,6 +1,6 @@
 <?php
 
-abstract class Core_Cms_Document_DataContentType extends App_ActiveRecord
+abstract class Core_Cms_Document_Data_ContentType extends App_ActiveRecord
 {
 	private static $Base;
 	const TABLE = 'fo_data_content_type';
@@ -20,7 +20,7 @@ abstract class Core_Cms_Document_DataContentType extends App_ActiveRecord
 
 		foreach ($list as $item) {
 			$obj = new $class;
-			$obj->SetAttribute(App_Cms_Document_DataContentType::GetPri(), $item[0]);
+			$obj->SetAttribute(App_Cms_Document_Data_ContentType::GetPri(), $item[0]);
 			$obj->SetAttribute('title', $item[1]);
 			$obj->SetAttribute('is_published', $item[2]);
 			$obj->Create();

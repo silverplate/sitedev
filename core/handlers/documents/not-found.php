@@ -2,8 +2,7 @@
 
 require_once 'common.php';
 
-abstract class Core_DocumentNotFound
-extends Core_DocumentCommon
+abstract class Core_DocumentNotFound extends App_DocumentCommon
 {
     public function execute()
     {

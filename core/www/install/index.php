@@ -67,10 +67,10 @@ $content2  = '<p>Неправильно набран адрес, или&nbsp;т�
 
 $foData = array(
     '/' => array(
-        array('title' => 'Содержание', 'tag' => 'html', App_Cms_Document_DataContentType::GetPri() => 'text', 'content' => $content1),
+        array('title' => 'Содержание', 'tag' => 'html', App_Cms_Document_Data_ContentType::GetPri() => 'text', 'content' => $content1),
     ),
     '/not-found/' => array(
-        array('title' => 'Содержание', 'tag' => 'html', App_Cms_Document_DataContentType::GetPri() => 'text', 'content' => $content2)
+        array('title' => 'Содержание', 'tag' => 'html', App_Cms_Document_Data_ContentType::GetPri() => 'text', 'content' => $content2)
     )
 );
 
@@ -213,7 +213,7 @@ $result['FO documents'] = count($foDocumentObjs);
 // Data content type
 $foDataContentTypeObjs = array();
 foreach ($foDataContentType as $id => $i) {
-    $obj = new App_Cms_Document_DataContentType();
+    $obj = new App_Cms_Document_Data_ContentType();
     $obj->dataInit($i);
     $obj->setId($id);
     $obj->setAttribute('is_published', isset($i['is_published']) ? $i['is_published'] : 1);

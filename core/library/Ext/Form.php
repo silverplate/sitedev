@@ -163,7 +163,7 @@ class Ext_Form
     public static function createByXml($_xml)
     {
         $form = new Ext_Form();
-        $xpath = new DOMXPath(DOMApp_Cms_Document::loadXML("<root>$_xml</root>"));
+        $xpath = new DOMXPath(DOMDocument::loadXML("<root>$_xml</root>"));
         $groups = $xpath->evaluate('group');
 
         if ($groups->length > 0) {

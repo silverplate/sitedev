@@ -28,7 +28,7 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 	}
 
 	public function GetParsedContent($_content) {
-		switch ($this->GetAttribute(App_Cms_Document_DataContentType::GetPri())) {
+		switch ($this->GetAttribute(App_Cms_Document_Data_ContentType::GetPri())) {
 			case 'integer':
 				return (int) $_content;
 			case 'float':
@@ -39,11 +39,11 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 	}
 
 	public function GetTypeId() {
-		return $this->GetAttribute(App_Cms_Document_DataContentType::GetPri());
+		return $this->GetAttribute(App_Cms_Document_Data_ContentType::GetPri());
 	}
 
 	public function SetTypeId($_type_id) {
-		return $this->SetAttribute(App_Cms_Document_DataContentType::GetPri(), $_type_id);
+		return $this->SetAttribute(App_Cms_Document_Data_ContentType::GetPri(), $_type_id);
 	}
 
 	public function GetXml($_additional_xml = null) {
@@ -129,7 +129,7 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'varchar', 30, true);
 			self::$Base->AddForeignKey(App_Cms_Document::GetBase());
 			self::$Base->AddForeignKey(App_Cms_Handler::GetBase());
-			self::$Base->AddForeignKey(App_Cms_Document_DataContentType::GetBase());
+			self::$Base->AddForeignKey(App_Cms_Document_Data_ContentType::GetBase());
 			self::$Base->AddAttribute('auth_status_id', 'int');
 			self::$Base->AddAttribute('tag', 'varchar', 255);
 			self::$Base->AddAttribute('title', 'varchar', 255);

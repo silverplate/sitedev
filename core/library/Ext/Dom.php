@@ -27,7 +27,7 @@ class Ext_Dom
      */
     public static function get($_xml, $_rootNode = 'root')
     {
-        return DOMApp_Cms_Document::loadXML(Ext_Xml::node($_rootNode, $_xml));
+        return DOMDocument::loadXML(Ext_Xml::node($_rootNode, $_xml));
     }
 
     /**

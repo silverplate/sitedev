@@ -23,8 +23,8 @@ if (is_null($document_id) || !App_Cms_Document::Load($document_id)) {
 	$tmp = array();
 	foreach ($form->Elements as $name => $ele) {
 		if ($name == 'fo_data_content_type_id') {
-			$tmp[App_Cms_Document_DataContentType::GetPri()] = $ele;
-			$tmp[App_Cms_Document_DataContentType::GetPri()]->SetName(App_Cms_Document_DataContentType::GetPri());
+			$tmp[App_Cms_Document_Data_ContentType::GetPri()] = $ele;
+			$tmp[App_Cms_Document_Data_ContentType::GetPri()]->SetName(App_Cms_Document_Data_ContentType::GetPri());
 
 		} elseif ($name == 'fo_handler_id') {
 			$tmp[App_Cms_Handler::GetPri()] = $ele;
@@ -37,8 +37,8 @@ if (is_null($document_id) || !App_Cms_Document::Load($document_id)) {
 	$form->Elements = $tmp;
 	unset($tmp);
 
-	foreach (App_Cms_Document_DataContentType::GetList(array('is_published' => 1)) as $item) {
-		$form->Elements[App_Cms_Document_DataContentType::GetPri()]->AddOption($item->GetId(), $item->GetTitle());
+	foreach (App_Cms_Document_Data_ContentType::GetList(array('is_published' => 1)) as $item) {
+		$form->Elements[App_Cms_Document_Data_ContentType::GetPri()]->AddOption($item->GetId(), $item->GetTitle());
 	}
 
 	$handler_row_conditions = array();

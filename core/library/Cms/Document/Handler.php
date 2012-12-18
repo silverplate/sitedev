@@ -133,7 +133,7 @@ abstract class Core_Cms_Document_Handler extends Core_Cms_FoPage
                     array_push($dataXml, $handler->getXml());
 
                 } else {
-                    $plainData = new App_Cms_Document_DataHandler($item);
+                    $plainData = new App_Cms_Document_Data_Handler($item);
                     array_push($dataXml, $plainData->getXml());
                 }
             }

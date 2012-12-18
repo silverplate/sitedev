@@ -366,7 +366,7 @@ abstract class Core_ActiveRecord
             if (!$item->IsValue()) {
                 if ($item->IsPrimary()) {
                     if ($item->GetType() == 'varchar') {
-                        $item->SetValue(App_Db::Get()->GetUnique($this->GetTable(), $item->GetName(), $item->GetLength()));
+                        $item->SetValue(App_Db::get()->getUnique($this->GetTable(), $item->GetName(), $item->GetLength()));
 
 //                     } else if ($item->GetType() == 'integer') {
 //                         $item->SetValue(App_Db::Get()->GetNextNumber($this->GetTable(), $item->GetName()));

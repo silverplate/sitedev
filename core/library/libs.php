@@ -12,16 +12,13 @@ define('CORE_SETS', CORE_PATH . 'sets/');
 define('TEMPLATES', WD . 'templates/');
 define('CORE_TEMPLATES', CORE_PATH . 'templates/');
 
-define('HANDLERS', WD . 'handlers/');
-define('CORE_HANDLERS', CORE_PATH . 'handlers/');
-
 define('LIBRARIES', WD . 'library/');
 define('CORE_LIBRARIES', CORE_PATH . 'library/');
 
 define('MODELS', WD . 'models/');
 
-define('DATA_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Data/Handler/');
-define('DOCUMENT_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Handler/');
+define('DATA_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Data/Controller/');
+define('DOCUMENT_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Controller/');
 
 require_once 'strings.php';
 require_once 'dates.php';

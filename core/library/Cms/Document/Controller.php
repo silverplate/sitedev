@@ -1,6 +1,6 @@
 <?php
 
-abstract class Core_Cms_Document_Handler extends Core_Cms_FoPage
+abstract class Core_Cms_Document_Controller extends Core_Cms_FoPage
 {
     /**
      * @var Core_Cms_Document
@@ -122,18 +122,18 @@ abstract class Core_Cms_Document_Handler extends Core_Cms_FoPage
                         break;
                 }
 
-                if ($item->GetHandlerFile()) {
-                    $handler = App_Cms_Document_Data::initHandler(
-                        $item->getHandler(),
+                if ($item->getControllerFile()) {
+                    $controller = App_Cms_Document_Data::initController(
+                        $item->getController(),
                         $item,
                         $this->Document
                     );
 
-                    $handler->execute();
-                    array_push($dataXml, $handler->getXml());
+                    $controller->execute();
+                    array_push($dataXml, $controller->getXml());
 
                 } else {
-                    $plainData = new App_Cms_Document_Data_Handler($item);
+                    $plainData = new App_Cms_Document_Data_Controller($item);
                     array_push($dataXml, $plainData->getXml());
                 }
             }

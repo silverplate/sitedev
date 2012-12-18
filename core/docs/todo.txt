@@ -1,13 +1,2 @@
-2) Создавать, но не публиковать стандартные обработчики для блоков:
+1) Создавать, но не публиковать стандартные обработчики для блоков:
 дочерние документы, подстановку изображений.
-
-+1) Выполнять предписанные действия в установщике (http://localhost/install/) автоматически:
-
->Не забудьте установить права:
->
->chmod 0777 /Users/kirill/Sites/silverplate/flacon/application/libs/
->chmod -R 0777 /Users/kirill/Sites/silverplate/flacon/application/handlers/*
->chmod -R 0777 /Users/kirill/Sites/silverplate/flacon/application/www/f/
->И удалить файлы установки:
->
->rm -rf /Users/kirill/Sites/silverplate/flacon/application/www/install/

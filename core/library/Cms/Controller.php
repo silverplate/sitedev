@@ -1,20 +1,20 @@
 <?php
 
-abstract class Core_Cms_Handler extends App_ActiveRecord
+abstract class Core_Cms_Controller extends App_ActiveRecord
 {
 	private static $Base;
-	const TABLE = 'fo_handler';
+	const TABLE = 'fo_controller';
 
     public function getClassName()
     {
         if ($this->type_id == 1) {
-            $class = 'App_Cms_Document_Handler_';
+            $class = 'App_Cms_Document_Controller_';
 
         } else if ($this->type_id == 2) {
-            $class = 'App_Cms_Document_Data_Handler_';
+            $class = 'App_Cms_Document_Data_Controller_';
 
         } else {
-            throw new Exception('Unkown handler type');
+            throw new Exception('Unkown controller type');
         }
 
         return $class . Ext_File::computeName($this->filename);

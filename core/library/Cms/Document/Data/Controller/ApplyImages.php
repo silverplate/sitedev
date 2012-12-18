@@ -1,7 +1,7 @@
 <?php
 
-abstract class Core_Cms_Document_Data_Handler_ApplyImages
-extends App_Cms_Document_Data_Handler
+abstract class Core_Cms_Document_Data_Controller_ApplyImages
+extends App_Cms_Document_Data_Controller
 {
     public function execute()
     {

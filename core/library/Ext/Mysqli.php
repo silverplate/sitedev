@@ -404,7 +404,7 @@ class Ext_Mysqli extends Mysqli
      */
     protected function _error($_error)
     {
-        die($_error);
+        throw new Exception($_error);
     }
 
     protected function _throwError()

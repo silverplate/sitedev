@@ -28,8 +28,8 @@ if ($page->IsAuthorized()) {
 
 		$tmp = array();
 		foreach ($form->Elements as $name => $ele) {
-			if ($name == 'fo_handler_id') {
-			    $key = App_Cms_Handler::getPri();
+			if ($name == 'fo_controller_id') {
+			    $key = App_Cms_Controller::getPri();
 				$tmp[$key] = $ele;
 				$tmp[$key]->SetName($key);
 
@@ -44,14 +44,14 @@ if ($page->IsAuthorized()) {
 		$form->Elements = $tmp;
 		unset($tmp);
 
-		$handler_row_conditions = array();
-		$handler_self_condition = isset($obj) && $obj && $obj->GetAttribute(App_Cms_Handler::GetPri()) ? ' OR ' . App_Cms_Handler::GetPri() . ' = ' . App_Db::escape($obj->GetAttribute(App_Cms_Handler::GetPri())) : '';
-		$used = App_Db::Get()->GetList('SELECT ' . App_Cms_Handler::GetPri() . ' FROM ' . App_Cms_Document::GetTbl() . ' WHERE ' . App_Cms_Handler::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . App_Cms_Document::GetPri() . ' != ' . App_Db::escape($obj->GetId()) : '') . ' GROUP BY ' . App_Cms_Handler::GetPri());
-		if ($used) array_push($handler_row_conditions, '(is_multiple = 1 OR ' . App_Cms_Handler::GetPri() . ' NOT IN (' . App_Db::escape($used) . ')' . $handler_self_condition . ')');
-		array_push($handler_row_conditions, $handler_self_condition ? '(is_published = 1' . $handler_self_condition . ')' : 'is_published = 1');
+		$controller_row_conditions = array();
+		$controller_self_condition = isset($obj) && $obj && $obj->GetAttribute(App_Cms_Controller::GetPri()) ? ' OR ' . App_Cms_Controller::GetPri() . ' = ' . App_Db::escape($obj->GetAttribute(App_Cms_Controller::GetPri())) : '';
+		$used = App_Db::Get()->GetList('SELECT ' . App_Cms_Controller::GetPri() . ' FROM ' . App_Cms_Document::GetTbl() . ' WHERE ' . App_Cms_Controller::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . App_Cms_Document::GetPri() . ' != ' . App_Db::escape($obj->GetId()) : '') . ' GROUP BY ' . App_Cms_Controller::GetPri());
+		if ($used) array_push($controller_row_conditions, '(is_multiple = 1 OR ' . App_Cms_Controller::GetPri() . ' NOT IN (' . App_Db::escape($used) . ')' . $controller_self_condition . ')');
+		array_push($controller_row_conditions, $controller_self_condition ? '(is_published = 1' . $controller_self_condition . ')' : 'is_published = 1');
 
-		foreach (App_Cms_Handler::GetList(array('type_id' => 1), null, $handler_row_conditions) as $item) {
-			$form->Elements[App_Cms_Handler::GetPri()]->AddOption($item->GetId(), $item->GetTitle());
+		foreach (App_Cms_Controller::GetList(array('type_id' => 1), null, $controller_row_conditions) as $item) {
+			$form->Elements[App_Cms_Controller::GetPri()]->AddOption($item->GetId(), $item->GetTitle());
 		}
 
         $usedCond = '';

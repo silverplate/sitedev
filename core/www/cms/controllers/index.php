@@ -7,11 +7,11 @@ $page->SetTitle($g_section->GetTitle());
 
 if ($page->IsAuthorized()) {
 	if (isset($_GET['id'])) {
-		$obj = App_Cms_Handler::Load($_GET['id']);
+		$obj = App_Cms_Controller::Load($_GET['id']);
 		if (!$obj) unset($obj);
 
 	} elseif (isset($_GET['NEW'])) {
-		$obj = new App_Cms_Handler();
+		$obj = new App_Cms_Controller();
 	}
 
 	if (isset($obj)) {
@@ -65,7 +65,7 @@ if ($page->IsAuthorized()) {
 					}
 
 					if ($obj->GetAttribute('is_document_main')) {
-						App_Db::Get()->Execute('UPDATE ' . App_Cms_Handler::GetTbl() . ' SET is_document_main = 0 WHERE is_document_main = 1 AND ' . App_Cms_Handler::GetPri() . ' != ' . App_Db::escape($obj->GetId()));
+						App_Db::Get()->Execute('UPDATE ' . App_Cms_Controller::GetTbl() . ' SET is_document_main = 0 WHERE is_document_main = 1 AND ' . App_Cms_Controller::GetPri() . ' != ' . App_Db::escape($obj->GetId()));
 					}
 
 					reload('?id=' . $obj->GetId() . '&OK');
@@ -91,7 +91,7 @@ if ($page->IsAuthorized()) {
 	}
 
 	$list_xml = '<local_navigation>';
-	foreach (App_Cms_Handler::GetList() as $item) {
+	foreach (App_Cms_Controller::GetList() as $item) {
 		$list_xml .= $item->GetXml('bo_list', 'item');
 	}
 	$list_xml .= '</local_navigation>';

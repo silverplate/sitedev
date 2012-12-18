@@ -141,14 +141,14 @@
 					<xsl:value-of select="title/text()" disable-output-escaping="yes" />
 				</a>
 			</label>
-			<xsl:apply-templates select="@tag|handler|auth_group" mode="document_data" />
+			<xsl:apply-templates select="@tag|controller|auth_group" mode="document_data" />
 		</div></div>
 		<div style="width: 70%; float: left;">
 			<xsl:apply-templates select="self::node()" mode="document_data_form_ele" />
 		</div>
 	</xsl:template>
 
-	<xsl:template match="@tag|handler|auth_group" mode="document_data">
+	<xsl:template match="@tag|controller|auth_group" mode="document_data">
 		<div style="font-size: 0.84em; clear: both;"><xsl:value-of select=".|text()" disable-output-escaping="yes" /></div>
 	</xsl:template>
 

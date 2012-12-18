@@ -3,7 +3,7 @@
 abstract class Core_Cms_Document_Data extends App_ActiveRecord
 {
 	private static $Base;
-	private $Handler;
+	private $Controller;
 
 	const TABLE = 'fo_data';
 
@@ -71,8 +71,8 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 			$result .= '<title>' . get_cdata($this->GetTitle()) . '</title>';
 		}
 
-		if ($this->GetHandler()) {
-			$result .= '<handler>' . get_cdata($this->GetHandler()->GetTitle()) . '</handler>';
+		if ($this->GetController()) {
+			$result .= '<controller>' . get_cdata($this->GetController()->GetTitle()) . '</controller>';
 		}
 
 		if ($this->GetAttribute('content') != '') {
@@ -90,25 +90,25 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 		return $result . '</document_data>';
 	}
 
-	public function GetHandler() {
-		if (is_null($this->Handler)) {
-			$this->Handler = $this->GetAttribute(App_Cms_Handler::GetPri())
-				? App_Cms_Handler::Load($this->GetAttribute(App_Cms_Handler::GetPri()))
+	public function GetController() {
+		if (is_null($this->Controller)) {
+			$this->Controller = $this->GetAttribute(App_Cms_Controller::GetPri())
+				? App_Cms_Controller::Load($this->GetAttribute(App_Cms_Controller::GetPri()))
 				: false;
 		}
 
-		return $this->Handler;
+		return $this->Controller;
 	}
 
-	public function GetHandlerFile() {
-		return $this->GetHandler() ? $this->GetHandler()->GetFilename() : false;
+	public function GetControllerFile() {
+		return $this->GetController() ? $this->GetController()->GetFilename() : false;
 	}
 
-	public static function initHandler($_handler, &$_documentData, &$_document)
+	public static function initController($_controller, &$_documentData, &$_document)
 	{
-        require_once $_handler->getFilename();
+        require_once $_controller->getFilename();
 
-        $class = $_handler->getClassName();
+        $class = $_controller->getClassName();
         if (class_exists($class)) {
             return new $class($_documentData, $_document);
         }
@@ -128,7 +128,7 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 			self::$Base = new App_ActiveRecord(self::ComputeTblName());
 			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'varchar', 30, true);
 			self::$Base->AddForeignKey(App_Cms_Document::GetBase());
-			self::$Base->AddForeignKey(App_Cms_Handler::GetBase());
+			self::$Base->AddForeignKey(App_Cms_Controller::GetBase());
 			self::$Base->AddForeignKey(App_Cms_Document_Data_ContentType::GetBase());
 			self::$Base->AddAttribute('auth_status_id', 'int');
 			self::$Base->AddAttribute('tag', 'varchar', 255);

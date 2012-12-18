@@ -1,15 +1,16 @@
 <?php
 
-require_once realpath(dirname(__FILE__) . '/../../libs') . '/libs.php';
-require_once SETS . 'project.php';
+require_once realpath(dirname(__FILE__) . '/../../../core/library') . '/libs.php';
+require_once CORE_SETS . 'project.php';
 $result = array();
 
 
 // Init for DB
+
 $boSections = array(
     array('title' => 'Страницы', 'uri' => 'pages', 'description' => 'Работа с навигацией и информационным наполнением страниц сайта.'),
     array('title' => 'Пользователи', 'uri' => 'users', 'description' => 'Редактирование пользователей сайта.', 'is_published' => 0),
-    array('title' => 'Обработчики', 'uri' => 'handlers', 'description' => 'Управление обработчиками страниц сайта и блоков данных.'),
+    array('title' => 'Обработчики', 'uri' => 'controllers', 'description' => 'Управление обработчиками страниц сайта и блоков данных.'),
     array('title' => 'Шаблоны', 'uri' => 'templates', 'description' => 'Управление шаблонами сайта.'),
     array('title' => 'Типы навигации', 'uri' => 'navigation', 'description' => 'Редактирование типов навигации.', 'is_published' => 0),
     array('title' => 'Пользователи СУ', 'uri' => 'cms-users', 'description' => 'Редактирование пользователей СУ.'),
@@ -21,11 +22,11 @@ $boUsers = array(
     array('title' => 'Разработчик', 'login' => 'developer', 'passwd' => get_random_string_optimized(8), 'email' => 'support@sitedev.ru')
 );
 
-$foHandlers = array(
-    'common' => array('title' => 'Страница сайта', 'type_id' => 1, 'filename' => 'common.php', 'is_document_main' => 1, 'is_multiple' => 1),
-    'not-found' => array('title' => 'Документ не найден', 'type_id' => 1, 'filename' => 'not-found.php', 'is_document_main' => 0, 'is_multiple' => 0),
-    'apply-images' => array('title' => 'Подставить изображения', 'type_id' => 2, 'filename' => 'apply-images.php', 'is_document_main' => 0, 'is_multiple' => 1),
-    'subpage-navigation' => array('title' => 'Вложенная навигация', 'type_id' => 2, 'filename' => 'subpage-navigation.php', 'is_document_main' => 0, 'is_multiple' => 1)
+$foControllers = array(
+    'common' => array('title' => 'Страница сайта', 'type_id' => 1, 'filename' => 'Common.php', 'is_document_main' => 1, 'is_multiple' => 1),
+    'not-found' => array('title' => 'Документ не найден', 'type_id' => 1, 'filename' => 'NotFound.php', 'is_document_main' => 0, 'is_multiple' => 0),
+    'apply-images' => array('title' => 'Подставить изображения', 'type_id' => 2, 'filename' => 'ApplyImages.php', 'is_document_main' => 0, 'is_multiple' => 1),
+    'subpage-navigation' => array('title' => 'Вложенная навигация', 'type_id' => 2, 'filename' => 'SubpageNavigation.php', 'is_document_main' => 0, 'is_multiple' => 1)
 );
 
 $templates = array(
@@ -36,12 +37,12 @@ $templates = array(
 $foDocuments = array(
     array('/' => array('title' => SITE_TITLE,
                        'folder' => '/',
-                       'handler' => 'common',
+                       'сontroller' => 'common',
                        'template' => 'common',
                        'navigations' => array('main'))),
     array('/not-found/' => array('title' => 'Документ не найден',
                                  'folder' => 'not-found',
-                                 'handler' => 'not-found',
+                                 'сontroller' => 'not-found',
                                  'template' => 'common'))
 );
 
@@ -76,13 +77,16 @@ $foData = array(
 
 
 // Create tables
+
 $sqlTables = file_get_contents('tables.sql');
 $sqlTables = str_replace('~db prefix~', DB_PREFIX, $sqlTables);
+
 App_Db::get()->multiExecute($sqlTables);
 
 
 // Insert start entries
 // Sections
+
 $boSectionObjs = array();
 foreach ($boSections as $i) {
     $obj = new App_Cms_Bo_Section;
@@ -97,6 +101,7 @@ $result['BO sections'] = count($boSectionObjs);
 
 
 // Users and user to section links
+
 $boUserObjs = array();
 foreach ($boUsers as $i) {
     $obj = new App_Cms_Bo_User;
@@ -121,21 +126,23 @@ foreach ($boUsers as $i) {
 $result['BO users'] = count($boUserObjs);
 
 
-// Handlers
-$foHandlerObjs = array();
-foreach ($foHandlers as $key => $i) {
-    $obj = new App_Cms_Handler;
+// Controllers
+
+$foControllerObjs = array();
+foreach ($foControllers as $key => $i) {
+    $obj = new App_Cms_Controller();
     $obj->dataInit($i);
     $obj->setAttribute('is_published', isset($i['is_published']) ? $i['is_published'] : 1);
     $obj->create();
 
-    $foHandlerObjs[$key] = $obj;
+    $foControllerObjs[$key] = $obj;
 }
 
-$result['FO handlers'] = count($foHandlerObjs);
+$result['FO controllers'] = count($foControllerObjs);
 
 
 // Templates
+
 $templatesObjs = array();
 foreach ($templates as $key => $i) {
     $obj = new App_Cms_Template();
@@ -152,6 +159,7 @@ $result['FO templates'] = count($templatesObjs);
 
 
 // Navigation
+
 $foNavigationObjs = array();
 foreach ($foNavigations as $key => $i) {
     $obj = new App_Cms_Document_Navigation;
@@ -166,6 +174,7 @@ $result['FO navigation'] = count($foNavigationObjs);
 
 
 // Documents
+
 $foDocumentObjs = array();
 foreach ($foDocuments as $level) {
     foreach ($level as $uri => $i) {
@@ -173,9 +182,9 @@ foreach ($foDocuments as $level) {
         $obj->dataInit($i);
         $obj->setAttribute('is_published', isset($i['is_published']) ? $i['is_published'] : 1);
 
-        if (isset($i['handler']) && isset($foHandlerObjs[$i['handler']])) {
-            $obj->setAttribute(App_Cms_Handler::getPri(),
-                               $foHandlerObjs[$i['handler']]->getId());
+        if (isset($i['сontroller']) && isset($foControllerObjs[$i['сontroller']])) {
+            $obj->setAttribute(App_Cms_Controller::getPri(),
+                               $foControllerObjs[$i['сontroller']]->getId());
         }
 
         if (isset($i['template']) && isset($templatesObjs[$i['template']])) {
@@ -211,6 +220,7 @@ $result['FO documents'] = count($foDocumentObjs);
 
 
 // Data content type
+
 $foDataContentTypeObjs = array();
 foreach ($foDataContentType as $id => $i) {
     $obj = new App_Cms_Document_Data_ContentType();
@@ -226,6 +236,7 @@ $result['FO data content type'] = count($foDataContentTypeObjs);
 
 
 // Document data
+
 $foDataObjs = array();
 foreach ($foData as $uri => $blocks) {
     if (isset($foDocumentObjs[$uri])) {
@@ -239,11 +250,11 @@ foreach ($foData as $uri => $blocks) {
             $obj->setAttribute('is_mount', isset($i['is_mount']) ? $i['is_mount'] : 1);
 
             if (
-                isset($i['handler']) &&
-                isset($foHandlerObjs[$i['handler']])
+                isset($i['сontroller']) &&
+                isset($foControllerObjs[$i['сontroller']])
             ) {
-                $obj->setAttribute(App_Cms_Handler::getPri(),
-                                   $foHandlerObjs[$i['handler']]->getId());
+                $obj->setAttribute(App_Cms_Controller::getPri(),
+                                   $foControllerObjs[$i['сontroller']]->getId());
             }
 
             $obj->create();
@@ -257,6 +268,7 @@ $result['FO data'] = count($foDataObjs);
 
 
 // Сообщение о результате
+
 echo '<p>Таблицы в базу данных добавлены:</p><pre>';
 print_r($result);
 echo '</pre>';
@@ -266,8 +278,8 @@ echo '<b><code>' . $boUsers[0]['login'] . '</code></b> ';
 echo 'и пароль <b><code>' . $boUsers[0]['passwd'] . '</code></b>.</p>';
 
 $isError = false;
-$permissions = array(array(HANDLERS . '*', true),
-                     array(TEMPLATES, true),
+$permissions = array(array(DATA_CONTROLLERS, true),
+                     array(DOCUMENT_CONTROLLERS, true),
                      array(DOCUMENT_ROOT . 'f/', true));
 
 foreach ($permissions as $path) {

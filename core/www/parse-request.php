@@ -24,13 +24,13 @@ if ($gCache->isAvailable() && $gCache->isCache()) {
     } else {
         if (
             $document &&
-            $document->getHandler() &&
+            $document->getController() &&
             ($document->getAttribute('is_published') == 1 || IS_SHOW_HIDDEN) &&
             (!$document->getAttribute('auth_status_id') || is_null(App_Cms_User::getAuthGroup()) || $document->getAttribute('auth_status_id') & App_Cms_User::getAuthGroup())
         ) {
-            $handler = App_Cms_Document::initHandler($document->getHandler(), $document);
-            $handler->execute();
-            $handler->output();
+            $controller = App_Cms_Document::initController($document->getController(), $document);
+            $controller->execute();
+            $controller->output();
 
         } else {
             documentNotFound();

@@ -64,7 +64,7 @@ DROP TABLE IF EXISTS `~db prefix~fo_data`;
 CREATE TABLE IF NOT EXISTS `~db prefix~fo_data` (
   `~db prefix~fo_data_id` CHAR(30) NOT NULL,
   `~db prefix~fo_document_id` CHAR(30) NOT NULL,
-  `~db prefix~fo_handler_id` CHAR(10) NULL,
+  `~db prefix~fo_controller_id` CHAR(10) NULL,
   `~db prefix~fo_data_content_type_id` CHAR(10) NOT NULL,
   `auth_status_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   `tag` VARCHAR(255) NOT NULL,
@@ -93,7 +93,7 @@ DROP TABLE IF EXISTS `~db prefix~fo_document`;
 
 CREATE TABLE IF NOT EXISTS `~db prefix~fo_document` (
   `~db prefix~fo_document_id` CHAR(30) NOT NULL,
-  `~db prefix~fo_handler_id` CHAR(10) NOT NULL,
+  `~db prefix~fo_controller_id` CHAR(10) NOT NULL,
   `~db prefix~fo_template_id` SMALLINT UNSIGNED NULL,
   `parent_id` CHAR(30) NULL,
   `auth_status_id` SMALLINT UNSIGNED NOT NULL DEFAULT 0,
@@ -131,18 +131,18 @@ CREATE TABLE IF NOT EXISTS `~db prefix~fo_document_to_navigation` (
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
 
 
-DROP TABLE IF EXISTS `~db prefix~fo_handler`;
+DROP TABLE IF EXISTS `~db prefix~fo_controller`;
 
-CREATE TABLE IF NOT EXISTS `~db prefix~fo_handler` (
-  `~db prefix~fo_handler_id` CHAR(10) NOT NULL,
+CREATE TABLE IF NOT EXISTS `~db prefix~fo_controller` (
+  `~db prefix~fo_controller_id` CHAR(10) NOT NULL,
   `type_id` SMALLINT UNSIGNED NOT NULL,
   `title` VARCHAR(255) NOT NULL,
   `filename` VARCHAR(255) NOT NULL,
   `is_document_main` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
   `is_multiple` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
   `is_published` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
-  PRIMARY KEY (`~db prefix~fo_handler_id`),
-  UNIQUE INDEX `uq_~db prefix~fo_handler_type_id_filename` (`type_id` ASC, `filename` ASC))
+  PRIMARY KEY (`~db prefix~fo_controller_id`),
+  UNIQUE INDEX `uq_~db prefix~fo_controller_type_id_filename` (`type_id` ASC, `filename` ASC))
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
 
 

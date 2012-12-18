@@ -1,10 +1,5 @@
 <?php
 
-// require_once(realpath(dirname(__FILE__) . '/../libs') . '/libs.php');
-// require_once(LIBRARIES . 'page.php');
-// require_once(LIBRARIES . 'page_fo.php');
-// require_once(SETS . 'project.php');
-
 require_once realpath(dirname(__FILE__) . '/../../core/library') . '/libs.php';
 require_once CORE_SETS . 'project.php';
 

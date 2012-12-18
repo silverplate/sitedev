@@ -1,6 +1,6 @@
 <?php
 
-abstract class Core_Cms_Document_Handler_RobotsSitemap extends App_Cms_Document_Handler_Common
+abstract class Core_Cms_Document_Controller_RobotsSitemap extends App_Cms_Document_Controller_Common
 {
     public function output()
     {
@@ -16,24 +16,24 @@ abstract class Core_Cms_Document_Handler_RobotsSitemap extends App_Cms_Document_
         $type = App_Cms_Document_Navigation::load('robots-sitemap', 'name');
         if ($type && $type->is_published) {
             $documents = App_Cms_Document_Navigation::getDocuments($type->name);
-            $handlers = array();
-            $handlerKey = App_Cms_Handler::getPri();
+            $controllers = array();
+            $controllerKey = App_Cms_Controller::getPri();
             $sitemap = array();
             $sitemapXml = '';
 
             foreach ($documents as $document) {
                 array_push($sitemap, self::getSitemapItemFromDocument($document));
 
-                if ($document->$handlerKey) {
-                    if (!isset($handlers[$document->$handlerKey])) {
-                        $handlers[$document->$handlerKey] = $document->getHandler();
+                if ($document->$controllerKey) {
+                    if (!isset($controllers[$document->$controllerKey])) {
+                        $controllers[$document->$controllerKey] = $document->getController();
                     }
 
-                    $handler = $handlers[$document->$handlerKey];
-                    if ($handler) {
-                        $class = $handler->getClassName();
+                    $controller = $controllers[$document->$controllerKey];
+                    if ($controller) {
+                        $class = $controller->getClassName();
+                        require_once $controller->getFilename();
 
-                        require_once $handler->getFilename();
                         if (method_exists($class, 'getRobotsSitemapItems')) {
                             $list = call_user_func_array(array($class, 'getRobotsSitemapItems'), array());
                             foreach ($list as $item) {

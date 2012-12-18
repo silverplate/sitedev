@@ -4,7 +4,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 {
 	private static $Base;
 	private $IsChildren;
-	private $Handler;
+	private $Controller;
 	private $_template;
 	private $Language;
 	protected $Links = array('navigations' => null);
@@ -252,14 +252,14 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		return $result;
 	}
 
-	public function GetHandler() {
-		if (is_null($this->Handler)) {
-			$this->Handler = $this->GetAttribute(App_Cms_Handler::GetPri())
-				? App_Cms_Handler::Load($this->GetAttribute(App_Cms_Handler::GetPri()))
+	public function GetController() {
+		if (is_null($this->Controller)) {
+			$this->Controller = $this->GetAttribute(App_Cms_Controller::GetPri())
+				? App_Cms_Controller::Load($this->GetAttribute(App_Cms_Controller::GetPri()))
 				: false;
 		}
 
-		return $this->Handler;
+		return $this->Controller;
 	}
 
 	public function getTemplate()
@@ -273,15 +273,15 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		return $this->_template;
 	}
 
-	public function GetHandlerFile() {
-		return $this->GetHandler() ? $this->GetHandler()->GetFilename() : false;
+	public function GetControllerFile() {
+		return $this->GetController() ? $this->GetController()->GetFilename() : false;
 	}
 
-	public static function initHandler(App_Cms_Handler $_handler, &$_document)
+	public static function initController(App_Cms_Controller $_controller, &$_document)
 	{
-        require_once $_handler->getFilename();
+        require_once $_controller->getFilename();
 
-        $class = $_handler->getClassName();
+        $class = $_controller->getClassName();
 
         if (class_exists($class)) {
             return new $class($_document);
@@ -403,7 +403,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 		switch ($_name) {
 			case 'navigations':
-				$class_name = 'DocumentToNavigation';
+				$class_name = 'App_Cms_Document_ToNavigation';
 				$keys = array(App_Cms_Document_ToNavigation::GetFirstKey(), App_Cms_Document_ToNavigation::GetSecondKey());
 				break;
 		}
@@ -441,7 +441,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		if (!isset(self::$Base)) {
 			self::$Base = new App_ActiveRecord(self::ComputeTblName());
 			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'varchar', 30, true);
-			self::$Base->AddForeignKey(App_Cms_Handler::GetBase());
+			self::$Base->AddForeignKey(App_Cms_Controller::GetBase());
 			self::$Base->addForeignKey(App_Cms_TemplateDb::getBase());
 			self::$Base->AddAttribute('parent_id', 'varchar', 30);
 			self::$Base->AddAttribute('auth_status_id', 'int');

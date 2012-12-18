@@ -183,7 +183,7 @@ function documentNotFound()
 {
     header('HTTP/1.0 404 Not Found');
 
-    if (class_exists('Document')) {
+    if (class_exists('App_Cms_Document')) {
         $realUrl = parse_url($_SERVER['REQUEST_URI']);
         $document = App_Cms_Document::load(get_lang_inner_uri() . 'not-found/', 'uri');
 
@@ -195,14 +195,14 @@ function documentNotFound()
                 goToUrl($document->getAttribute('link'));
 
             } else if (
-                $document->getHandler() && (
+                $document->getController() && (
                     $document->getAttribute('is_published') == 1 ||
                     (defined('IS_SHOW_HIDDEN') && IS_SHOW_HIDDEN)
                 )
             ) {
-                $handler = App_Cms_Document::initHandler($document->getHandler(), $document);
-                $handler->execute();
-                $handler->output();
+                $controller = App_Cms_Document::initController($document->getController(), $document);
+                $controller->execute();
+                $controller->output();
                 exit();
             }
         }

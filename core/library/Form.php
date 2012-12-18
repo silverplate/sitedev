@@ -39,18 +39,16 @@ abstract class Core_Form
 	}
 
 	public function CreateElement($_name, $_type, $_label = null, $_is_required = false) {
-		$class_name = 'App_Form_Element';
-		foreach (explode('_', $_type) as $word) {
-			$class_name .= ucfirst($word);
+		$class = 'App_Form_Element_' . Ext_String::upperCase($_type);
+
+		if (!class_exists($class)) {
+			$class = 'App_Form_Element';
 		}
 
-		if (!class_exists($class_name)) {
-			$class_name = 'App_Form_Element';
-		}
-
-		if (class_exists($class_name)) {
-			$this->Elements[$_name] = new $class_name($_name, $_type, $_label, $_is_required);
+		if (class_exists($class)) {
+			$this->Elements[$_name] = new $class($_name, $_type, $_label, $_is_required);
 			return $this->Elements[$_name];
+
 		} else {
 			return false;
 		}

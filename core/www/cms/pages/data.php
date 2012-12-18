@@ -26,9 +26,9 @@ if (is_null($document_id) || !App_Cms_Document::Load($document_id)) {
 			$tmp[App_Cms_Document_Data_ContentType::GetPri()] = $ele;
 			$tmp[App_Cms_Document_Data_ContentType::GetPri()]->SetName(App_Cms_Document_Data_ContentType::GetPri());
 
-		} elseif ($name == 'fo_handler_id') {
-			$tmp[App_Cms_Handler::GetPri()] = $ele;
-			$tmp[App_Cms_Handler::GetPri()]->SetName(App_Cms_Handler::GetPri());
+		} else if ($name == 'fo_controller_id') {
+			$tmp[App_Cms_Controller::GetPri()] = $ele;
+			$tmp[App_Cms_Controller::GetPri()]->SetName(App_Cms_Controller::GetPri());
 
 		} else {
 			$tmp[$name] = $ele;
@@ -41,15 +41,15 @@ if (is_null($document_id) || !App_Cms_Document::Load($document_id)) {
 		$form->Elements[App_Cms_Document_Data_ContentType::GetPri()]->AddOption($item->GetId(), $item->GetTitle());
 	}
 
-	$handler_row_conditions = array();
-	$handler_self_condition = isset($obj) && $obj && $obj->GetAttribute(App_Cms_Handler::GetPri()) ? ' OR ' . App_Cms_Handler::GetPri() . ' = ' . App_Db::escape($obj->GetAttribute(App_Cms_Handler::GetPri())) : '';
-	$used = App_Db::Get()->GetList('SELECT ' . App_Cms_Handler::GetPri() . ' FROM ' . App_Cms_Document_Data::GetTbl() . ' WHERE ' . App_Cms_Handler::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . App_Cms_Document_Data::GetPri() . ' != ' . App_Db::escape($obj->GetId()) : '') . ' GROUP BY ' . App_Cms_Handler::GetPri());
-	if ($used) array_push($handler_row_conditions, '(is_multiple = 1 OR ' . App_Cms_Handler::GetPri() . ' NOT IN (' . App_Db::escape($used) . ')' . $handler_self_condition . ')');
-	array_push($handler_row_conditions, $handler_self_condition ? '(is_published = 1' . $handler_self_condition . ')' : 'is_published = 1');
+	$controller_row_conditions = array();
+	$controller_self_condition = isset($obj) && $obj && $obj->GetAttribute(App_Cms_Controller::GetPri()) ? ' OR ' . App_Cms_Controller::GetPri() . ' = ' . App_Db::escape($obj->GetAttribute(App_Cms_Controller::GetPri())) : '';
+	$used = App_Db::Get()->GetList('SELECT ' . App_Cms_Controller::GetPri() . ' FROM ' . App_Cms_Document_Data::GetTbl() . ' WHERE ' . App_Cms_Controller::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . App_Cms_Document_Data::GetPri() . ' != ' . App_Db::escape($obj->GetId()) : '') . ' GROUP BY ' . App_Cms_Controller::GetPri());
+	if ($used) array_push($controller_row_conditions, '(is_multiple = 1 OR ' . App_Cms_Controller::GetPri() . ' NOT IN (' . App_Db::escape($used) . ')' . $controller_self_condition . ')');
+	array_push($controller_row_conditions, $controller_self_condition ? '(is_published = 1' . $controller_self_condition . ')' : 'is_published = 1');
 
-	$form->Elements[App_Cms_Handler::GetPri()]->AddOption('', 'Нет');
-	foreach (App_Cms_Handler::GetList(array('type_id' => 2), null, $handler_row_conditions) as $item) {
-		$form->Elements[App_Cms_Handler::GetPri()]->AddOption($item->GetId(), $item->GetTitle());
+	$form->Elements[App_Cms_Controller::GetPri()]->AddOption('', 'Нет');
+	foreach (App_Cms_Controller::GetList(array('type_id' => 2), null, $controller_row_conditions) as $item) {
+		$form->Elements[App_Cms_Controller::GetPri()]->AddOption($item->GetId(), $item->GetTitle());
 	}
 
 	if (IS_USERS) {

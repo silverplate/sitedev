@@ -1,6 +1,6 @@
 <?php
 
-abstract class Core_DocumentCommon extends App_Cms_Document_Handler
+abstract class Core_Cms_Document_Handler_Common extends App_Cms_Document_Handler
 {
     public function execute()
     {

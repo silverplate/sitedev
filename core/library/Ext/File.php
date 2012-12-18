@@ -128,10 +128,14 @@ class Ext_File
         return false;
     }
 
+    public static function computeName($_file)
+    {
+        return pathinfo($_file, PATHINFO_FILENAME);
+    }
+
     public static function computeExt($_file)
     {
-        $info = pathinfo($_file);
-        return empty($info['extension']) ? '' : strtolower($info['extension']);
+        return pathinfo($_file, PATHINFO_EXTENSION);
     }
 
     public static function computeSizeMeasure($_size)
@@ -353,7 +357,7 @@ class Ext_File
         $this->_dir = dirname($this->_path);
         $this->_filename = basename($this->_path);
         $this->_ext = self::computeExt($this->_path);
-        $this->_name = substr($this->_filename, 0, strlen($this->_filename) - strlen($this->_ext) - 1);
+        $this->_name = self::computeName($this->_filename);
 
         $this->setUri(self::computeUri(
             $this->_path,

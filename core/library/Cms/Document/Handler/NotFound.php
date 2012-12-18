@@ -1,8 +1,6 @@
 <?php
 
-require_once 'common.php';
-
-abstract class Core_DocumentNotFound extends App_DocumentCommon
+abstract class Core_Cms_Document_Handler_NotFound extends App_Cms_Document_Handler_Common
 {
     public function execute()
     {

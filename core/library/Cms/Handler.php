@@ -5,47 +5,41 @@ abstract class Core_Cms_Handler extends App_ActiveRecord
 	private static $Base;
 	const TABLE = 'fo_handler';
 
-
     public function getClassName()
     {
         if ($this->type_id == 1) {
-            $class = 'App_Document';
+            $class = 'App_Cms_Document_Handler_';
 
         } else if ($this->type_id == 2) {
-            $class = 'App_Document_Data';
+            $class = 'App_Cms_Document_Data_Handler_';
 
         } else {
             throw new Exception('Unkown handler type');
         }
 
-        $class .= ucfirst(
-            transformUnderlineToCase(
-                get_file_name($this->getFilename())
-            )
-        );
-
-        return $class;
+        return $class . Ext_File::computeName($this->filename);
     }
 
-	public static function GetPathByType($_type_id) {
-		switch ($_type_id) {
-			case 1:
-				return HANDLERS . 'documents/';
-			case 2:
-				return HANDLERS . 'data/';
-			default:
-				return false;
+	public static function getPathByType($_id)
+	{
+		switch ($_id) {
+			case 1: return DOCUMENT_CONTROLLERS;
+			case 2: return DATA_CONTROLLERS;
 		}
+
+		return false;
 	}
 
-	public function GetFolder() {
-		return self::GetPathByType($this->GetAttribute('type_id'));
+	public function getFolder()
+	{
+		return self::getPathByType($this->type_id);
 	}
 
-	public function GetFilename() {
-		return $this->GetFolder() && $this->GetAttribute('filename')
-			? $this->GetFolder() . $this->GetAttribute('filename')
-			: false;
+	public function getFilename()
+	{
+	    return $this->getFolder() && $this->filename
+	         ? $this->getFolder() . $this->filename
+	         : false;
 	}
 
 	public function GetContent() {

@@ -1,0 +1,6 @@
+<?php
+
+class App_Cms_Document_Data_Handler_SubpageNavigation
+extends Core_Cms_Document_Data_Handler_SubpageNavigation
+{
+}

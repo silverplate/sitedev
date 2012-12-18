@@ -277,8 +277,9 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		return $this->GetHandler() ? $this->GetHandler()->GetFilename() : false;
 	}
 
-	public static function initHandler(App_Cms_Handler $_handler, &$_document) {
-        require_once($_handler->getFilename());
+	public static function initHandler(App_Cms_Handler $_handler, &$_document)
+	{
+        require_once $_handler->getFilename();
 
         $class = $_handler->getClassName();
 

@@ -20,6 +20,9 @@ define('CORE_LIBRARIES', CORE_PATH . 'library/');
 
 define('MODELS', WD . 'models/');
 
+define('DATA_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Data/Handler/');
+define('DOCUMENT_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Handler/');
+
 require_once 'strings.php';
 require_once 'dates.php';
 require_once 'files.php';

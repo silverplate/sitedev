@@ -21,7 +21,6 @@ define('DATA_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Data/Controller/');
 define('DOCUMENT_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Controller/');
 
 require_once 'strings.php';
-require_once 'dates.php';
 require_once 'files.php';
 require_once 'dom.php';
 

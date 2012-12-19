@@ -119,7 +119,7 @@ abstract class Core_Cms_Page
 		}
 
 		$result .= $this->getUrlXml();
-		$result .= '<date day="' . date('d') . '" month="' . date('m') . '" year="' . date('Y') . '" date="' . date('d.m.Y') . '" hour="' . date('H') . '" minute="' . date('i') . '" second="' . date('s') . '" time="' . date('H:i:s') . '" day_zeroless="'. date('j') .'" weekday="' . date_get_week_day(date('w')) . '" month_label_2="' . date_get_month(date('m'), 2) . '" unixtimestamp="' . mktime() . '" />';
+		$result .= Ext_Date::getXml(time());
 		$result .= '</' .  $this->GetRootNodeName() . '>';
 
 		return $result;

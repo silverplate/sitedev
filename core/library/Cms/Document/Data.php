@@ -29,12 +29,9 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 
 	public function GetParsedContent($_content) {
 		switch ($this->GetAttribute(App_Cms_Document_Data_ContentType::GetPri())) {
-			case 'integer':
-				return (int) $_content;
-			case 'float':
-				return (float) $_content;
-			default:
-				return get_cdata_back($_content);
+			case 'integer': return (int) $_content;
+			case 'float':   return (float) $_content;
+			default:        return Ext_Xml::decodeCdata($_content);
 		}
 	}
 
@@ -67,20 +64,19 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 
 		$result .= '>';
 
-		if ($this->GetTitle()) {
-			$result .= '<title>' . get_cdata($this->GetTitle()) . '</title>';
+		$result .= Ext_Xml::notEmptyCdata('title', $this->getTitle());
+
+		if ($this->getController()) {
+		    $result .= Ext_Xml::cdata('controller', $this->getController()->getTitle());
 		}
 
-		if ($this->GetController()) {
-			$result .= '<controller>' . get_cdata($this->GetController()->GetTitle()) . '</controller>';
-		}
-
-		if ($this->GetAttribute('content') != '') {
-			$result .= '<content>' . get_cdata($this->GetAttribute('content')) . '</content>';
-		}
+		$result .= Ext_Xml::notEmptyCdata('content', $this->getAttribute('content'));
 
 		if (IS_USERS && $this->GetAttribute('auth_status_id') != App_Cms_User::AUTH_GROUP_ALL && App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))) {
-			$result .= '<auth_group>' . get_cdata(App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))) . '</auth_group>';
+			$result .= Ext_Xml::cdata(
+		        'auth-group',
+		        App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))
+	        );
 		}
 
 		if ($_additional_xml) {

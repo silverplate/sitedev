@@ -31,7 +31,6 @@ if (!defined('IS_CACHE')) {
 
 define('IS_USERS', false);
 define('DB_PREFIX', '');
-define('DOM_LOAD_OPTIONS', LIBXML_DTDLOAD + LIBXML_COMPACT + LIBXML_NOENT);
 
 if (defined('ENV')) {
     $env = ENV;

@@ -33,7 +33,7 @@ class App_Image extends Ext_Image
 
     public static function applyXmlImages($_xml, array $_files)
     {
-        $dom = getXmlObject($_xml);
+        $dom = Ext_Dom::get(Core_Cms_Ext_Xml::getDocument($_xml));
         $illus = $dom->getElementsByTagName('illu');
         $i = 0;
 
@@ -67,7 +67,7 @@ class App_Image extends Ext_Image
                     $i++;
 
                 } else {
-                    dom_remove($illu);
+                    Ext_Dom::remove($illu);
                 }
 
             } else if ($illu->hasAttribute('uri') && !$illu->hasAttribute('width')) {

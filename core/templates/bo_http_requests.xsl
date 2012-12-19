@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE xsl:stylesheet SYSTEM "character_entities.dtd">
+<!DOCTYPE xsl:stylesheet SYSTEM "entities.dtd">
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:output method="html" indent="no" encoding="utf-8" />
@@ -141,14 +141,14 @@
 					<xsl:value-of select="title/text()" disable-output-escaping="yes" />
 				</a>
 			</label>
-			<xsl:apply-templates select="@tag|controller|auth_group" mode="document_data" />
+			<xsl:apply-templates select="@tag|controller|auth-group" mode="document_data" />
 		</div></div>
 		<div style="width: 70%; float: left;">
 			<xsl:apply-templates select="self::node()" mode="document_data_form_ele" />
 		</div>
 	</xsl:template>
 
-	<xsl:template match="@tag|controller|auth_group" mode="document_data">
+	<xsl:template match="@tag|controller|auth-group" mode="document_data">
 		<div style="font-size: 0.84em; clear: both;"><xsl:value-of select=".|text()" disable-output-escaping="yes" /></div>
 	</xsl:template>
 

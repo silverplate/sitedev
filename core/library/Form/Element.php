@@ -57,13 +57,13 @@ abstract class Core_Form_Element
     {
         if (func_num_args() == 1) {
             $value = func_get_arg(0);
-            $this->Value = $value == 'NULL' ? '' : get_cdata_back($value);
+            $this->Value = $value == 'NULL' ? '' : Ext_Xml::decodeCdata($value);
 
         } else if (func_num_args() == 2) {
             if (!is_array($this->Value)) $this->Value = array();
 
             $value = func_get_arg(1);
-            $this->Value[func_get_arg(0)] = $value == 'NULL' ? '' : get_cdata_back($value);
+            $this->Value[func_get_arg(0)] = $value == 'NULL' ? '' : Ext_Xml::decodeCdata($value);
 
         } else {
             $this->Value = '';
@@ -74,13 +74,13 @@ abstract class Core_Form_Element
     {
         if (func_num_args() == 1) {
             $value = func_get_arg(0);
-            $this->ErrorValue = $value == 'NULL' ? '' : get_cdata_back($value);
+            $this->ErrorValue = $value == 'NULL' ? '' : Ext_Xml::decodeCdata($value);
 
         } else if (func_num_args() == 2) {
             if (!is_array($this->ErrorValue)) $this->ErrorValue = array();
 
             $value = func_get_arg(1);
-            $this->ErrorValue[func_get_arg(0)] = $value == 'NULL' ? '' : get_cdata_back($value);
+            $this->ErrorValue[func_get_arg(0)] = $value == 'NULL' ? '' : Ext_Xml::decodeCdata($value);
         }
     }
 
@@ -138,22 +138,25 @@ abstract class Core_Form_Element
         $xml .= '>';
 
         if ($this->Label) {
-            $xml .= '<label>' . get_cdata($this->Label) . '</label>';
+            $xml .= Ext_Xml::cdata('label', $this->Label);
         }
 
         if ($this->Value != '') {
             $xml .= '<value>';
+
             if (is_array($this->Value)) {
                 foreach ($this->Value as $key => $value) {
                     if ($value != 'NULL') {
                         $xml .= preg_match('/^[a-z_]+$/', $key)
-                            ? '<' . $key . '>' . get_cdata($value) . '</' . $key . '>'
-                            : '<item key="' . $key . '">' . get_cdata($value) . '</item>';
+                            ? Ext_Xml::cdata($key, $value)
+                            : Ext_Xml::cdata('item', $value, array('key' => $key));
                     }
                 }
+
             } else {
-                $xml .= get_cdata($this->Value);
+                $xml .= '<![CDATA[' . Ext_Xml::encodeCdata($this->Value) . ']]>';
             }
+
             $xml .= '</value>';
         }
 

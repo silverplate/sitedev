@@ -48,7 +48,7 @@ abstract class Core_Cms_Document_Controller_RobotsSitemap extends App_Cms_Docume
                 $sitemapXml .= '<url>';
 
                 foreach ($item as $name => $value) {
-                    $sitemapXml .= getCdata($name, $value);
+                    $sitemapXml .= Ext_Xml::cdata($name, $value);
                 }
 
                 $sitemapXml .= '</url>';

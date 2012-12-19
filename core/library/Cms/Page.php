@@ -86,7 +86,11 @@ abstract class Core_Cms_Page
 	public function Output() {
 		if (isset($_GET['xml']) || !$this->Template) {
 			header('Content-type: text/xml; charset=utf-8');
-			echo getXmlDocumentForRoot($this->getXml(), $this->getRootNodeName());
+
+			echo Core_Cms_Ext_Xml::getDocumentForXml(
+		        $this->getXml(),
+		        $this->getRootNodeName()
+			);
 
 		} else {
 			echo $this->getHtml();
@@ -138,8 +142,12 @@ abstract class Core_Cms_Page
 	public function GetHtml() {
 		if ($this->Template) {
 			$obj = new XSLTProcessor;
-			$obj->importStylesheet(loadXmlObject($this->Template));
-			return $obj->transformToXml(getXmlObjectForRoot($this->getXml(), $this->getRootNodeName()));
+			$obj->importStylesheet(Ext_Dom::load($this->Template));
+
+			return $obj->transformToXml(Ext_Dom::get(Ext_Xml::getDocumentForXml(
+			    $this->getXml(),
+		        $this->getRootNodeName()
+	        )));
 
 		} else {
 			throw new Exception ('Шаблон не указан.');

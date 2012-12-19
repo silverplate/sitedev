@@ -15,7 +15,7 @@ extends App_Cms_Document_Data_Controller
         $append = array();
 
         if ($content) {
-            $pref = getXmlObject($content);
+            $pref = Ext_Dom::get(Core_Cms_Ext_Xml::getDocument($content));
 
             foreach ($pref->getElementsByTagName('except') as $item) {
                 foreach ($item->attributes as $attr) {
@@ -54,7 +54,7 @@ extends App_Cms_Document_Data_Controller
                   ? $item->getAttribute('link')
                   : $item->getUri();
 
-            $itemXml = getCdata('title', $item->getTitle());
+            $itemXml = Ext_Xml::cdata('title', $item->getTitle());
             $itemAttrs = array('uri' => $item->getUri(), 'link' => $link);
 
             if (count($append) > 0) {
@@ -70,7 +70,7 @@ extends App_Cms_Document_Data_Controller
                 }
             }
 
-            $xml .= getNode('item', $itemXml, $itemAttrs);
+            $xml .= Ext_Xml::node('item', $itemXml, $itemAttrs);
         }
 
         $this->setContent($xml);

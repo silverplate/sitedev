@@ -83,10 +83,10 @@ abstract class Core_Form
 
 	public function Load($_xml_file = null, $_xml_source = null) {
 		if ($_xml_file && is_file($_xml_file)) {
-			$form = loadXmlObject($_xml_file);
+			$form = Ext_Dom::load($_xml_file);
 
 		} else if ($_xml_source) {
-			$form = getXmlObject($_xml_source);
+		    $form = Ext_Dom::get(Core_Cms_Ext_Xml::getDocument($_xml_source));
 		}
 
 		if (isset($form)) {
@@ -103,7 +103,7 @@ abstract class Core_Form
 			if ($groups && $groups->length > 0) {
 				foreach ($groups as $group) {
 					$group_name = $group->getAttribute('name');
-					$label_node = dom_get_child($group, 'title');
+					$label_node = Ext_Dom::getChildByName($group, 'title');
 					$this->CreateGroup($group_name, $label_node->nodeValue);
 
 					foreach ($dom_xpath->evaluate('element', $group) as $item) {
@@ -118,7 +118,7 @@ abstract class Core_Form
 			}
 
 			foreach ($dom_xpath->evaluate('button[label/text()]') as $item) {
-				$label_node = dom_get_child($item, 'label');
+				$label_node = Ext_Dom::getChildByName($item, 'label');
 				$this->CreateButton($label_node->firstChild->nodeValue, $item->getAttribute('name'), $item->getAttribute('image_url'));
 			}
 
@@ -131,7 +131,7 @@ abstract class Core_Form
 
 	protected function LoadElement(&$_item, $_group_name = null) {
 		if ($_item->hasAttribute('name') && $_item->hasAttribute('type')) {
-			$label_node = dom_get_child($_item, 'label');
+			$label_node = Ext_Dom::getChildByName($_item, 'label');
 			$label = $label_node && $label_node->nodeValue ? $label_node->nodeValue : null;
 
 			$element = $this->CreateElement($_item->getAttribute('name'), $_item->getAttribute('type'), $label, $_item->hasAttribute('is_required'));
@@ -145,12 +145,12 @@ abstract class Core_Form
 					$this->Groups[$_group_name]->AddElement($element);
 				}
 
-				$description_node = dom_get_child($_item, 'description');
+				$description_node = Ext_Dom::getChildByName($_item, 'description');
 				if ($description_node) {
 					$element->SetDescription($description_node->nodeValue);
 				}
 
-				$options_node = dom_get_child($_item, 'options');
+				$options_node = Ext_Dom::getChildByName($_item, 'options');
 				if ($options_node) {
 					foreach ($options_node->getElementsByTagName('item') as $option) {
 						$element->AddOption($option->getAttribute('value'), $option->nodeValue);
@@ -161,7 +161,7 @@ abstract class Core_Form
 // 					}
 				}
 
-				$value_node = dom_get_child($_item, 'value');
+				$value_node = Ext_Dom::getChildByName($_item, 'value');
 				if ($value_node) {
 					if ($value_node->firstChild->nodeType == XML_ELEMENT_NODE || $value_node->childNodes->length > 1) {
 						foreach ($value_node->childNodes as $value) {

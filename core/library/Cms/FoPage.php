@@ -25,7 +25,11 @@ abstract class Core_Cms_FoPage extends Core_Cms_Page
 		if (isset($_GET['xml']) && defined('IS_ADMIN_MODE') && IS_ADMIN_MODE) {
 			// header('Content-type: text/xml; charset=' . ini_get('default_charset'));
 			header('Content-type: text/xml; charset=utf-8');
-			echo getXmlDocumentForRoot($this->getXml(), $this->getRootNodeName());
+
+			echo Core_Cms_Ext_Xml::getDocumentForXml(
+		        $this->getXml(),
+		        $this->getRootNodeName()
+	        );
 
 		} else if ($this->Template) {
 			$content = $this->GetHtml();

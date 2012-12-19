@@ -64,7 +64,11 @@ abstract class Core_Cms_Document_Controller extends Core_Cms_FoPage
 
                     case 'xml':
                         if ($item->GetAttribute('content')) {
-                            $data_dom = getXmlObject($item->GetAttribute('content'), 'data');
+                            $data_dom = Ext_Dom::get(Core_Cms_Ext_Xml::getDocument(
+                                $item->content,
+                                'data'
+                            ));
+
                             $data_images = $data_dom->getElementsByTagName('image');
 
                             foreach ($data_images as $data_image) {

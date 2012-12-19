@@ -37,15 +37,12 @@ abstract class Core_Cms_Document_Data_Controller
 		return $this->Type = $_type;
 	}
 
-	public function GetXml() {
-		$result = '<' . $this->DocumentData->GetAttribute('tag') . '>';
+	public function getXml()
+	{
+	    $tag = $this->DocumentData->getAttribute('tag');
 
-		$result .= $this->GetType() == 'xml'
-			? get_cdata_back($this->GetContent())
-			: get_cdata($this->GetContent());
-
-		$result .= '</' . $this->DocumentData->GetAttribute('tag') . '>';
-
-		return $result;
+	    return $this->getType() == 'xml'
+	         ? Ext_Xml::node($tag, Ext_Xml::decodeCdata($this->getContent()))
+	         : Ext_Xml::cdata($tag, $this->getContent());
 	}
 }

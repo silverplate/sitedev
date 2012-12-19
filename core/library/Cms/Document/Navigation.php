@@ -82,7 +82,7 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 		        ? self::GetNavigationXmlTree()
 		        : self::GetNavigationXmlList();
 
-        return $result ? getNode($_name, $result) : false;
+        return $result ? Ext_Xml::node($_name, $result) : false;
 	}
 
 	public function GetNavigationXmlTree($_parent_id = '') {

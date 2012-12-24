@@ -48,7 +48,8 @@ abstract class Core_Cms_BackOffice
         global $gOpenBranches;
 
         $data = $_POST;
-        $parentId = isset($data['parent_id']) ? $data['parent_id'] : '';
+        $parentId = empty($data['parent_id']) ? null : $data['parent_id'];
+
         $selectedIds = isset($data['selected_ids']) &&
                        is_array($data['selected_ids'])
                      ? $data['selected_ids']
@@ -150,7 +151,7 @@ abstract class Core_Cms_BackOffice
         global $gOpenBranches;
 
         $result = '';
-        $conditions = array('parent_id' => empty($_parentId) ? 'NULL' : $_parentId);
+        $conditions = array('parent_id' => empty($_parentId) ? null : $_parentId);
         $rowConditions = array();
 
         if ($_excludeId) {

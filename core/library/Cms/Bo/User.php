@@ -127,8 +127,17 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 
 		$result = array('tables' => array($self['table']), 'row_conditions' => array());
 
-		foreach ($_conditions as $attribute => $value) {
-			$result['row_conditions'][] = $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . App_Db::Get()->EscapeList($value) . ')' : ' = ' . App_Db::escape($value));
+		if ($_conditions) {
+		    $conditions = array();
+
+		    foreach ($_conditions as $name => $value) {
+		        $conditions[$self['table'] . '.' . $name] = $value;
+		    }
+
+		    $result['row_conditions'] = array_merge(
+	            $result['row_conditions'],
+	            App_Db::get()->getWhere($conditions)
+		    );
 		}
 
 		return $result;

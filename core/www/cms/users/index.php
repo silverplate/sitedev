@@ -12,7 +12,7 @@ if ($page->IsAuthorized()) {
 		if (!$obj) unset($obj);
 
 	} elseif (isset($_GET['NEW'])) {
-		$obj = new App_Cms_User;
+		$obj = new App_Cms_User();
 	}
 
 	if (isset($obj)) {
@@ -43,7 +43,7 @@ if ($page->IsAuthorized()) {
 				App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
 				goToUrl($page->Url['path'] . '?DEL');
 
-			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
+			} else if ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
 				if (App_Cms_User::CheckUnique($form->Elements['email']->GetValue(), $obj->GetId())) {
 					$obj->fillWithData($form->GetSqlValues());
 

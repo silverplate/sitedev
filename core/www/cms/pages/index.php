@@ -120,9 +120,10 @@ if ($page->IsAuthorized()) {
 
 			if ($is_root && $is_unique) {
 				$obj->fillWithData($form->GetSqlValues());
-				if (!$obj->parent_id) {
-				    $obj->parentId = 'NULL';
-				}
+
+// 				if (!$obj->parent_id) {
+// 				    $obj->parentId = 'NULL';
+// 				}
 
 				if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 					$obj->Delete();

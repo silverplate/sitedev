@@ -58,7 +58,7 @@ abstract class Core_Cms_Document_ToNavigation extends App_ActiveRecord
 		}
 
 		if ($attributes) {
-			$row_conditions = parent::GetQueryCondition($attributes);
+		    $row_conditions = App_Db::get()->getWhere($attributes);
 		}
 
 		return parent::getList(

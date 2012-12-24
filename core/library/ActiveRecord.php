@@ -144,28 +144,6 @@ abstract class Core_ActiveRecord
         return $names;
     }
 
-    public static function getQueryCondition($_attributes = array())
-    {
-        $conditions = array();
-
-        foreach ($_attributes as $attribute => $value) {
-            if ($value === 'NULL') {
-                $conditions[] = 'ISNULL(' . $attribute . ')';
-
-//             } else if (!$value) {
-//                 $conditions[] = "$attribute = ''";
-
-            } else if (is_array($value)) {
-                $conditions[] = $attribute . ' IN (' . App_Db::escape($value) . ')';
-
-            } else {
-                $conditions[] = $attribute . ' = ' . App_Db::escape($value);
-            }
-        }
-
-        return $conditions;
-    }
-
     public function addAttribute($_name,
                                  $_type,
                                  $_length = null,
@@ -317,10 +295,10 @@ abstract class Core_ActiveRecord
 
     public function getTitle()
     {
-        if ($this->title) {
+        if (isset($this->title) && $this->title) {
             return $this->title;
 
-        } elseif ($this->name) {
+        } else if (isset($this->name) && $this->name) {
             return $this->name;
 
         } else {
@@ -330,7 +308,7 @@ abstract class Core_ActiveRecord
 
     public function getDate($_name)
     {
-        $value = $this->getAttribute($_name);
+        $value = $this->$_name;
         return ($value && $value != '0000-00-00' && $value != '0000-00-00 00:00:00') ? strtotime($value) : false;
     }
 
@@ -437,7 +415,7 @@ abstract class Core_ActiveRecord
 
             return App_Db::get()->execute(
                 'UPDATE ' . $this->getTable() .
-                App_Db::get()->getQueryFields(array($this->_attributes[$_name]->getName() => $this->_attributes[$_name]->getValue(true)), 'update', true) .
+                App_Db::get()->getQueryFields(array($this->_attributes[$_name]->getName() => $this->_attributes[$_name]->getSqlValue()), 'update', true) .
                 'WHERE ' . $primary_key_condition
             );
 
@@ -537,61 +515,57 @@ abstract class Core_ActiveRecord
     public static function massDelete($_table, $_conditions = null)
     {
         if ($_conditions) {
-            $conditions = self::getQueryCondition($_conditions);
-            $condition = ($conditions) ? ' WHERE ' . implode(' AND ', $conditions) : '';
-            App_Db::get()->execute('DELETE FROM ' . $_table . $condition);
+            App_Db::get()->execute(
+                'DELETE FROM ' . $_table .
+                ' WHERE ' . implode(' AND ', App_Db::get()->getWhere($_conditions))
+            );
+
         } else {
             App_Db::get()->execute('TRUNCATE ' . $_table);
         }
     }
 
-    public static function getList($_class, $_tables, $_attributes, $_conditions = array(), $_parameters = array(), $_row_conditions = array())
+    public static function getList($_class, $_tables, $_attributes, $_conditions = array(), $_parameters = array(), $_row = array())
     {
         $result = array();
         $tables = (is_array($_tables)) ? implode(', ', $_tables) : $_tables;
 
-        $sort_order = isset($_parameters['sort_order'])
-            ? $_parameters['sort_order']
-            : self::getSortAttribute($_tables, $_attributes);
+        $sortOrder = isset($_parameters['sort_order'])
+                   ? $_parameters['sort_order']
+                   : self::getSortAttribute($_tables, $_attributes);
 
-        if ($sort_order) {
-            $sort_order = ' ORDER BY ' . $sort_order;
+        if ($sortOrder) {
+            $sortOrder = ' ORDER BY ' . $sortOrder;
         }
 
         $limit = '';
         if (isset($_parameters['count'])) {
-            $limit .= ' LIMIT ' .  (int) $_parameters['count'];
+            $limit .= ' LIMIT ' . (int) $_parameters['count'];
         }
 
         if (isset($_parameters['offset'])) {
-            $limit .= ' OFFSET ' .  (int) $_parameters['offset'];
+            $limit .= ' OFFSET ' . (int) $_parameters['offset'];
         }
 
-        if ($_row_conditions && is_array($_row_conditions)) {
-            $conditions = $_row_conditions;
-        } elseif ($_row_conditions) {
-            $conditions = array($_row_conditions);
-        } else {
-            $conditions = array();
-        }
+        if ($_row && is_array($_row)) $conditions = $_row;
+        else if ($_row)               $conditions = array($_row);
+        else                          $conditions = array();
 
         if ($_conditions) {
-            $conditions = array_merge($conditions, self::getQueryCondition($_conditions));
+            $conditions = array_merge($conditions, App_Db::get()->getWhere($_conditions));
         }
 
-        $condition = ($conditions) ? ' WHERE ' . implode(' AND ', $conditions) : '';
-        $list = App_Db::get()->getList('SELECT ' . implode(', ', $_attributes) . ' FROM ' . $tables . $condition . $sort_order . $limit, 'few');
+        $condition = $conditions ? ' WHERE ' . implode(' AND ', $conditions) : '';
+        $list = App_Db::get()->getList('SELECT ' . implode(', ', $_attributes) .
+                                       ' FROM ' . $tables .
+                                       $condition .
+                                       $sortOrder .
+                                       $limit, 'few');
 
         if ($list) {
             foreach ($list as $item) {
                 $obj = new $_class;
-//                 $obj->fillWithData($item);
-
-                foreach ($obj->_attributes as $i) {
-                    if (isset($item[$i->getName()])) {
-                        $i->setValue($item[$i->getName()]);
-                    }
-                }
+                $obj->fillWithData($item);
 
                 if (is_array($obj->getId())) {
                     $result[] = $obj;

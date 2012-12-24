@@ -311,21 +311,21 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 					$result['row_conditions'][] = App_Cms_Document_Navigation::GetTbl() . '.is_published = ' . App_Db::escape($_conditions['is_published']);
 				}
 			}
+
 			unset($_conditions['navigations']);
 		}
 
 		if ($_conditions) {
-			foreach ($_conditions as $attribute => $value) {
-                if ($value === 'NULL') {
-                    $result['row_conditions'][] =  'ISNULL(' . $self['table'] . '.' . $attribute . ')';
+		    $conditions = array();
 
-                } else if (is_array($value)) {
-                    $result['row_conditions'][] = $self['table'] . '.' . $attribute . ' IN (' . App_Db::escape($value) . ')';
+		    foreach ($_conditions as $name => $value) {
+		        $conditions[$self['table'] . '.' . $name] = $value;
+		    }
 
-                } else {
-                    $result['row_conditions'] = $self['table'] . '.' . $attribute . ' = ' . App_Db::escape($value);
-                }
-			}
+		    $result['row_conditions'] = array_merge(
+	            $result['row_conditions'],
+	            App_Db::get()->getWhere($conditions)
+            );
 		}
 
 		return $result;
@@ -335,7 +335,10 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		$conditions = self::GetQueryConditions($_attributes);
 
 		if ($_row_conditions) {
-			$conditions['row_conditions'] = array_merge($conditions['row_conditions'], $_row_conditions);
+			$conditions['row_conditions'] = array_merge(
+		        $conditions['row_conditions'],
+		        $_row_conditions
+	        );
 		}
 
 		return parent::getList(

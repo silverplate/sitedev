@@ -50,11 +50,11 @@ if (!empty($data['branches'])) {
 
 			if ($isRoot && $isUnique && $isNotCustomUrl) {
 			    $parentId = empty($parent[$i->getId()])
-			              ? 'NULL'
+			              ? null
 			              : $parent[$i->getId()];
 
 				$objects[$i->getId()]->parentId = $parentId;
-				array_push($changed, $i->getId());
+				$changed[] = $i->getId();
 			}
 		}
 	}

@@ -24,15 +24,16 @@ if ($result_items['items']) {
 
 	foreach ($result_items['items'] as $item) {
 		$xml = array();
-		if ($item->GetAttribute(App_Cms_Bo_User::GetPri()) && isset($users[$item->GetAttribute(App_Cms_Bo_User::GetPri())])) {
-			$xml['user'] = $users[$item->GetAttribute(App_Cms_Bo_User::GetPri())]->GetTitle();
+
+		if ($item->boUserId && isset($users[$item->boUserId])) {
+			$xml['user'] = $users[$item->boUserId]->GetTitle();
 
 		} else if ($item->userName) {
 			$xml['user'] = $item->userName;
 		}
 
-		if ($item->GetAttribute(App_Cms_Bo_Section::GetPri()) && isset($sections[$item->GetAttribute(App_Cms_Bo_Section::GetPri())])) {
-			$xml['section'] = $sections[$item->GetAttribute(App_Cms_Bo_Section::GetPri())]->GetTitle();
+		if ($item->boSectionId && isset($sections[$item->boSectionId])) {
+			$xml['section'] = $sections[$item->boSectionId]->GetTitle();
 
 		} else if ($item->sectionName) {
 			$xml['section'] = $item->sectionName;

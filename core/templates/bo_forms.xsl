@@ -275,8 +275,8 @@
 							<input type="text" name="{@name}_last_name" id="form_ele_{@name}" maxlength="255">
 								<xsl:attribute name="value">
 									<xsl:choose>
-										<xsl:when test="error/value/last_name/text()"><xsl:value-of select="error/value/last_name/text()" /></xsl:when>
-										<xsl:otherwise><xsl:value-of select="value/last_name/text()" /></xsl:otherwise>
+										<xsl:when test="error/value/last-name"><xsl:value-of select="error/value/last-name" /></xsl:when>
+										<xsl:otherwise><xsl:value-of select="value/last-name" /></xsl:otherwise>
 									</xsl:choose>
 								</xsl:attribute>
 							</input>
@@ -285,8 +285,8 @@
 							<input type="text" name="{@name}_first_name" id="form_ele_{@name}_first_name" maxlength="255">
 								<xsl:attribute name="value">
 									<xsl:choose>
-										<xsl:when test="error/value/first_name/text()"><xsl:value-of select="error/value/first_name/text()" /></xsl:when>
-										<xsl:otherwise><xsl:value-of select="value/first_name/text()" /></xsl:otherwise>
+										<xsl:when test="error/value/first-name"><xsl:value-of select="error/value/first-name" /></xsl:when>
+										<xsl:otherwise><xsl:value-of select="value/first-name" /></xsl:otherwise>
 									</xsl:choose>
 								</xsl:attribute>
 							</input>
@@ -295,8 +295,8 @@
 							<input type="text" name="{@name}_patronymic_name" id="form_ele_{@name}_patronymic_name" maxlength="255">
 								<xsl:attribute name="value">
 									<xsl:choose>
-										<xsl:when test="error/value/patronymic_name/text()"><xsl:value-of select="error/value/patronymic_name/text()" /></xsl:when>
-										<xsl:otherwise><xsl:value-of select="value/patronymic_name/text()" /></xsl:otherwise>
+										<xsl:when test="error/value/patronymic-name"><xsl:value-of select="error/value/patronymic-name" /></xsl:when>
+										<xsl:otherwise><xsl:value-of select="value/patronymic-name" /></xsl:otherwise>
 									</xsl:choose>
 								</xsl:attribute>
 							</input>

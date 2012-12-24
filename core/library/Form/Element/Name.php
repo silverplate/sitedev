@@ -72,19 +72,19 @@ abstract class Core_Form_Element_Name extends App_Form_Element
             $value = $this->GetValue();
 
             if (isset($value['first_name'])) {
-                $result[$this->Name . '_first_name'] = $value['first_name'];
+                $result['first_name'] = $value['first_name'];
             }
 
             if (isset($value['last_name'])) {
-                $result[$this->Name . '_last_name'] = $value['last_name'];
+                $result['last_name'] = $value['last_name'];
             }
 
             if (isset($value['patronymic_name'])) {
-                $result[$this->Name . '_patronymic_name'] = $value['patronymic_name'];
+                $result['patronymic_name'] = $value['patronymic_name'];
             }
 
             if (isset($value['middle_name'])) {
-                $result[$this->Name . '_middle_name'] = $value['middle_name'];
+                $result['middle_name'] = $value['middle_name'];
             }
 
             return $result;

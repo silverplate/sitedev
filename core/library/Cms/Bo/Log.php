@@ -123,6 +123,7 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 			if ($_conditions['from_date']) {
 				$result['row_conditions'][] = $self['table'] . '.creation_date >= ' . App_Db::escape(date('Y-m-d 00:00:00', $_conditions['from_date']));
 			}
+
 			unset($_conditions['from_date']);
 		}
 
@@ -130,13 +131,21 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 			if ($_conditions['till_date']) {
 				$result['row_conditions'][] = $self['table'] . '.creation_date <= ' . App_Db::escape(date('Y-m-d 23:59:59', $_conditions['till_date']));
 			}
+
 			unset($_conditions['till_date']);
 		}
 
 		if ($_conditions) {
-			foreach ($_conditions as $attribute => $value) {
-				$result['row_conditions'][] = $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . App_Db::Get()->EscapeList($value) . ')' : ' = ' . App_Db::escape($value));
-			}
+		    $conditions = array();
+
+		    foreach ($_conditions as $name => $value) {
+		        $conditions[$self['table'] . '.' . $name] = $value;
+		    }
+
+		    $result['row_conditions'] = array_merge(
+	            $result['row_conditions'],
+	            App_Db::get()->getWhere($conditions)
+            );
 		}
 
 		return $result;

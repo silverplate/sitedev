@@ -2,131 +2,113 @@
 
 abstract class Core_ActiveRecord_Attribute
 {
-    private $Name;
-    private $Type;
-    private $Length;
-    private $Value;
-    private $IsPrimary;
-    private $IsUnique;
+    private $_name;
+    private $_type;
+    private $_length;
+    private $_value;
+    private $_isPrimary;
+    private $_isUnique;
 
-    public function __construct($_name, $_type, $_length = null, $_is_primary = null, $_is_unique = null, $_value = null) {
-        $this->Name = $_name;
-        $this->SetType($_type);
-        $this->Length = $_length;
-        $this->IsPrimary = ($_is_primary);
-        $this->IsUnique = ($_is_unique);
+    public function __construct($_name, $_type, $_length = null, $_isPrimary = null, $_isUnique = null, $_value = null)
+    {
+        $this->_name = $_name;
+        $this->_length = $_length;
+        $this->_isPrimary = (boolean) $_isPrimary;
+        $this->_isUnique = (boolean) $_isUnique;
+
+        $this->setType($_type);
 
         if ($_value) {
-            $this->SetValue($_value);
+            $this->setValue($_value);
         }
     }
 
-    public function SetType($_type) {
-        switch ($_type) {
-            case 'int':
-            case 'integer':
-                $this->Type = 'integer';
-                break;
-            case 'float':
-                $this->Type = 'float';
-                break;
-            case 'bool':
-            case 'boolean':
-                $this->Type = 'boolean';
-                break;
-            case 'char':
-            case 'varchar':
-                $this->Type = 'varchar';
-                break;
-            default:
-                $this->Type = $_type;
-        }
+    public function setType($_type)
+    {
+        $this->_type = $_type == 'char' || $_type == 'varchar'
+                     ? 'string'
+                     : $_type;
     }
 
-    public function GetType() {
-        return $this->Type;
+    public function getType()
+    {
+        return $this->_type;
     }
 
-    public function GetLength() {
-        return $this->Length;
+    public function getLength()
+    {
+        return $this->_length;
     }
 
-    public function SetValue($_value) {
-        if ($_value === 'NULL') {
-            $this->Value = $_value;
+    public function setValue($_value)
+    {
+        if ($_value == 'NULL') {
+            $this->_value = $_value;
             return;
         }
 
-        switch ($this->Type) {
-            case 'int':
+        switch ($this->_type) {
             case 'integer':
-                $this->Value = (int) $_value;
+                $this->_value = (integer) $_value;
                 break;
 
             case 'float':
-                $this->Value = (float) str_replace(',', '.', $_value);
+                $this->_value = Ext_Number::number($_value);
                 break;
 
-            case 'bool':
             case 'boolean':
-                $this->Value = ($_value) ? 1 : 0;
+                $this->_value = $_value ? 1 : 0;
                 break;
 
-            case 'char':
-            case 'varchar':
-            case 'string':
             default:
-                $this->Value = $_value;
+                $this->_value = $_value;
                 break;
         }
     }
 
-    public function GetValue($_is_escape = true) {
-        if ($this->Value == 'NULL') {
-            return $this->Value;
-
-        } else if (
-            $this->Value == '' &&
-            (in_array($this->Type, array('date', 'datetime')))
+    public function getValue($_doEscape = true)
+    {
+        if (
+            $this->_value == 'NULL' || (
+                $this->_value == '' &&
+                in_array($this->getType(), array('date', 'datetime'))
+            )
         ) {
             return 'NULL';
 
-        } else if ($this->Value == '' && $_is_escape) {
+        } else if ($this->_value == '' && $_doEscape) {
             return '\'\'';
 
         } else {
-            switch ($this->Type) {
-                case 'int':
+            switch ($this->_type) {
                 case 'integer':
-                case 'bool':
                 case 'boolean':
-                    return $this->Value;
-
                 case 'float':
-                    return str_replace(',', '.', $this->Value);
+                    return $this->_value;
 
-                case 'char':
-                case 'varchar':
-                case 'string':
                 default:
-                    return ($_is_escape) ? App_Db::escape($this->Value) : $this->Value;
+                    return $_doEscape ? App_Db::escape($this->_value) : $this->_value;
             }
         }
     }
 
-    public function IsValue() {
-        return !((string) $this->Value == '');
+    public function isValue()
+    {
+        return $this->_value !== '';
     }
 
-    public function GetName() {
-        return $this->Name;
+    public function getName()
+    {
+        return $this->_name;
     }
 
-    public function IsPrimary() {
-        return ($this->IsPrimary);
+    public function isPrimary()
+    {
+        return $this->_isPrimary;
     }
 
-    public function IsUnique() {
-        return ($this->IsUnique);
+    public function isUnique()
+    {
+        return $this->_isUnique;
     }
 }

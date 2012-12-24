@@ -165,7 +165,7 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 		if ($links) {
 			foreach ($links as $item) {
 				if ($item->$key) {
-					array_push($result, $item->$key);
+					$result[] = $item->$key;
 				}
 			}
 		}

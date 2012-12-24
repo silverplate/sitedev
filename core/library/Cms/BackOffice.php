@@ -25,7 +25,7 @@ abstract class Core_Cms_BackOffice
             );
 
             foreach ($objects as $item) {
-                array_push($currentSortOrder, $item->sortOrder);
+                $currentSortOrder[] = $item->sortOrder;
             }
 
             foreach ($objects as $item) {

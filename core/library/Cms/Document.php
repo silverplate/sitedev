@@ -250,7 +250,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		$result = array();
 		$entry = App_Db::Get()->GetEntry('SELECT ' . self::GetPri() . ', parent_id FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . App_Db::escape($_id));
 		if ($entry) {
-			array_push($result, $entry[self::GetPri()]);
+			$result[] = $entry[self::GetPri()];
 			if ($entry['parent_id']) $result = array_merge($result, self::GetAncestors($entry['parent_id']));
 		}
 		return $result;
@@ -301,14 +301,14 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 		if (isset($_conditions['navigations'])) {
 			if ($_conditions['navigations']) {
-				array_push($result['tables'], App_Cms_Document_ToNavigation::GetTbl());
-				array_push($result['row_conditions'], $self['pk_attr'] . ' = ' . App_Cms_Document_ToNavigation::GetTbl() . '.' . $self['pk']);
-				array_push($result['row_conditions'], App_Cms_Document_ToNavigation::GetTbl() . '.' . App_Cms_Document_Navigation::GetPri() . (is_array($_conditions['navigations']) ? ' IN (' . App_Db::escape($_conditions['navigations']) . ')' : ' = ' . App_Db::escape($_conditions['navigations'])));
+				$result['tables'][] = App_Cms_Document_ToNavigation::GetTbl();
+				$result['row_conditions'][] = $self['pk_attr'] . ' = ' . App_Cms_Document_ToNavigation::GetTbl() . '.' . $self['pk'];
+				$result['row_conditions'][] = App_Cms_Document_ToNavigation::GetTbl() . '.' . App_Cms_Document_Navigation::GetPri() . (is_array($_conditions['navigations']) ? ' IN (' . App_Db::escape($_conditions['navigations']) . ')' : ' = ' . App_Db::escape($_conditions['navigations']));
 
 				if (isset($_conditions['is_published'])) {
-					array_push($result['tables'], App_Cms_Document_Navigation::GetTbl());
-					array_push($result['row_conditions'], App_Cms_Document_ToNavigation::GetTbl() . '.' . App_Cms_Document_Navigation::GetPri() . ' = ' . App_Cms_Document_Navigation::GetPri(true));
-					array_push($result['row_conditions'], App_Cms_Document_Navigation::GetTbl() . '.is_published = ' . App_Db::escape($_conditions['is_published']));
+					$result['tables'][] = App_Cms_Document_Navigation::GetTbl();
+					$result['row_conditions'][] = App_Cms_Document_ToNavigation::GetTbl() . '.' . App_Cms_Document_Navigation::GetPri() . ' = ' . App_Cms_Document_Navigation::GetPri(true);
+					$result['row_conditions'][] = App_Cms_Document_Navigation::GetTbl() . '.is_published = ' . App_Db::escape($_conditions['is_published']);
 				}
 			}
 			unset($_conditions['navigations']);
@@ -317,22 +317,13 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		if ($_conditions) {
 			foreach ($_conditions as $attribute => $value) {
                 if ($value === 'NULL') {
-                    array_push(
-                        $result['row_conditions'],
-                        'ISNULL(' . $self['table'] . '.' . $attribute . ')'
-                    );
+                    $result['row_conditions'][] =  'ISNULL(' . $self['table'] . '.' . $attribute . ')';
 
                 } else if (is_array($value)) {
-                    array_push(
-                        $result['row_conditions'],
-                        $self['table'] . '.' . $attribute . ' IN (' . App_Db::escape($value) . ')'
-                    );
+                    $result['row_conditions'][] = $self['table'] . '.' . $attribute . ' IN (' . App_Db::escape($value) . ')';
 
                 } else {
-                    array_push(
-                        $result['row_conditions'],
-                        $self['table'] . '.' . $attribute . ' = ' . App_Db::escape($value)
-                    );
+                    $result['row_conditions'] = $self['table'] . '.' . $attribute . ' = ' . App_Db::escape($value);
                 }
 			}
 		}
@@ -359,7 +350,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 	public static function CheckUnique($_parent_id, $_folder, $_except_id = null) {
 		$row_conditions = array();
-		if ($_except_id) array_push($row_conditions, self::GetPri() . ' != ' . App_Db::escape($_except_id));
+		if ($_except_id) $row_conditions[] = self::GetPri() . ' != ' . App_Db::escape($_except_id);
 		return !(self::getList(array('parent_id' => $_parent_id, 'folder' => $_folder), array('count' => 1), $row_conditions));
 	}
 
@@ -393,7 +384,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		if ($links) {
 			foreach ($links as $item) {
 				if ($item->$key) {
-					array_push($result, $item->$key);
+					$result[] = $item->$key;
 				}
 			}
 		}

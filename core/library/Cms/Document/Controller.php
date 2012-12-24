@@ -29,16 +29,16 @@ abstract class Core_Cms_Document_Controller extends Core_Cms_FoPage
             if ($ancestors) $ancestors = array_values(array_diff($ancestors, array($this->Document->GetId())));
 
             if ($ancestors) {
-                array_push($params,
-                '((' . App_Cms_Document::GetPri() . ' IN (' . App_Db::escape($ancestors) . ') AND apply_type_id IN (2, 3)) OR (' .
-                App_Cms_Document::GetPri() . ' = ' . App_Db::escape($this->Document->GetId()) . ' AND apply_type_id IN (1, 3)))'
-                        );
+                $params[] =
+                    '((' . App_Cms_Document::GetPri() . ' IN (' . App_Db::escape($ancestors) . ') AND apply_type_id IN (2, 3)) OR (' .
+                    App_Cms_Document::GetPri() . ' = ' . App_Db::escape($this->Document->GetId()) . ' AND apply_type_id IN (1, 3)))';
+
             } else {
-                array_push($params, '(' . App_Cms_Document::GetPri() . ' = ' . App_Db::escape($this->Document->GetId()) . ' AND apply_type_id IN (1, 3))');
+                $params[] = '(' . App_Cms_Document::GetPri() . ' = ' . App_Db::escape($this->Document->GetId()) . ' AND apply_type_id IN (1, 3))';
             }
 
             if (!is_null(App_Cms_User::GetAuthGroup())) {
-                array_push($params, '(auth_status_id = 0 OR auth_status_id & ' . App_Cms_User::GetAuthGroup() . ')');
+                $params[] = '(auth_status_id = 0 OR auth_status_id & ' . App_Cms_User::GetAuthGroup() . ')';
             }
 
             $data = App_Cms_Document_Data::GetList($conditions, null, $params);
@@ -134,17 +134,17 @@ abstract class Core_Cms_Document_Controller extends Core_Cms_FoPage
                     );
 
                     $controller->execute();
-                    array_push($dataXml, $controller->getXml());
+                    $dataXml[] = $controller->getXml();
 
                 } else {
                     $plainData = new App_Cms_Document_Data_Controller($item);
-                    array_push($dataXml, $plainData->getXml());
+                    $dataXml[] = $plainData->getXml();
                 }
             }
 
             $content = array();
             foreach ($dataXml as $xml) {
-                array_push($content, $xml);
+                $content[] = $xml;
             }
 
             $this->setContent(array_merge($content, $this->getContent()));

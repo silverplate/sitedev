@@ -59,7 +59,7 @@ abstract class Core_Cms_Page
 
 	public function AddSystem($_source) {
 		if ($_source) {
-			array_push($this->System, $_source);
+			$this->System[] = $_source;
 		}
 	}
 
@@ -69,7 +69,7 @@ abstract class Core_Cms_Page
 
 	public function AddContent($_source) {
 		if ($_source) {
-			array_push($this->Content, $_source);
+			$this->Content[] = $_source;
 		}
 	}
 

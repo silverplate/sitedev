@@ -6,11 +6,17 @@ abstract class Core_Form_Element_Multiple extends App_Form_Element
         if (isset($_data[$this->Name])) {
             if (is_array($_data[$this->Name])) {
                 $value = array();
-                foreach ($_data[$this->Name] as $item) array_push($value, $item);
+
+                foreach ($_data[$this->Name] as $item) {
+                    $value[] = $item;
+                }
+
                 return $value;
+
             } else {
                 return array($_data[$this->Name]);
             }
+
         } else {
             return array();
         }

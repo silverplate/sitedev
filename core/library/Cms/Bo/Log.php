@@ -121,21 +121,21 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 
 		if (isset($_conditions['from_date'])) {
 			if ($_conditions['from_date']) {
-				array_push($result['row_conditions'], $self['table'] . '.creation_date >= ' . App_Db::escape(date('Y-m-d 00:00:00', $_conditions['from_date'])));
+				$result['row_conditions'][] = $self['table'] . '.creation_date >= ' . App_Db::escape(date('Y-m-d 00:00:00', $_conditions['from_date']));
 			}
 			unset($_conditions['from_date']);
 		}
 
 		if (isset($_conditions['till_date'])) {
 			if ($_conditions['till_date']) {
-				array_push($result['row_conditions'], $self['table'] . '.creation_date <= ' . App_Db::escape(date('Y-m-d 23:59:59', $_conditions['till_date'])));
+				$result['row_conditions'][] = $self['table'] . '.creation_date <= ' . App_Db::escape(date('Y-m-d 23:59:59', $_conditions['till_date']));
 			}
 			unset($_conditions['till_date']);
 		}
 
 		if ($_conditions) {
 			foreach ($_conditions as $attribute => $value) {
-				array_push($result['row_conditions'], $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . App_Db::Get()->EscapeList($value) . ')' : ' = ' . App_Db::escape($value)));
+				$result['row_conditions'][] = $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . App_Db::Get()->EscapeList($value) . ')' : ' = ' . App_Db::escape($value));
 			}
 		}
 

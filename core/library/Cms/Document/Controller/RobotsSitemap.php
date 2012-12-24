@@ -22,7 +22,7 @@ abstract class Core_Cms_Document_Controller_RobotsSitemap extends App_Cms_Docume
             $sitemapXml = '';
 
             foreach ($documents as $document) {
-                array_push($sitemap, self::getSitemapItemFromDocument($document));
+                $sitemap[] = self::getSitemapItemFromDocument($document);
 
                 if ($document->$controllerKey) {
                     if (!isset($controllers[$document->$controllerKey])) {
@@ -37,7 +37,7 @@ abstract class Core_Cms_Document_Controller_RobotsSitemap extends App_Cms_Docume
                         if (method_exists($class, 'getRobotsSitemapItems')) {
                             $list = call_user_func_array(array($class, 'getRobotsSitemapItems'), array());
                             foreach ($list as $item) {
-                                array_push($sitemap, self::getSitemapItem($item['uri'], '0.8'));
+                                $sitemap[] = self::getSitemapItem($item['uri'], '0.8');
                             }
                         }
                     }

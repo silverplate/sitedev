@@ -125,7 +125,7 @@ abstract class Core_DbMapper
             $key = $pri == $keys[0] ? $keys[1] : $keys[0];
 
             foreach ($this->getLinks($_name, $_isPublished) as $item) {
-                array_push($result, $item->$key);
+                $result[] = $item->$key;
             }
         }
 

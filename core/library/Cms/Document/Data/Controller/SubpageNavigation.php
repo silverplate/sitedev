@@ -23,7 +23,7 @@ extends App_Cms_Document_Data_Controller
                         $except[$attr->name] = array();
                     }
 
-                    array_push($except[$attr->name], $attr->value);
+                    $except[$attr->name][] = $attr->value;
                 }
             }
 
@@ -33,7 +33,7 @@ extends App_Cms_Document_Data_Controller
                         $append[$attr->name] = array();
                     }
 
-                    array_push($append[$attr->name], $attr->value);
+                    $append[$attr->name][] = $attr->value;
                 }
             }
         }
@@ -43,7 +43,7 @@ extends App_Cms_Document_Data_Controller
                        'is_published' => 1);
 
         foreach ($except as $attr => $value) {
-            array_push($rowConds, $attr . ' != ' . App_Db::escape($value));
+            $rowConds[] = $attr . ' != ' . App_Db::escape($value);
         }
 
         $children = App_Cms_Document::getList($conds, null, $rowConds);

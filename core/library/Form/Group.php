@@ -27,7 +27,7 @@ abstract class Core_Form_Group
     }
 
     public function AddElement(&$_element) {
-        array_push($this->Elements, $_element);
+        $this->Elements[] = $_element;
     }
 
     public function DeleteElement($_name) {

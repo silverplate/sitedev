@@ -85,28 +85,32 @@ abstract class Core_Form_Element
     }
 
     public function AddOptionGroup($_label) {
-        array_push($this->OptionGroups, $_label);
+        $this->OptionGroups[] = $_label;
         return count($this->OptionGroups) - 1;
     }
 
     public function AddOption($_value, $_label, $_group = null) {
         if (is_null($_group)) {
-            array_push($this->Options, array('value' => $_value, 'label' => $_label));
+            $this->Options[] = array('value' => $_value, 'label' => $_label);
+
         } else {
             if (!isset($this->Options[$_group])) {
                 $this->Options[$_group] = array();
             }
-            array_push($this->Options[$_group], array('value' => $_value, 'label' => $_label));
+
+            $this->Options[$_group][] = array('value' => $_value, 'label' => $_label);
         }
     }
 
     public function RemoveOption($_value) {
         $options = array();
+
         for ($i = 0; $i < count($this->Options); $i++) {
             if ($this->Options[$i]['value'] != $_value) {
-                array_push($options, $this->Options[$i]);
+                $options[] = $this->Options[$i];
             }
         }
+
         $this->Options = $options;
     }
 

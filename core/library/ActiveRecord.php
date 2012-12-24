@@ -150,18 +150,16 @@ abstract class Core_ActiveRecord
 
         foreach ($_attributes as $attribute => $value) {
             if ($value === 'NULL') {
-                array_push($conditions, 'ISNULL(' . $attribute . ')');
+                $conditions[] = 'ISNULL(' . $attribute . ')';
 
 //             } else if (!$value) {
-//                 array_push($conditions, "$attribute = ''");
+//                 $conditions[] = "$attribute = ''";
 
             } else if (is_array($value)) {
-                array_push($conditions,
-                           $attribute . ' IN (' . App_Db::escape($value) . ')');
+                $conditions[] = $attribute . ' IN (' . App_Db::escape($value) . ')';
 
             } else {
-                array_push($conditions,
-                           $attribute . ' = ' . App_Db::escape($value));
+                $conditions[] = $attribute . ' = ' . App_Db::escape($value);
             }
         }
 
@@ -198,7 +196,7 @@ abstract class Core_ActiveRecord
 
         foreach ($this->_attributes as $item) {
             if ($item->isPrimary()) {
-                array_push($keys, $item);
+                $keys[] = $item;
             }
         }
 
@@ -222,9 +220,11 @@ abstract class Core_ActiveRecord
 
             if (is_array($keys)) {
                 $names = array();
+
                 foreach ($keys as $key) {
-                    array_push($names, $table . $key->getName());
+                    $names[] = $table . $key->getName();
                 }
+
                 if ($names) return $names;
 
             } else {
@@ -258,12 +258,12 @@ abstract class Core_ActiveRecord
                         $value = $key[$i]->getSqlValue();
                     }
 
-                    array_push($conditions, $key[$i]->getName() . ' = ' . $value);
+                    $conditions[] = $key[$i]->getName() . ' = ' . $value;
                 }
 
             } else {
                 $value = is_null($_value) ? $key->getSqlValue() : App_Db::escape($_value);
-                array_push($conditions, $key->getName() . ' = ' . $value);
+                $conditions[] = $key->getName() . ' = ' . $value;
             }
         }
 
@@ -282,8 +282,9 @@ abstract class Core_ActiveRecord
 
         if (is_array($key)) {
             $value = array();
+
             foreach ($key as $item) {
-                array_push($value, array($item->getName() => $item->getValue()));
+                $value[] = array($item->getName() => $item->getValue());
             }
 
         } else {
@@ -593,7 +594,8 @@ abstract class Core_ActiveRecord
                 }
 
                 if (is_array($obj->getId())) {
-                    array_push($result, $obj);
+                    $result[] = $obj;
+
                 } else {
                     $result[$obj->getId()] = $obj;
                 }

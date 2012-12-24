@@ -11,18 +11,18 @@ abstract class Core_Form_Element_AddingFiles extends Core_Form_Element
                 if (is_array($data['name']) && is_array($data['tmp_name'])) {
                     for ($i = 0; $i < count($data['name']); $i++) {
                         if (isset($data['name'][$i]) && $data['name'][$i] && isset($data['tmp_name'][$i]) && $data['tmp_name'][$i]) {
-                            array_push($value, array(
+                            $value[] = array(
                                 'name' => $data['name'][$i],
                                 'tmp_name' => $data['tmp_name'][$i]
-                            ));
+                            );
                         }
                     }
 
                 } else if ($data['name'] && $data['tmp_name']) {
-                    array_push($value, array(
+                    $value[] = array(
                         'name' => $data['name'],
                         'tmp_name' => $data['tmp_name']
-                    ));
+                    );
                 }
             }
 
@@ -61,7 +61,7 @@ abstract class Core_Form_Element_AddingFiles extends Core_Form_Element
                         $result = array();
                         foreach ($value as $file) {
                             if (isset($file['name'])) {
-                                array_push($result, Ext_File::normalizeName($file['name']));
+                                $result[] = Ext_File::normalizeName($file['name']);
                             }
                         }
                         if ($result) {

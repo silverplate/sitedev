@@ -128,7 +128,7 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 		$result = array('tables' => array($self['table']), 'row_conditions' => array());
 
 		foreach ($_conditions as $attribute => $value) {
-			array_push($result['row_conditions'], $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . App_Db::Get()->EscapeList($value) . ')' : ' = ' . App_Db::escape($value)));
+			$result['row_conditions'][] = $self['table'] . '.' . $attribute . (is_array($value) ? ' IN (' . App_Db::Get()->EscapeList($value) . ')' : ' = ' . App_Db::escape($value));
 		}
 
 		return $result;
@@ -207,7 +207,7 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 		if ($links) {
 			foreach ($links as $item) {
 				if ($item->$key) {
-					array_push($result, $item->$key);
+					$result[] = $item->$key;
 				}
 			}
 		}

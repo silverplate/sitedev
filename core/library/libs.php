@@ -166,7 +166,7 @@ function getAdvMailParams()
 {
     $result = array();
     $params = getAdvParams();
-    array_push($params, 'HTTP_REFERER');
+    $params[] = 'HTTP_REFERER';
 
     foreach ($params as $item) {
         $value = advGetCookie($item);

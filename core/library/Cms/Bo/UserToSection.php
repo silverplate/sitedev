@@ -30,30 +30,30 @@ abstract class Core_Cms_Bo_UserToSection extends App_ActiveRecord
 
 		if (isset($attributes[self::getFirstKey()])) {
 			if (is_array($_attributes[self::getFirstKey()])) {
-				array_push($row_conditions, self::GetTbl() . '.' . self::getFirstKey() . ' IN (' . App_Db::Get()->EscapeList($_attributes[self::getFirstKey()]) . ')');
+				$row_conditions[] = self::GetTbl() . '.' . self::getFirstKey() . ' IN (' . App_Db::Get()->EscapeList($_attributes[self::getFirstKey()]) . ')';
 			} else {
-				array_push($row_conditions, self::GetTbl() . '.' . self::getFirstKey() . ' = ' . App_Db::escape($_attributes[self::getFirstKey()]));
+				$row_conditions[] = self::GetTbl() . '.' . self::getFirstKey() . ' = ' . App_Db::escape($_attributes[self::getFirstKey()]);
 			}
 			unset($attributes[self::getFirstKey()]);
 		}
 
 		if (isset($attributes[self::GetSecondKey()])) {
 			if (is_array($_attributes[self::GetSecondKey()])) {
-				array_push($row_conditions, self::GetTbl() . '.' . self::GetSecondKey() . ' IN (' . App_Db::Get()->EscapeList($_attributes[self::GetSecondKey()]) . ')');
+				$row_conditions[] = self::GetTbl() . '.' . self::GetSecondKey() . ' IN (' . App_Db::Get()->EscapeList($_attributes[self::GetSecondKey()]) . ')';
 			} else {
-				array_push($row_conditions, self::GetTbl() . '.' . self::GetSecondKey() . ' = ' . App_Db::escape($_attributes[self::GetSecondKey()]));
+				$row_conditions[] = self::GetTbl() . '.' . self::GetSecondKey() . ' = ' . App_Db::escape($_attributes[self::GetSecondKey()]);
 			}
 			unset($attributes[self::GetSecondKey()]);
 		}
 
 		if (isset($attributes['is_published'])) {
-			array_push($tables, self::GetFirstKeyTable());
-			array_push($row_conditions, self::GetFirstKeyTable() . '.status_id ' . ($attributes['is_published'] == 1 ? ' = 1' : ' != 1'));
-			array_push($row_conditions, self::getFirstKey(true) . ' = ' . self::GetTbl() . '.' . self::getFirstKey());
+			$tables[] = self::GetFirstKeyTable();
+			$row_conditions[] = self::GetFirstKeyTable() . '.status_id ' . ($attributes['is_published'] == 1 ? ' = 1' : ' != 1');
+			$row_conditions[] = self::getFirstKey(true) . ' = ' . self::GetTbl() . '.' . self::getFirstKey();
 
-			array_push($tables, self::GetSecondKeyTable());
-			array_push($row_conditions, self::GetSecondKeyTable() . '.is_published = ' . App_Db::escape($attributes['is_published']));
-			array_push($row_conditions, self::GetSecondKey(true) . ' = ' . self::GetTbl() . '.' . self::GetSecondKey());
+			$tables[] = self::GetSecondKeyTable();
+			$row_conditions[] = self::GetSecondKeyTable() . '.is_published = ' . App_Db::escape($attributes['is_published']);
+			$row_conditions[] = self::GetSecondKey(true) . ' = ' . self::GetTbl() . '.' . self::GetSecondKey();
 
 			unset($attributes['is_published']);
 		}

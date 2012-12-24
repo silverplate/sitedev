@@ -20,8 +20,6 @@ define('MODELS', WD . 'models/');
 define('DATA_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Data/Controller/');
 define('DOCUMENT_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Controller/');
 
-require_once 'strings.php';
-require_once 'files.php';
 
 /**
  * Файлы классов могут находиться в папках ~/core/library, ~/library, ~/models.
@@ -256,4 +254,165 @@ function debug($_var)
         echo '</pre>';
         echo PHP_EOL;
     }
+}
+
+function goToUrl($_url)
+{
+	header('Location: ' . $_url);
+	exit;
+}
+
+function reload($_append = null)
+{
+//     $uri = empty($_SERVER['REQUEST_URI'])
+//          ? './'
+//          : preg_replace('/\?.*$/', '', $_SERVER['REQUEST_URI']);
+//
+//     goToUrl($uri . $_append);
+
+    goToUrl('./' . $_append);
+}
+
+function documentNotFound()
+{
+    header('HTTP/1.0 404 Not Found');
+
+    if (class_exists('App_Cms_Document')) {
+        $realUrl = parse_url($_SERVER['REQUEST_URI']);
+        $document = App_Cms_Document::load(get_lang_inner_uri() . 'not-found/', 'uri');
+
+        if ($document) {
+            if (
+                $document->getAttribute('link') &&
+                $document->getAttribute('link') != $realUrl['path']
+            ) {
+                goToUrl($document->getAttribute('link'));
+
+            } else if (
+                $document->getController() && (
+                    $document->getAttribute('is_published') == 1 ||
+                    (defined('IS_SHOW_HIDDEN') && IS_SHOW_HIDDEN)
+                )
+            ) {
+                $controller = App_Cms_Document::initController($document->getController(), $document);
+                $controller->execute();
+                $controller->output();
+                exit();
+            }
+        }
+    }
+
+    echo '<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1>';
+    echo '<p>The requested URL ' . $_SERVER['REQUEST_URI'] . ' was not found on this server.</p><hr />';
+    echo '<i>' . $_SERVER['SERVER_SOFTWARE'] . ' at ' . $_SERVER['SERVER_NAME'] . ' Port ' . $_SERVER['SERVER_PORT'] . '</i>';
+    echo '</body></html>';
+    exit();
+}
+
+function traceTime($_function, $_label = null)
+{
+    global $gReceptacle;
+
+    if (!$gReceptacle) $gReceptacle = array();
+
+    list($msec, $sec) = explode(' ', microtime());
+    $now = ((float) $msec + (float) $sec);
+    $i = 0;
+
+    while (true) {
+        $func = $i == 0 ? $_function : "$_function \{$i\}";
+
+        if (!isset($gReceptacle[$func])) {
+            $open = $isGlobal = false;
+            $level = 0;
+
+            foreach ($gReceptacle as $key => $value) {
+                if ($value['is_global']) {
+                    $isGlobal = true;
+                }
+
+                if (is_null($value['finish'])) {
+                    $level++;
+                    if (!$open) $open = $key;
+                }
+            }
+
+            if (!$isGlobal && $open) {
+                $gReceptacle[$open]['is_global'] = true;
+            }
+
+            $gReceptacle[$func] = array(
+                'start' => $now,
+                'finish' => null,
+                'label' => $_label,
+                'is_global' => false,
+                'level' => $level
+            );
+
+            break;
+
+        } else if (!$gReceptacle[$func]['finish']) {
+            $gReceptacle[$func]['finish'] = $now;
+
+            if ($_label) {
+                $gReceptacle[$func]['label'] = $_label;
+            }
+
+            break;
+
+        } else {
+            $i++;
+        }
+    }
+}
+
+function traceTimeGetReport($_format = 'html')
+{
+    global $gReceptacle;
+
+    $result = '';
+    $nl = $_format != 'html' ? PHP_EOL : '<br>';
+    $lv = $_format != 'html' ? "\t" : '&bull;&nbsp;';
+
+    if ($gReceptacle) {
+        $globalTime = null;
+
+        foreach ($gReceptacle as $name => $item) {
+            if ($item['is_global']) {
+                $globalTime = $item['finish'] - $item['start'];
+                break;
+            }
+        }
+
+        foreach ($gReceptacle as $name => $item) {
+            $time = $item['finish'] - $item['start'];
+
+            if ($time > 3600) {
+                $timeTaken = Ext_Number::format($time / 3600, 2) . ' hours';
+
+            } else if ($time > 60) {
+                $timeTaken = Ext_Number::format($time / 60, 2) . ' minutes';
+
+            } else {
+                $timeTaken = Ext_Number::format($time, 6) . ' seconds';
+            }
+
+            if ($item['level']) {
+                for ($i = 0; $i < $item['level']; $i++) {
+                    $result .= $lv;
+                }
+            }
+
+            $result .= ($item['label'] ? "{$item['label']} ($name)" : $name) .
+                       ': ' . $timeTaken;
+
+            if ($globalTime && $globalTime != $time) {
+                $result .= ' (' . Ext_Number::format(($time * 100) / $globalTime, 2) . '%)';
+            }
+
+            $result .= $nl;
+        }
+    }
+
+    return $result;
 }

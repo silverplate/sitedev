@@ -119,8 +119,8 @@ abstract class Core_Cms_Cache
 			if (isset($path['basename']) && $path['basename'] == 'index.html') {
 				$this->File .= $path['dirname'] . '/';
 
-			} elseif(isset($path['basename']) && isset($path['extension'])) {
-				$this->File .= $path['dirname'] . '/' . get_file_name($path['basename']) . '/';
+			} else if (isset($path['basename']) && isset($path['extension'])) {
+				$this->File .= $path['dirname'] . '/' . Ext_File::computeName($path['basename']) . '/';
 
 			} else {
 				$this->File .= $this->GetRequestPath();
@@ -147,27 +147,30 @@ abstract class Core_Cms_Cache
 		return self::IsCache() ? file_get_contents($this->GetFile()) : false;
 	}
 
-	function Set($_content) {
-		create_directory(dirname($this->GetFile()), true);
-		write_file($this->GetFile(), $_content);
+	public function set($_content)
+	{
+	    Ext_File::createDir(dirname($this->getFile()));
+	    Ext_File::write($this->getFile(), $_content);
 	}
 
 	function DeletePage() {
 		if (is_file($this->GetFile())) {
 			unlink($this->GetFile());
-
 			$path = dirname($this->GetFile());
-			if (is_directory_empty($path)) {
-				remove_directory($path);
+
+		    if (Ext_File::isDirEmpty($path)) {
+			    Ext_File::deleteDir($path);
 			}
 		}
 	}
 
-	function EmptyPage() {
-		empty_directory(dirname($this->GetFile()), true);
+	public function emptyPage()
+	{
+	    return Ext_File::deleteDir(dirname($this->getFile()), false, true);
 	}
 
-	public function EmptyCache() {
-		empty_directory($this->Path);
+	public function emptyCache()
+	{
+		return Ext_File::deleteDir($this->Path, false);
 	}
 }

@@ -22,7 +22,7 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 	public function UploadFile($_name, $_tmp_name) {
 		if ($_name && $_tmp_name) {
 		    $name = Ext_File::normalizeName($_name);
-			create_directory($this->GetFileFolder(), true);
+		    Ext_File::createDir($this->getFileFolder());
 			move_uploaded_file($_tmp_name, $this->GetFileFolder() . $name);
 			@chmod($this->GetFileFolder() . $name, 0777);
 		}

@@ -37,10 +37,13 @@ abstract class Core_Form_Element_Image extends App_Form_Element
         if ($this->IsRequired && (!$_value || !isset($_value['name']) || !isset($_value['tmp_name']) || !$_value['name'] || !$_value['tmp_name'])) {
             return FIELD_ERROR_REQUIRED;
 
-        } elseif (!($_value && isset($_value['name']) && isset($_value['tmp_name']) && $_value['name'] && $_value['tmp_name'])) {
+        } else if (!($_value && isset($_value['name']) && isset($_value['tmp_name']) && $_value['name'] && $_value['tmp_name'])) {
             return FIELD_NO_UPDATE;
 
-        } elseif (!in_array(strtolower(get_file_extension($_value['name'])), array('jpg', 'gif', 'png')) || !getimagesize($_value['tmp_name'])) {
+        } else if (
+            !Ext_Image::isImageExt(Ext_File::computeExt($_value['name'])) ||
+            !getimagesize($_value['tmp_name'])
+        ) {
             return FIELD_ERROR_SPELLING;
 
         } else {

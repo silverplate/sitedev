@@ -76,9 +76,9 @@ abstract class Core_Cms_Document_Controller extends Core_Cms_FoPage
                                     $image = null;
 
                                     if ($data_image->hasAttribute('alias-uri')) {
-                                        $filepath = get_file_by_name(
-                                                rtrim(DOCUMENT_ROOT, '/') . $data_image->getAttribute('alias-uri'),
-                                                $data_image->getAttribute('alias')
+                                        $filepath = Ext_File::getByName(
+                                            rtrim(DOCUMENT_ROOT, '/') . $data_image->getAttribute('alias-uri'),
+                                            $data_image->getAttribute('alias')
                                         );
 
                                         if ($filepath) {
@@ -98,9 +98,9 @@ abstract class Core_Cms_Document_Controller extends Core_Cms_FoPage
                             foreach ($data_files as $data_file) {
                                 if ($data_file->hasAttribute('alias')) {
                                     if ($data_file->hasAttribute('alias-uri')) {
-                                        $filepath = get_file_by_name(
-                                                rtrim(DOCUMENT_ROOT, '/') . $data_file->getAttribute('alias-uri'),
-                                                $data_file->getAttribute('alias')
+                                        $filepath = Ext_File::getByName(
+                                            rtrim(DOCUMENT_ROOT, '/') . $data_file->getAttribute('alias-uri'),
+                                            $data_file->getAttribute('alias')
                                         );
 
                                         if ($filepath) {

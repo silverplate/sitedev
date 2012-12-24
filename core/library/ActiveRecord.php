@@ -439,7 +439,7 @@ abstract class Core_ActiveRecord
                 }
             }
 
-            if (is_directory_empty($this->GetImagePath())) {
+            if (Ext_File::isDirEmpty($this->getImagePath())) {
                 rmdir($this->GetImagePath());
             }
         }
@@ -462,9 +462,9 @@ abstract class Core_ActiveRecord
         $obj = new $class_name($_table);
 
         if ($_is_log) {
-            $log_file = LIBRARIES . get_file_name(__FILE__) . '.txt';
-            write_file($log_file, $_table . "\r\r", 'append');
-            write_file($log_file, 'self::$Base = new App_ActiveRecord(self::TABLE);' . "\r", 'append');
+            $log_file = LIBRARIES . Ext_File::computeName(__FILE__) . '.txt';
+            Ext_File::write($log_file, $_table . "\r\r", 'append');
+            Ext_File::write($log_file, 'self::$Base = new App_ActiveRecord(self::TABLE);' . "\r", 'append');
         }
 
         $attributes = App_Db::Get()->GetList('SHOW COLUMNS FROM ' . $_table);
@@ -483,14 +483,14 @@ abstract class Core_ActiveRecord
             }
 
             if ($_is_log) {
-                write_file($log_file, 'self::$Base->AddAttribute(\'' . $item['Field'] . '\', \'' . $type . '\', ' . (($length) ? $length : 'null') . ', ' . ((strpos($item['Key'], 'PRI') !== false) ? 'true' : 'false') . ', ' . ((strpos($item['Key'], 'UNI') !== false) ? 'true' : 'false') . ');' . "\r", 'append');
+                Ext_File::write($log_file, 'self::$Base->AddAttribute(\'' . $item['Field'] . '\', \'' . $type . '\', ' . (($length) ? $length : 'null') . ', ' . ((strpos($item['Key'], 'PRI') !== false) ? 'true' : 'false') . ', ' . ((strpos($item['Key'], 'UNI') !== false) ? 'true' : 'false') . ');' . "\r", 'append');
             }
 
             $obj->AddAttribute($item['Field'], $type, $length, (strpos($item['Key'], 'PRI') !== false), (strpos($item['Key'], 'UNI') !== false), null);
         }
 
         if ($_is_log) {
-            write_file($log_file, "\r", 'append');
+            Ext_File::write($log_file, "\r", 'append');
         }
 
         if ($_id) {

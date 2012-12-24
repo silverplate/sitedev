@@ -92,7 +92,7 @@ abstract class Core_Cms_Controller extends App_ActiveRecord
 		App_Db::Get()->Execute('UPDATE ' . App_Cms_Document::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . App_Db::escape($this->GetId()));
 		App_Db::Get()->Execute('UPDATE ' . App_Cms_Document_Data::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . App_Db::escape($this->GetId()));
 
-		remove_file($this->GetFilename());
+		Ext_File::deleteFile($this->getFilename());
 		parent::Delete();
 	}
 

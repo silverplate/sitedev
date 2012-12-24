@@ -52,15 +52,22 @@ if ($page->IsAuthorized()) {
 					if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
 						$obj->Create();
 						if (!is_file($obj->GetFilename()) || $form->Elements['content']->GetValue() != '') {
-							write_file(
-								$obj->GetFilename(),
+							Ext_File::write(
+							    $obj->getFilename(),
 								$form->Elements['content']->GetValue()
 							);
 						}
+
 						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+
 					} else {
 						$obj->Update();
-						write_file($obj->GetFilename(), $form->Elements['content']->GetValue());
+
+						Ext_File::write(
+						    $obj->getFilename(),
+						    $form->Elements['content']->GetValue()
+						);
+
 						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
 					}
 

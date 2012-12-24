@@ -160,27 +160,10 @@ abstract class Core_Form_Element
             $xml .= '</value>';
         }
 
-//         if ('' != $this->GetDescription() || 'adding_files' == $this->GetType()) {
-        if ($this->getDescription() != '') {
-            $xml .= '<description><![CDATA[';
-
-//             if ('' != $this->GetDescription()) {
-                $xml .= $this->getDescription();
-//             }
-//
-//             if ('adding_files' == $this->GetType()) {
-//                 if ('' != $this->GetDescription()) {
-//                     $xml .= ' ';
-//                 }
-//
-//                 $xml .=
-//                     'Суммарный размер за&nbsp;один раз загружаемых файлов не&nbsp;должен превышать ' .
-//                     get_max_upload_size() .
-//                     '&nbsp;МБ.';
-//             }
-
-            $xml .= ']]></description>';
-        }
+        Ext_Xml::append(
+            $xml,
+            Ext_Xml::notEmptyCdata('description', $this->getDescription())
+        );
 
         if ($this->Options) {
             $xml .= '<options>';

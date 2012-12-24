@@ -11,7 +11,7 @@ if (!empty($g_user) && isset($_POST['f']) && is_file($_POST['f'])) {
     $dir = dirname($_POST['f']);
 
     if (Ext_File::isDirEmpty($dir)) {
-        Ext_File::removeDir($dir);
+        Ext_File::deleteDir($dir);
     }
 
 	$result = 1;

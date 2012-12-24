@@ -355,11 +355,11 @@ abstract class Core_Form
 					}
 
 					if ($isUpload) {
-						create_directory($uploadDir, true);
+					    Ext_File::createDir($uploadDir);
 
 						switch ($_fileNameType) {
 							case 'field':
-								$fileName = $item->getName() . '.' . strtolower(get_file_extension($value['name']));
+								$fileName = $item->getName() . '.' . strtolower(Ext_File::computeExt($value['name']));
 								break;
 
 							case 'real':
@@ -373,7 +373,7 @@ abstract class Core_Form
 						$uploaded[$item->getName()] = $uploadDir . $fileName;
 					}
 
-					if (is_directory_empty($uploadDir)) {
+					if (Ext_File::isDirEmpty($uploadDir)) {
 					    rmdir($uploadDir);
 					}
 				}

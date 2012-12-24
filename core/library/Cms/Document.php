@@ -23,7 +23,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 	public function UploadFile($_name, $_tmp_name) {
 		if ($_name && $_tmp_name) {
 			$name = Ext_File::normalizeName($_name);
-			create_directory($this->GetFilePath(), true);
+			Ext_File::createDir($this->getFilePath());
 			move_uploaded_file($_tmp_name, $this->GetFilePath() . $name);
 			@chmod($this->GetFilePath() . $name, 0777);
 		}
@@ -186,8 +186,9 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 	public function Update() {
 		$path = $this->GetFilePath();
 		$this->ComputeUri();
+
 		if ($path != $this->GetFilePath() && is_dir($path)) {
-			move_directory($path, $this->GetFilePath());
+		    Ext_File::moveDir($path, $this->getFilePath());
 		}
 
 		parent::Update();
@@ -203,8 +204,8 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 			$item->Delete();
 		}
 
-		remove_directory($this->GetFilePath());
-		parent::Delete();
+		Ext_File::deleteDir($this->getFilePath());
+		parent::delete();
 	}
 
 	public function IsChildren($_except_id = null) {

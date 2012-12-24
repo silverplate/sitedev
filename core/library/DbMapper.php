@@ -301,7 +301,7 @@ abstract class Core_DbMapper
 
         if (
             method_exists($this, 'getFilePath') &&
-            is_directory_empty($this->getFilePath())
+            Ext_File::isDirEmpty($this->getFilePath())
         ) {
             rmdir($this->getFilePath());
         }

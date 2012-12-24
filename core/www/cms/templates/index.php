@@ -21,7 +21,7 @@ if ($page->isAuthorized()) {
         $form->load('form.xml');
 
         if ($obj->getId()) {
-            $form->fillFields($obj->getDb()->getAttributeValues());
+            $form->fillFields($obj->getDb()->toArray());
             $form->Elements['content']->setValue($obj->getContent());
 
             $form->createButton('Сохранить', 'update');
@@ -34,7 +34,7 @@ if ($page->isAuthorized()) {
         $form->execute();
 
         if ($form->UpdateStatus == FORM_UPDATED) {
-            $obj->getDb()->dataInit($form->getSqlValues());
+            $obj->getDb()->fillWithData($form->getSqlValues());
 
             if (
                 isset($form->Buttons['delete']) &&
@@ -128,7 +128,7 @@ if ($page->isAuthorized()) {
         $page->addContent($module);
 
     } else {
-        $about = $g_section->getAttribute('description') ? '<p class="first">' . $g_section->getAttribute('description') . '</p>' : '';
+        $about = $g_section->description ? '<p class="first">' . $g_section->description . '</p>' : '';
         $page->addContent('<module type="simple" is_able_to_add="true">' . $listXml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
     }
 }

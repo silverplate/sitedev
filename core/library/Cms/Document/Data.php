@@ -12,8 +12,8 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 	}
 
 	public function CheckApplyType() {
-		if (!in_array((int) $this->GetAttribute('apply_type_id'), array_keys(self::GetApplyTypes()))) {
-			$this->SetAttribute('apply_type_id', 1);
+		if (!in_array((int) $this->applyTypeId, array_keys(self::GetApplyTypes()))) {
+			$this->applyTypeId = 1;
 		}
 	}
 
@@ -28,7 +28,7 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 	}
 
 	public function GetParsedContent($_content) {
-		switch ($this->GetAttribute(App_Cms_Document_Data_ContentType::GetPri())) {
+		switch ($this->foDataContentTypeId) {
 			case 'integer': return (int) $_content;
 			case 'float':   return (float) $_content;
 			default:        return Ext_Xml::decodeCdata($_content);
@@ -36,11 +36,12 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 	}
 
 	public function GetTypeId() {
-		return $this->GetAttribute(App_Cms_Document_Data_ContentType::GetPri());
+		return $this->foDataContentTypeId;
 	}
 
-	public function SetTypeId($_type_id) {
-		return $this->SetAttribute(App_Cms_Document_Data_ContentType::GetPri(), $_type_id);
+	public function SetTypeId($_id)
+	{
+		return $this->foDataContentTypeId = $_id;
 	}
 
 	public function getXml($_additional_xml = null) {
@@ -50,15 +51,15 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 			$result .= ' type_id="' . $this->GetTypeId() . '"';
 		}
 
-		if ($this->GetAttribute('tag')) {
-			$result .= ' tag="' . $this->GetAttribute('tag') . '"';
+		if ($this->tag) {
+			$result .= ' tag="' . $this->tag . '"';
 		}
 
-		if ($this->GetAttribute('is_published') == 1) {
+		if ($this->isPublished) {
 			$result .= ' is_published="true"';
 		}
 
-		if ($this->GetAttribute('is_mount') == 1) {
+		if ($this->isMount) {
 			$result .= ' is_mount="true"';
 		}
 
@@ -70,12 +71,16 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 		    $result .= Ext_Xml::cdata('controller', $this->getController()->getTitle());
 		}
 
-		$result .= Ext_Xml::notEmptyCdata('content', $this->getAttribute('content'));
+		$result .= Ext_Xml::notEmptyCdata('content', $this->content);
 
-		if (IS_USERS && $this->GetAttribute('auth_status_id') != App_Cms_User::AUTH_GROUP_ALL && App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))) {
+		if (
+		    IS_USERS &&
+		    $this->authStatusId != App_Cms_User::AUTH_GROUP_ALL &&
+		    App_Cms_User::GetAuthGroupTitle($this->authStatusId)
+		) {
 			$result .= Ext_Xml::cdata(
 		        'auth-group',
-		        App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))
+		        App_Cms_User::GetAuthGroupTitle($this->authStatusId)
 	        );
 		}
 
@@ -88,9 +93,9 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 
 	public function GetController() {
 		if (is_null($this->Controller)) {
-			$this->Controller = $this->GetAttribute(App_Cms_Controller::GetPri())
-				? App_Cms_Controller::load($this->GetAttribute(App_Cms_Controller::GetPri()))
-				: false;
+			$this->Controller = $this->foControllerId
+				              ? App_Cms_Controller::load($this->foControllerId)
+				              : false;
 		}
 
 		return $this->Controller;
@@ -155,7 +160,7 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 		return parent::getList(
 			get_called_class(),
 			self::GetTbl(),
-			self::GetBase()->GetAttributes(),
+			self::GetBase()->getAttrNames(),
 			$_attributes,
 			$_parameters,
 			$_row_conditions

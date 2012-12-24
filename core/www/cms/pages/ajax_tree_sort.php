@@ -26,26 +26,26 @@ if (!empty($data['branches'])) {
 		$k = 0;
 		foreach ($objects as $j) {
 			if (in_array($j->getId(), $data['branch_' . $i])) {
-				$order[++$k] = $j->getAttribute('sort_order');
+				$order[++$k] = $j->sortOrder;
 			}
 		}
 
 		for ($j = 0; $j < count($data['branch_' . $i]); $j++) {
 			$id = $data['branch_' . $i][$j];
-			$objects[$id]->setAttribute('sort_order', $order[$newOrder[$id]]);
+			$objects[$id]->sortOrder = $order[$newOrder[$id]];
 			array_push($changed, $id);
 		}
 	}
 
 	foreach ($objects as $i) {
 		if (isset($parent[$i->getId()])) {
-			$isRoot = $i->getAttribute('folder') != '/'
+			$isRoot = $i->folder != '/'
 			       || $parent[$i->getId()] == '';
 
 			$isUnique = App_Cms_Document::checkUnique($parent[$i->getId()],
-			                                  $i->getAttribute('folder'), $i->getId());
+			                                  $i->folder, $i->getId());
 
-			$isNotCustomUrl = empty($gCustomUrls) || !in_array(trim($objects[$i->getId()]->getAttribute('uri'), '/'),
+			$isNotCustomUrl = empty($gCustomUrls) || !in_array(trim($objects[$i->getId()]->uri, '/'),
 			                                                   $gCustomUrls);
 
 			if ($isRoot && $isUnique && $isNotCustomUrl) {
@@ -53,7 +53,7 @@ if (!empty($data['branches'])) {
 			              ? 'NULL'
 			              : $parent[$i->getId()];
 
-				$objects[$i->getId()]->setAttribute('parent_id', $parentId);
+				$objects[$i->getId()]->parentId = $parentId;
 				array_push($changed, $i->getId());
 			}
 		}

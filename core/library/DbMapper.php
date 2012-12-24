@@ -147,20 +147,20 @@ abstract class Core_DbMapper
 
             foreach ($values as $id => $item) {
                 $obj = new $class;
-                $obj->setAttribute($pri, $this->id);
+                $obj->$pri = $this->id;
 
                 if (is_array($item)) {
-                    $obj->setAttribute($key, $id);
+                    $obj->$key = $id;
 
                     foreach ($item as $attribute => $value) {
-                        $obj->setAttribute($attribute, $value);
+                        $obj->$attribute = $value;
                     }
 
                 } else {
-                    $obj->setAttribute($key, $item);
+                    $obj->$key = $item;
                 }
 
-                array_push($this->_links[$_name], $obj);
+                $this->_links[$_name][] = $obj;
             }
         }
     }
@@ -237,10 +237,10 @@ abstract class Core_DbMapper
                 return $this->_db->getPri();
 
             default:
-                if (in_array($name, $this->_db->getAttributes())) {
+                if (in_array($name, $this->_db->getAttrNames())) {
                     return $name;
 
-                } elseif (in_array($attribute, $this->_db->getAttributes())) {
+                } elseif (in_array($attribute, $this->_db->getAttrNames())) {
                     return $attribute;
 
                 } else {
@@ -254,28 +254,19 @@ abstract class Core_DbMapper
     }
 
     public function __get($name) {
-        return $this->_db->getAttribute(
-            $this->getAttributeName($name)
-        );
+        return $this->_db->__get($name);
     }
 
     public function __set($name, $value) {
-        return $this->_db->setAttribute(
-            $this->getAttributeName($name),
-            $value
-        );
+        return $this->_db->__set($name, $value);
     }
 
     public function getAttribute($name) {
         return $this->__get($name);
     }
 
-    public function setAttribute($name, $value) {
-        return $this->__set($name, $value);
-    }
-
     public function hasAttribute($name) {
-        return $this->_db->HasAttribute($name);
+        return $this->_db->hasAttribute($name);
     }
 
     public function setId($value) {

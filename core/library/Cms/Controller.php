@@ -60,7 +60,7 @@ abstract class Core_Cms_Controller extends App_ActiveRecord
 	}
 
 	private function GetPrefix() {
-		switch ($this->GetAttribute('type_id')) {
+		switch ($this->typeId) {
 			case 1:
 				return 'с';
 			case 2:
@@ -77,7 +77,7 @@ abstract class Core_Cms_Controller extends App_ActiveRecord
 		switch ($_type) {
 			case 'bo_list':
 				$result .= '<' . $node_name . ' id="' . $this->GetId() . '"';
-				if ($this->GetAttribute('is_published') == 1) $result .= ' is_published="true"';
+				if ($this->isPublished) $result .= ' is_published="true"';
 				if ($this->GetPrefix()) $result .= ' prefix="' . $this->GetPrefix() . '"';
 				$result .= '><title><![CDATA[' . $this->GetTitle() . ']]></title>';
 				$result .= $_append_xml;
@@ -152,7 +152,7 @@ abstract class Core_Cms_Controller extends App_ActiveRecord
 		return parent::getList(
 			get_called_class(),
 			self::GetTbl(),
-			self::GetBase()->GetAttributes(),
+			self::GetBase()->getAttrNames(),
 			$_attributes,
 			$parameters,
 			$_row_conditions

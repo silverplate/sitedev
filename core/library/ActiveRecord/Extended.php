@@ -12,7 +12,7 @@ abstract class Core_ActiveRecord_Extended extends Core_ActiveRecord
     {
         return parent::getList(get_called_class(),
                                self::getTbl(),
-                               self::getObjectBase()->getAttributes(),
+                               self::getObjectBase()->getAttrNames(),
                                $_conds,
                                $_params,
                                $_rowConds);

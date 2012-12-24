@@ -96,16 +96,16 @@ abstract class Core_Cms_User extends App_ActiveRecord
 
 	public static function Auth() {
 		if (func_num_args() == 1) {
-			$try = App_Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . App_Db::escape(func_get_arg(0)) . ' AND status_id = 1');
+			$try = App_Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->getAttrNames(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . App_Db::escape(func_get_arg(0)) . ' AND status_id = 1');
 
 		} elseif (func_num_args() == 2) {
-			$try = App_Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE email = ' . App_Db::escape(func_get_arg(0)) . ' AND passwd = ' . App_Db::escape(md5(func_get_arg(1))) . ' AND status_id = 1');
+			$try = App_Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->getAttrNames(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE email = ' . App_Db::escape(func_get_arg(0)) . ' AND passwd = ' . App_Db::escape(md5(func_get_arg(1))) . ' AND status_id = 1');
 		}
 
 		if (isset($try) && $try) {
 			$cname = get_called_class();
 			$obj = new $cname;
-			$obj->DataInit($try);
+			$obj->fillWithData($try);
 
 			return $obj;
 		}
@@ -116,15 +116,15 @@ abstract class Core_Cms_User extends App_ActiveRecord
 	public function RemindPassword() {
 		global $g_mail;
 
-		if ($this->GetAttribute('email')) {
-			$this->SetAttribute('reminder_key', App_Db::Get()->GetUnique(self::GetTbl(), 'reminder_key', 30));
-			$this->SetAttribute('reminder_date', date('Y-m-d H:i:s'));
-			$this->Update();
+		if ($this->email) {
+			$this->reminderKey = App_Db::Get()->GetUnique(self::GetTbl(), 'reminder_key', 30);
+			$this->reminderDate = date('Y-m-d H:i:s');
+			$this->update();
 
-			return send_email($g_mail, $this->GetAttribute('email'), 'Смена пароля',
+			return send_email($g_mail, $this->email, 'Смена пароля',
 				'Для смены пароля к сайту http://' .
 				$_SERVER['HTTP_HOST'] . ' загрузите страницу: http://' .
-				$_SERVER['HTTP_HOST'] . '?r=' . $this->GetAttribute('reminder_key') . "\r\n\n" .
+				$_SERVER['HTTP_HOST'] . '?r=' . $this->reminderKey . "\r\n\n" .
 				'Если вы не просили поменять пароль, проигнорируйте это сообщение.', null, false
 			);
 		}
@@ -133,18 +133,18 @@ abstract class Core_Cms_User extends App_ActiveRecord
 	public function ChangePassword() {
 		global $g_mail;
 
-		if ($this->GetAttribute('email')) {
-			if ($this->GetAttribute('status_id') == 1 && $this->GetDate('reminder_date') && mktime() - 60 * 60 * 24 < $this->GetDate('reminder_date')) {
+		if ($this->email) {
+			if ($this->statusId == 1 && $this->GetDate('reminder_date') && mktime() - 60 * 60 * 24 < $this->GetDate('reminder_date')) {
 				$password = $this->GeneratePassword();
 
-				$this->SetPassword($password);
-				$this->SetAttribute('reminder_key', '');
-				$this->SetAttribute('reminder_date', '');
-				$this->Update();
+				$this->setPassword($password);
+				$this->reminderKey = '';
+				$this->reminderDate = '';
+				$this->update();
 
-				return send_email($g_mail, $this->GetAttribute('email'), 'Доступ',
+				return send_email($g_mail, $this->email, 'Доступ',
 					'Доступ к сайту http://' . $_SERVER['HTTP_HOST'] . ".\r\n\n" .
-					'Логин: ' . $this->GetAttribute('email') .
+					'Логин: ' . $this->email .
 					"\r\nПароль: " . $password, null, false
 				) ? 0 : 3;
 			} else return 2;
@@ -152,7 +152,7 @@ abstract class Core_Cms_User extends App_ActiveRecord
 	}
 
 	public function GetTitle() {
-		return $this->GetAttribute('last_name') . ' ' . $this->GetAttribute('first_name');
+		return $this->lastName . ' ' . $this->firstName;
 	}
 
 	public static function generatePassword()
@@ -161,7 +161,7 @@ abstract class Core_Cms_User extends App_ActiveRecord
 	}
 
 	public function SetPassword($_password) {
-		$this->SetAttribute('passwd', md5($_password));
+		$this->passwd = md5($_password);
 	}
 
 	public function UpdatePassword($_password) {
@@ -175,7 +175,7 @@ abstract class Core_Cms_User extends App_ActiveRecord
 		switch ($_type) {
 			case 'bo_list':
 				$result .= '<' . $node_name . ' id="' . $this->getId() . '"';
-				if ($this->GetAttribute('status_id') == 1) $result .= ' is_published="true"';
+				if ($this->status_id == 1) $result .= ' is_published="true"';
 
 				$result .= '><title><![CDATA[' . $this->GetTitle() . ']]></title>';
 				$result .= $_append_xml;
@@ -236,7 +236,7 @@ abstract class Core_Cms_User extends App_ActiveRecord
 		return parent::getList(
 			get_called_class(),
 			self::GetTbl(),
-			self::GetBase()->GetAttributes(),
+			self::GetBase()->getAttrNames(),
 			$_attributes,
 			$_parameters,
 			$_row_conditions

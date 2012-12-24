@@ -20,10 +20,10 @@ if ($page->IsAuthorized()) {
 		$form->Load('form.xml');
 
 		if ($obj->GetId()) {
-			$form->FillFields($obj->GetAttributeValues());
+			$form->FillFields($obj->toArray());
 			$form->Elements['passwd']->SetValue();
 
-			if ($obj->getAttribute('status_id') != 1) {
+			if ($obj->statusId != 1) {
 				$form->Elements['status_id']->SetValue(0);
 			}
 
@@ -45,7 +45,7 @@ if ($page->IsAuthorized()) {
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
 				if (App_Cms_User::CheckUnique($form->Elements['email']->GetValue(), $obj->GetId())) {
-					$obj->DataInit($form->GetSqlValues());
+					$obj->fillWithData($form->GetSqlValues());
 
 					$password = $form->Elements['passwd']->GetValue();
 					if (isset($password['password'])) {
@@ -53,7 +53,7 @@ if ($page->IsAuthorized()) {
 					}
 
 					if ($form->Elements['status_id']->GetValue() != 1) {
-						$obj->SetAttribute('status_id', 2);
+						$obj->statusId = 2;
 					}
 
 					if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
@@ -70,7 +70,7 @@ if ($page->IsAuthorized()) {
 					$form->UpdateStatus = FORM_ERROR;
 					$form->Elements['email']->SetUpdateType(FIELD_ERROR_EXIST);
 					$form->Elements['email']->SetErrorValue($form->Elements['email']->GetValue());
-					$form->Elements['email']->SetValue($obj->getAttribute('email'));
+					$form->Elements['email']->SetValue($obj->email);
 				}
 			}
 		}
@@ -122,7 +122,7 @@ if ($page->IsAuthorized()) {
 		$page->AddContent($module);
 
 	} else {
-		$about = $g_section->GetAttribute('description') ? '<p class="first">' . $g_section->GetAttribute('description') . '</p>' : '';
+		$about = $g_section->description ? '<p class="first">' . $g_section->description . '</p>' : '';
 		$page->AddContent('<module type="simple" is_able_to_add="true">' . $list_xml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
 	}
 }

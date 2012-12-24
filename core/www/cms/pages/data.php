@@ -42,7 +42,7 @@ if (is_null($document_id) || !App_Cms_Document::Load($document_id)) {
 	}
 
 	$controller_row_conditions = array();
-	$controller_self_condition = isset($obj) && $obj && $obj->GetAttribute(App_Cms_Controller::GetPri()) ? ' OR ' . App_Cms_Controller::GetPri() . ' = ' . App_Db::escape($obj->GetAttribute(App_Cms_Controller::GetPri())) : '';
+	$controller_self_condition = isset($obj) && $obj && $obj->foControllerId ? ' OR ' . App_Cms_Controller::GetPri() . ' = ' . App_Db::escape($obj->foControllerId) : '';
 	$used = App_Db::Get()->GetList('SELECT ' . App_Cms_Controller::GetPri() . ' FROM ' . App_Cms_Document_Data::GetTbl() . ' WHERE ' . App_Cms_Controller::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . App_Cms_Document_Data::GetPri() . ' != ' . App_Db::escape($obj->GetId()) : '') . ' GROUP BY ' . App_Cms_Controller::GetPri());
 	if ($used) array_push($controller_row_conditions, '(is_multiple = 1 OR ' . App_Cms_Controller::GetPri() . ' NOT IN (' . App_Db::escape($used) . ')' . $controller_self_condition . ')');
 	array_push($controller_row_conditions, $controller_self_condition ? '(is_published = 1' . $controller_self_condition . ')' : 'is_published = 1');
@@ -70,31 +70,31 @@ if (is_null($document_id) || !App_Cms_Document::Load($document_id)) {
 
 	} else {
 		$page->SetTitle($obj->GetTitle());
-		$form->FillFields($obj->GetAttributeValues());
+		$form->FillFields($obj->toArray());
 		$form->CreateButton('Сохранить', 'update');
 		$form->CreateButton('Удалить', 'delete');
 	}
 
-	$obj->SetAttribute(App_Cms_Document::GetPri(), $document_id);
+	$obj->foDocumentId = $document_id;
 	$form->Execute();
 
 	if ($form->UpdateStatus == FORM_UPDATED) {
-		$obj->DataInit($form->GetSqlValues());
+		$obj->fillWithData($form->GetSqlValues());
 
 		if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 			$obj->Delete();
-			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->getId(), 'Блоки данных. Документ ' . $obj->getAttribute(App_Cms_Document::GetPri()));
-			goToUrl($page->Url['path'] . '?parent_id=' . $obj->getAttribute(App_Cms_Document::GetPri()) . '&DEL');
+			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->getId(), 'Блоки данных. Документ ' . $obj->foDocumentId);
+			goToUrl($page->Url['path'] . '?parent_id=' . $obj->foDocumentId . '&DEL');
 
 		} elseif (isset($form->Buttons['create']) && $form->Buttons['create']->IsSubmited()) {
 			$obj->Create();
-			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->getId(), 'Блоки данных. Документ ' . $obj->getAttribute(App_Cms_Document::GetPri()));
-			goToUrl($page->Url['path'] . '?id=' . $obj->getId() . '&parent_id=' . $obj->getAttribute(App_Cms_Document::GetPri()) . '&OK');
+			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->getId(), 'Блоки данных. Документ ' . $obj->foDocumentId);
+			goToUrl($page->Url['path'] . '?id=' . $obj->getId() . '&parent_id=' . $obj->foDocumentId . '&OK');
 
 		} elseif (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited()) {
 			$obj->Update();
-			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->getId(), 'Блоки данных. Документ ' . $obj->getAttribute(App_Cms_Document::GetPri()));
-			goToUrl($page->Url['path'] . '?id=' . $obj->getId() . '&parent_id=' . $obj->getAttribute(App_Cms_Document::GetPri()) . '&OK');
+			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->getId(), 'Блоки данных. Документ ' . $obj->foDocumentId);
+			goToUrl($page->Url['path'] . '?id=' . $obj->getId() . '&parent_id=' . $obj->foDocumentId . '&OK');
 		}
 	}
 

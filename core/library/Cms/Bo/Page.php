@@ -53,8 +53,8 @@ abstract class Core_Cms_Bo_Page extends Core_Cms_Page
 
 			if ($user_sections_list) {
 				foreach ($user_sections_list AS $key => $section) {
-					$append_xml = $section->GetAttribute('description')
-						? '<description><![CDATA[' . $section->GetAttribute('description') . ']]></description>'
+					$append_xml = $section->description
+						? '<description><![CDATA[' . $section->description . ']]></description>'
 						: '';
 					$sections_xml .= $section->GetXml('bo_navigation', 'item', $append_xml);
 				}

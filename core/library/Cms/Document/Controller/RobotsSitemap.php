@@ -14,7 +14,7 @@ abstract class Core_Cms_Document_Controller_RobotsSitemap extends App_Cms_Docume
         $this->setTemplate(TEMPLATES . 'robots_sitemap.xsl');
 
         $type = App_Cms_Document_Navigation::load('robots-sitemap', 'name');
-        if ($type && $type->is_published) {
+        if ($type && $type->isPublished) {
             $documents = App_Cms_Document_Navigation::getDocuments($type->name);
             $controllers = array();
             $controllerKey = App_Cms_Controller::getPri();

@@ -16,17 +16,17 @@ if ($gCache->isAvailable() && $gCache->isCache()) {
 
     if (
         $document &&
-        $document->getAttribute('link') &&
-        $document->getAttribute('link') != $realUrl['path']
+        $document->link &&
+        $document->link != $realUrl['path']
     ) {
-        goToUrl($document->getAttribute('link'));
+        goToUrl($document->link);
 
     } else {
         if (
             $document &&
             $document->getController() &&
-            ($document->getAttribute('is_published') == 1 || IS_SHOW_HIDDEN) &&
-            (!$document->getAttribute('auth_status_id') || is_null(App_Cms_User::getAuthGroup()) || $document->getAttribute('auth_status_id') & App_Cms_User::getAuthGroup())
+            ($document->isPublished == 1 || IS_SHOW_HIDDEN) &&
+            (!$document->authStatusId || is_null(App_Cms_User::getAuthGroup()) || $document->authStatusId & App_Cms_User::getAuthGroup())
         ) {
             $controller = App_Cms_Document::initController($document->getController(), $document);
             $controller->execute();

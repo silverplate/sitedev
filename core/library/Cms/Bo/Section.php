@@ -21,11 +21,11 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 		$url = parse_url($_SERVER['REQUEST_URI']);
 		$path = explode('/', trim(str_replace($g_section_start_url, '', $url['path']), '/'));
 
-		$entry = App_Db::Get()->GetEntry('SELECT ' . implode(',', self::GetBase()->GetAttributes()) . ' FROM ' . self::GetTbl() . ' WHERE uri = ' . App_Db::escape($path[0]));
+		$entry = App_Db::Get()->GetEntry('SELECT ' . implode(',', self::GetBase()->getAttrNames()) . ' FROM ' . self::GetTbl() . ' WHERE uri = ' . App_Db::escape($path[0]));
 		if ($entry) {
 			$class = get_called_class();
 			$obj = new $class;
-			$obj->DataInit($entry);
+			$obj->fillWithData($entry);
 			return $obj;
 		}
 
@@ -33,7 +33,7 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 	}
 
 	public function GetUri() {
-		return '/cms/' . $this->getAttribute('uri') . '/';
+		return '/cms/' . $this->uri . '/';
 	}
 
 	public function getXml($_type, $_node_name = null, $_append_xml = null, $_append_attributes = null) {
@@ -43,7 +43,7 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 		switch ($_type) {
 			case 'bo_list':
 				$result .= '<' . $node_name . ' id="' . $this->GetId() . '"';
-				if ($this->getAttribute('is_published') == 1) $result .= ' is_published="true"';
+				if ($this->isPublished) $result .= ' is_published="true"';
 
 				$result .= '><title><![CDATA[' . $this->GetTitle() . ']]></title>';
 				$result .= $_append_xml;
@@ -100,8 +100,8 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 
 		if ($links) {
 			foreach ($links as $item) {
-				if ($item->GetAttribute($key)) {
-					array_push($result, $item->GetAttribute($key));
+				if ($item->$key) {
+					array_push($result, $item->$key);
 				}
 			}
 		}
@@ -124,19 +124,20 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 
 			foreach ($_value as $id => $item) {
 				$obj = new $class_name;
-				$obj->SetAttribute($this->GetPri(), $this->GetId());
+				$obj->setAttrValue($this->getPri(), $this->getId());
 
 				if (is_array($item)) {
-					$obj->SetAttribute($key, $id);
+					$obj->$key = $id;
+
 					foreach ($item as $attribute => $value) {
-						$obj->SetAttribute($attribute, $value);
+						$obj->$attribute = $value;
 					}
 
 				} else {
-					$obj->SetAttribute($key, $item);
+				    $obj->$key = $item;
 				}
 
-				array_push($this->_links[$_name], $obj);
+				$this->_links[$_name][] = $obj;
 			}
 		}
 	}
@@ -178,7 +179,7 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 		return parent::getList(
 			get_called_class(),
 			self::GetTbl(),
-			self::GetBase()->GetAttributes(),
+			self::GetBase()->getAttrNames(),
 			$_attributes,
 			$_parameters
 		);

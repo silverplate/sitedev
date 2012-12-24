@@ -68,7 +68,7 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 
 		$class_name = get_called_class();
 		$obj = new $class_name;
-		$obj->DataInit($params);
+		$obj->fillWithData($params);
 		$obj->Create();
 
 		return $obj;
@@ -94,15 +94,15 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 			case 'bo_list':
 				$append_attributes = array('date' => date('d.m.y H:i:s', $this->GetDate('creation_date')));
 				foreach (array('entry_id', 'user_ip', 'script_name', 'action_id') as $item) {
-					if ($this->GetAttribute($item)) {
-						$append_attributes[$item] = $this->GetAttribute($item);
+					if ($this->$item) {
+						$append_attributes[$item] = $this->$item;
 					}
 				}
 
 				$append_xml = $_append_xml;
 				foreach (array('user_agent', 'description') as $item) {
-					if ($this->GetAttribute($item)) {
-						$append_xml .= '<' . $item . '><![CDATA[' . $this->GetAttribute($item) . ']]></' . $item . '>';
+					if ($this->$item) {
+						$append_xml .= '<' . $item . '><![CDATA[' . $this->$item . ']]></' . $item . '>';
 					}
 				}
 
@@ -155,7 +155,14 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 			$row_conditions = array_merge($row_conditions, $_row_conditions);
 		}
 
-		return parent::getList(get_called_class(), $conditions['tables'], self::GetBase()->GetAttributes(true), null, $parameters, $row_conditions);
+		return parent::getList(
+	        get_called_class(),
+	        $conditions['tables'],
+	        self::getBase()->getAttrNames(true),
+	        null,
+	        $parameters,
+	        $row_conditions
+        );
 	}
 
 
@@ -180,7 +187,7 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 	public static function GetBase() {
 		if (!isset(self::$Base)) {
 			self::$Base = new App_ActiveRecord(self::ComputeTblName());
-			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'int', 10, true);
+			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'integer', null, true);
 			self::$Base->AddForeignKey(App_Cms_Bo_User::GetBase());
 			self::$Base->AddForeignKey(App_Cms_Bo_Section::GetBase());
 			self::$Base->AddAttribute('section_name', 'varchar', 255);

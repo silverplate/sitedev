@@ -17,7 +17,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 	protected $images;
 
 	public function GetFilePath() {
-		return rtrim(DOCUMENT_ROOT . 'f/' . ltrim($this->GetAttribute('uri'), '/'), '/') . '/';
+		return rtrim(DOCUMENT_ROOT . 'f/' . ltrim($this->uri, '/'), '/') . '/';
 	}
 
 	public function UploadFile($_name, $_tmp_name) {
@@ -36,9 +36,13 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		switch ($_type) {
 			case 'bo_list':
 				$result .= '<' . $node_name . ' id="' . $this->GetId() . '"';
-				if ($this->GetAttribute('is_published') == 1) $result .= ' is_published="true"';
-				if (IS_USERS && $this->GetAttribute('auth_status_id') != App_Cms_User::AUTH_GROUP_ALL && App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))) {
-					$result .= ' prefix="' . Ext_String::toLower(substr(App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id')), 0, 1)) . '"';
+				if ($this->isPublished) $result .= ' is_published="true"';
+				if (
+				    IS_USERS &&
+				    $this->authStatusId != App_Cms_User::AUTH_GROUP_ALL &&
+				    App_Cms_User::GetAuthGroupTitle($this->authStatusId)
+			    ) {
+					$result .= ' prefix="' . Ext_String::toLower(substr(App_Cms_User::GetAuthGroupTitle($this->authStatusId), 0, 1)) . '"';
 				}
 
 				if ($_append_attributes) {
@@ -47,12 +51,12 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 					}
 				}
 
-				$result .=
-					'><title><![CDATA[' .
-					($this->GetAttribute('title_compact')
-						? $this->GetAttribute('title_compact')
-						: $this->GetTitle()) .
-					']]></title>';
+				$result .= '>';
+
+				$result .= Ext_Xml::cdata(
+			        'title',
+			        $this->titleCompact ? $this->titleCompact : $this->getTitle()
+		        );
 
 				$result .= $_append_xml;
 				$result .= '</' . $node_name . '>';
@@ -60,7 +64,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 			case 'list':
 				$result .= '<' . $node_name . ' id="' . $this->GetId() . '"';
-				if ($this->GetAttribute('is_published') == 1) $result .= ' is_published="true"';
+				if ($this->isPublished) $result .= ' is_published="true"';
 
 				if ($_append_attributes) {
 					foreach ($_append_attributes as $name => $value) {
@@ -70,8 +74,8 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 				$result .= '><title><![CDATA[' . $this->GetTitle() . ']]></title>';
 
-				if ($this->GetAttribute('title_compact')) {
-					$result .= '<title_compact><![CDATA[' . $this->GetAttribute('title_compact') . ']]></title_compact>';
+				if ($this->titleCompact) {
+					$result .= '<title_compact><![CDATA[' . $this->titleCompact . ']]></title_compact>';
 				}
 
 				$result .= $_append_xml;
@@ -89,7 +93,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 			$this->Language = '';
 			if (isset($g_langs) && $g_langs) {
 				foreach (array_keys($g_langs) as $i) {
-					$pos = strpos($this->GetAttribute('uri'), '/' . $i . '/');
+					$pos = strpos($this->uri, '/' . $i . '/');
 					if ($pos !== false && $pos == 0) {
 						$this->Language = $i;
 						break;
@@ -113,9 +117,9 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 	public function GetUri() {
 		if ($this->GetLang()) {
-			return substr($this->GetAttribute('uri'), strlen($this->GetLang()) + 2 - 1);
+			return substr($this->uri, strlen($this->GetLang()) + 2 - 1);
 		} else {
-			return $this->GetAttribute('uri');
+			return $this->uri;
 		}
 	}
 
@@ -124,14 +128,11 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		if (!is_null($_parentUri)) {
 			$uri = $_parentUri;
 
-		} else if (
-		    $this->getAttribute('parent_id') &&
-		    $this->getAttribute('parent_id') !== 'NULL'
-		) {
-			$parent = self::load($this->getAttribute('parent_id'));
+		} else if ($this->parentId && $this->parentId !== 'NULL') {
+			$parent = self::load($this->parentId);
 
 			if ($parent) {
-			    $uri = $parent->getAttribute('uri');
+			    $uri = $parent->uri;
 			}
 		}
 
@@ -139,7 +140,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		    $uri = '/';
 		}
 
-        $folder = $this->getAttribute('folder');
+        $folder = $this->folder;
 
 		if ($folder != '/') {
 			$uri .= $folder;
@@ -149,7 +150,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 			}
 		}
 
-		$this->setAttribute('uri', $uri);
+		$this->uri = $uri;
 	}
 
 	public static function UpdateChildrenUri($_id = null) {
@@ -158,9 +159,11 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 		if (!is_null($_id)) {
 			$obj = self::load($_id);
+
 			if ($obj) {
 				$id = $_id;
-				$uri = $obj->GetAttribute('uri');
+				$uri = $obj->uri;
+
 			} else {
 				return false;
 			}
@@ -168,7 +171,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 		$list = self::getList(array('parent_id' => $id));
         foreach ($list as $item) {
-            $folder = $item->getAttribute('folder');
+            $folder = $item->folder;
             if ($folder != '/' && strpos($folder, '.') === false) {
                 $folder .= '/';
             }
@@ -255,9 +258,9 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 	public function GetController() {
 		if (is_null($this->Controller)) {
-			$this->Controller = $this->GetAttribute(App_Cms_Controller::GetPri())
-				? App_Cms_Controller::load($this->GetAttribute(App_Cms_Controller::GetPri()))
-				: false;
+			$this->Controller = $this->foControllerId
+			                  ? App_Cms_Controller::load($this->foControllerId)
+			                  : false;
 		}
 
 		return $this->Controller;
@@ -266,8 +269,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 	public function getTemplate()
 	{
 		if (is_null($this->_template)) {
-		    $key = App_Cms_TemplateDb::getPri();
-		    $id = $this->getAttribute($key);
+		    $id = $this->foTemplateId;
 		    $this->_template = $id ? App_Cms_Template::getById($id) : false;
 		}
 
@@ -348,7 +350,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		return parent::getList(
 			get_called_class(),
 			$conditions['tables'],
-			self::GetBase()->GetAttributes(true),
+			self::GetBase()->getAttrNames(true),
 			null,
 			$_parameters,
 			$conditions['row_conditions']
@@ -390,8 +392,8 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 		if ($links) {
 			foreach ($links as $item) {
-				if ($item->GetAttribute($key)) {
-					array_push($result, $item->GetAttribute($key));
+				if ($item->$key) {
+					array_push($result, $item->$key);
 				}
 			}
 		}
@@ -414,19 +416,20 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 			foreach ($_value as $id => $item) {
 				$obj = new $class_name;
-				$obj->SetAttribute($this->GetPri(), $this->GetId());
+				$obj->setAttrValue($this->getPri(), $this->getId());
 
 				if (is_array($item)) {
-					$obj->SetAttribute($key, $id);
+					$obj->$key = $id;
+
 					foreach ($item as $attribute => $value) {
-						$obj->SetAttribute($attribute, $value);
+						$obj->$attribute = $value;
 					}
 
 				} else {
-					$obj->SetAttribute($key, $item);
+					$obj->$key = $item;
 				}
 
-				array_push($this->_links[$_name], $obj);
+				$this->_links[$_name][] = $obj;
 			}
 		}
 	}

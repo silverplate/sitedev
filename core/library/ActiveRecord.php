@@ -22,78 +22,126 @@ abstract class Core_ActiveRecord
         $this->_table = $_table;
     }
 
+    public function getTable()
+    {
+        return $this->_table;
+    }
+
+    public function hasAttribute($_name)
+    {
+        return key_exists($_name, $this->_attributes) ||
+               key_exists(Ext_String::underline($_name), $this->_attributes);
+    }
+
+    public function __isset($_name)
+    {
+        return property_exists($this, $_name) || $this->hasAttribute($_name);
+    }
+
+    /**
+     * Преобразоваывает и ищет атрибут, чтобы вернут его название. Имя id
+     * преобразовывается в первичный ключ, *_id преобразовывается в первичный
+     * ключ внешней таблицы.
+     *
+     * @param string $_name
+     * @return string|array|false
+     */
     public function getAttributeName($_name)
     {
-        $name = Ext_String::underline($_name);
+        if (!property_exists($this, $_name)) {
+            if (key_exists($_name, $this->_attributes)) {
+                return $_name;
+            }
 
-        switch ($name) {
-            case 'id':
-                return $this->getPrimaryKey();
+            if ($_name == 'id') {
+                return $this->getPrimaryKey()->getName();
+            }
 
-            default:
-                if (in_array($_name, $this->getAttributes())) {
-                    return $_name;
+            $name = Ext_String::underline($_name);
 
-                } elseif (in_array($name, $this->getAttributes())) {
+            if (key_exists($name, $this->_attributes)) {
+                return $name;
+            }
+
+            if (defined(DB_PREFIX) && DB_PREFIX) {
+                $name = DB_PREFIX . $name;
+
+                if (key_exists($name, $this->_attributes)) {
                     return $name;
-
-                } else {
-                    throw new Exception(
-                        'There is no a such attribute "' . $name . '" ' .
-                        '(original "' . $_name . '") ' .
-                        'in ' . get_called_class() . '.'
-                    );
                 }
+            }
         }
+
+        return false;
     }
 
-    public function __get($name) {
-        return $this->getAttribute(
-            $this->getAttributeName($name)
-        );
-    }
-
-    public function __set($name, $value) {
-        return $this->setAttribute(
-            $this->getAttributeName($name),
-            $value
-        );
-    }
-
-//     public function getAttribute($name) {
-//         return $this->__get($name);
-//     }
-
-
-    public function getAttributeObject($_attribute)
+    public function __get($_name)
     {
-        if ($this->hasAttribute($_attribute)) {
-            return $this->_attributes[$_attribute];
-        } else {
-            return false;
+        if (property_exists($this, $_name)) {
+            return $this->$_name;
         }
+
+        return $this->getAttrValue($_name);
     }
 
-    public function hasAttribute($_attribute)
+    public function __set($_name, $_value)
     {
-        return isset($this->_attributes[$_attribute]);
-    }
-
-    public function getAttribute($_attribute, $_is_escaped = false)
-    {
-        return isset($this->_attributes[$_attribute])
-            ? $this->_attributes[$_attribute]->getValue($_is_escaped)
-            : false;
-    }
-
-    public function setAttribute($_attribute, $_value)
-    {
-        if (isset($this->_attributes[$_attribute])) {
-            $this->_attributes[$_attribute]->setValue($_value);
-            return true;
-        } else {
-            return false;
+        if (property_exists($this, $_name)) {
+            $this->$_name = $_value;
         }
+
+        $this->setAttrValue($_name, $_value);
+    }
+
+    /**
+     * @param string $_name
+     * @throws Exception
+     * @return Core_ActiveRecord_Attribute
+     */
+    public function getAttr($_name)
+    {
+        $name = $this->getAttributeName($_name);
+        if ($name) {
+            return $this->_attributes[$name];
+        }
+
+        throw new Exception("There is no a such property `$_name`.");
+    }
+
+    public function getAttrValue($_name)
+    {
+        return $this->getAttr($_name)->getValue();
+    }
+
+    public function setAttrValue($_name, $_value)
+    {
+        $this->getAttr($_name)->setValue($_value);
+    }
+
+    public function toArray()
+    {
+        $attrs = array();
+
+        foreach ($this->_attributes as $attr) {
+            $attrs[$attr->getName()] = $attr->getValue();
+        }
+
+        return $attrs;
+    }
+
+    public function getAttrNames($_table = false)
+    {
+        $names = array_keys($this->_attributes);
+
+        if ($_table) {
+            $p = '`' . ($_table === true ? $this->getTable() : $_table) . '`.';
+
+             foreach ($names as $key => $value) {
+                 $names[$value] = $p . $value;
+             }
+        }
+
+        return $names;
     }
 
     public static function getQueryCondition($_attributes = array())
@@ -120,11 +168,6 @@ abstract class Core_ActiveRecord
         return $conditions;
     }
 
-    public function getTable()
-    {
-        return $this->_table;
-    }
-
     public function addAttribute($_name,
                                  $_type,
                                  $_length = null,
@@ -147,31 +190,6 @@ abstract class Core_ActiveRecord
     public function addPrimaryKey($_name, $_type, $_length = null)
     {
         return $this->addAttribute($_name, $_type, $_length, true);
-    }
-
-    public function getAttributes($_table = false)
-    {
-        $attributes = array_keys($this->_attributes);
-        $prefix = $_table === false
-                ? ''
-                : '`' . ($_table === true ? $this->getTable() : $_table) . '`.';
-
-        for ($i = 0; $i < count($attributes); $i++) {
-            $attributes[$i] = $prefix . $attributes[$i];
-        }
-
-        return $attributes;
-    }
-
-    public function getAttributeValues($_is_escaped = false)
-    {
-        $attributes = array();
-
-        foreach ($this->_attributes as $item) {
-            $attributes[$item->getName()] = $item->getValue($_is_escaped);
-        }
-
-        return $attributes;
     }
 
     public function getPrimaryKey()
@@ -228,19 +246,23 @@ abstract class Core_ActiveRecord
                     if ($_value && is_array($_value)) {
                         if (isset($_value[$key[$i]->getName()])) {
                             $value = App_Db::escape($_value[$key[$i]->getName()]);
-                        } elseif (isset($_value[$i])) {
+
+                        } else if (isset($_value[$i])) {
                             $value = App_Db::escape($_value[$i]);
+
                         } else {
-                            $value = $key[$i]->getValue();
+                            $value = $key[$i]->getSqlValue();
                         }
+
                     } else {
-                        $value = $key[$i]->getValue();
+                        $value = $key[$i]->getSqlValue();
                     }
 
                     array_push($conditions, $key[$i]->getName() . ' = ' . $value);
                 }
+
             } else {
-                $value = ($_value) ? App_Db::escape($_value) : $key->getValue();
+                $value = is_null($_value) ? $key->getSqlValue() : App_Db::escape($_value);
                 array_push($conditions, $key->getName() . ' = ' . $value);
             }
         }
@@ -261,8 +283,9 @@ abstract class Core_ActiveRecord
         if (is_array($key)) {
             $value = array();
             foreach ($key as $item) {
-                array_push($value, array($item->getName() => $item->getValue(false)));
+                array_push($value, array($item->getName() => $item->getValue()));
             }
+
         } else {
             $value = $key->getValue(false);
         }
@@ -279,7 +302,8 @@ abstract class Core_ActiveRecord
                 for ($i = 0; $i < count($key); $i++) {
                     if (isset($_value[$key[$i]->getName()])) {
                         $key[$i]->setValue($_value[$key[$i]->getName()]);
-                    } elseif (isset($_value[$i])) {
+
+                    } else if (isset($_value[$i])) {
                         $key[$i]->setValue($_value[$i]);
                     }
                 }
@@ -292,11 +316,11 @@ abstract class Core_ActiveRecord
 
     public function getTitle()
     {
-        if ($this->getAttribute('title')) {
-            return $this->getAttribute('title');
+        if ($this->title) {
+            return $this->title;
 
-        } elseif ($this->getAttribute('name')) {
-            return $this->getAttribute('name');
+        } elseif ($this->name) {
+            return $this->name;
 
         } else {
             return 'ID ' . $this->getId();
@@ -312,28 +336,29 @@ abstract class Core_ActiveRecord
     public function setDate($_name, $_date)
     {
         $format = isset($this->_attributes[$_name]) && $this->_attributes[$_name]->getType() == 'datetime' ? 'Y-m-d H:i:s' : 'Y-m-d';
-        $this->setAttribute($_name, date($format, $_date));
+        $this->$_name = date($format, $_date);
     }
 
-    public static function load($_class_name, $_value, $_attribute = null)
+    public static function load($_className, $_value, $_attribute = null)
     {
-        $obj = new $_class_name;
-        return ($obj->retrieve($_value, $_attribute)) ? $obj : false;
+        $obj = new $_className;
+        return $obj->fetch($_value, $_attribute) ? $obj : false;
     }
 
-    public function retrieve($_value, $_attribute = null)
+    public function fetch($_value, $_attr = null)
     {
-        $condition = (is_null($_attribute) || !in_array($_attribute, $this->getAttributes()))
-            ? $this->getPrimaryKeyStatment($_value)
-            : $_attribute . ' = ' . App_Db::escape($_value);
+        $condition = $_attr
+                   ? $_attr . ' = ' . App_Db::escape($_value)
+                   : $this->getPrimaryKeyStatment($_value);
 
-        $record = App_Db::get()->getEntry('SELECT ' . implode(', ', $this->getAttributes()) . ' FROM ' . $this->getTable() . ' WHERE ' . $condition);
-        if ($record) {
-            foreach ($this->_attributes as $item) {
-                if (isset($record[$item->getName()])) {
-                    $item->setValue($record[$item->getName()]);
-                }
-            }
+        $data = App_Db::get()->getEntry(
+            'SELECT * FROM ' . $this->getTable() .
+            ' WHERE ' . $condition
+        );
+
+        if ($data) {
+            $this->fillWithData($data);
+
             return true;
 
         } else {
@@ -341,56 +366,59 @@ abstract class Core_ActiveRecord
         }
     }
 
+    public function fillWithData(array $_data)
+    {
+        foreach ($this->_attributes as $item) {
+            if (key_exists($item->getName(), $_data)) {
+                $item->setValue($_data[$item->getName()]);
+            }
+        }
+    }
+
     public function create()
     {
+        $t = $this->getTable();
         $attributes = array();
+
         foreach ($this->_attributes as $item) {
             if (!$item->isValue()) {
                 if ($item->isPrimary()) {
-                    if ($item->getType() == 'varchar') {
-                        $item->setValue(App_Db::get()->getUnique($this->getTable(), $item->getName(), $item->getLength()));
-
-//                     } else if ($item->getType() == 'integer') {
-//                         $item->setValue(App_Db::get()->getNextNumber($this->getTable(), $item->getName()));
+                    if ($item->getType() == 'string') {
+                        $item->setValue(App_Db::get()->getUnique($t, $item->getName(), $item->getLength()));
                     }
 
                 } else if ($item->getName() == 'sort_order') {
-                    $item->setValue(App_Db::get()->getNextNumber($this->getTable(), $item->getName()));
+                    $item->setValue(App_Db::get()->getNextNumber($t, $item->getName()));
 
                 } else if (
                     $item->getName() == 'creation_date' ||
                     $item->getName() == 'creation_time'
                 ) {
-                    $item->setValue($item->getType() == 'integer'
-                                    ? time()
-                                    : date('Y-m-d H:i:s'));
+                    $item->setValue(
+                        $item->getType() == 'integer' ? time() : date('Y-m-d H:i:s')
+                    );
                 }
             }
 
-            $value = null;
-
-            if ($item->isValue()) {
-                $value = $item->getValue();
-            } elseif ('text' == $item->getType()) {
-                $value = '\'\'';
-            }
-
-            if (!is_null($value)) {
-                $attributes[$item->getName()] = $value;
-            }
+            $attributes[$item->getName()] = $item->getSqlValue();
         }
 
-        $result = App_Db::get()->execute('INSERT INTO ' . $this->getTable() . App_Db::get()->getQueryFields($attributes, 'insert', true));
+        $result = App_Db::get()->execute(
+            'INSERT INTO ' . $t .
+            App_Db::get()->getQueryFields($attributes, 'insert', true)
+        );
+
         if ($result && App_Db::get()->getLastInsertedId()) {
-            $this->setId(App_Db::get()->getLastInsertedId());
+            $this->id = App_Db::get()->getLastInsertedId();
         }
+
         return $result;
     }
 
     public function update(array $_fields = null)
     {
         $fields = empty($_fields)
-                ? App_Db::get()->getQueryFields($this->getAttributeValues(true), 'update', true)
+                ? App_Db::get()->getQueryFields($this->toArray(), 'update')
                 : App_Db::get()->getQueryFields($_fields, 'update');
 
         return App_Db::get()->execute(
@@ -404,8 +432,14 @@ abstract class Core_ActiveRecord
     {
         if ($this->_attributes[$_name]) {
             $primary_key_condition = $this->getPrimaryKeyStatment();
-            if (!is_null($_value)) $this->setAttribute($_name, $_value);
-            return App_Db::get()->execute('UPDATE ' . $this->getTable() . App_Db::get()->getQueryFields(array($this->_attributes[$_name]->getName() => $this->_attributes[$_name]->getValue(true)), 'update', true) . 'WHERE ' . $primary_key_condition);
+            if (!is_null($_value)) $this->$_name = $_value;
+
+            return App_Db::get()->execute(
+                'UPDATE ' . $this->getTable() .
+                App_Db::get()->getQueryFields(array($this->_attributes[$_name]->getName() => $this->_attributes[$_name]->getValue(true)), 'update', true) .
+                'WHERE ' . $primary_key_condition
+            );
+
         } else {
             return false;
         }
@@ -430,16 +464,6 @@ abstract class Core_ActiveRecord
         }
 
         return App_Db::get()->execute('DELETE FROM ' . $this->getTable() . ' WHERE ' . $this->getPrimaryKeyStatment());
-    }
-
-    public function dataInit($_data)
-    {
-        foreach ($this->_attributes as $item) {
-//             if (isset($_data[$item->getName()])) {
-            if (key_exists($item->getName(), $_data)) {
-                $item->setValue($_data[$item->getName()]);
-            }
-        }
     }
 
     public static function tableInit($_table, $_id = null, $_is_log = false)
@@ -560,7 +584,7 @@ abstract class Core_ActiveRecord
         if ($list) {
             foreach ($list as $item) {
                 $obj = new $_class;
-                //$obj->dataInit($item);
+//                 $obj->fillWithData($item);
 
                 foreach ($obj->_attributes as $i) {
                     if (isset($item[$i->getName()])) {

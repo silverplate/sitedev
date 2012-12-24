@@ -26,18 +26,20 @@ if ($result_items['items']) {
 		$xml = array();
 		if ($item->GetAttribute(App_Cms_Bo_User::GetPri()) && isset($users[$item->GetAttribute(App_Cms_Bo_User::GetPri())])) {
 			$xml['user'] = $users[$item->GetAttribute(App_Cms_Bo_User::GetPri())]->GetTitle();
-		} elseif ($item->GetAttribute('user_name')) {
-			$xml['user'] = $item->GetAttribute('user_name');
+
+		} else if ($item->userName) {
+			$xml['user'] = $item->userName;
 		}
 
 		if ($item->GetAttribute(App_Cms_Bo_Section::GetPri()) && isset($sections[$item->GetAttribute(App_Cms_Bo_Section::GetPri())])) {
 			$xml['section'] = $sections[$item->GetAttribute(App_Cms_Bo_Section::GetPri())]->GetTitle();
-		} elseif ($item->GetAttribute('section_name')) {
-			$xml['section'] = $item->GetAttribute('section_name');
+
+		} else if ($item->sectionName) {
+			$xml['section'] = $item->sectionName;
 		}
 
-		if (isset($actions[$item->GetAttribute('action_id')])) {
-			$xml['action'] = $actions[$item->GetAttribute('action_id')];
+		if (isset($actions[$item->actionId])) {
+			$xml['action'] = $actions[$item->actionId];
 		}
 
 		$append_xml = '';

@@ -45,7 +45,7 @@ if ($page->IsAuthorized()) {
 		unset($tmp);
 
 		$controller_row_conditions = array();
-		$controller_self_condition = isset($obj) && $obj && $obj->getAttribute(App_Cms_Controller::GetPri()) ? ' OR ' . App_Cms_Controller::GetPri() . ' = ' . App_Db::escape($obj->getAttribute(App_Cms_Controller::GetPri())) : '';
+		$controller_self_condition = isset($obj) && $obj && $obj->foControllerId ? ' OR ' . App_Cms_Controller::GetPri() . ' = ' . App_Db::escape($obj->foControllerId) : '';
 		$used = App_Db::Get()->GetList('SELECT ' . App_Cms_Controller::GetPri() . ' FROM ' . App_Cms_Document::GetTbl() . ' WHERE ' . App_Cms_Controller::GetPri() . ' != ""' . (isset($obj) ? ' AND ' . App_Cms_Document::GetPri() . ' != ' . App_Db::escape($obj->getId()) : '') . ' GROUP BY ' . App_Cms_Controller::GetPri());
 		if ($used) array_push($controller_row_conditions, '(is_multiple = 1 OR ' . App_Cms_Controller::GetPri() . ' NOT IN (' . App_Db::escape($used) . ')' . $controller_self_condition . ')');
 		array_push($controller_row_conditions, $controller_self_condition ? '(is_published = 1' . $controller_self_condition . ')' : 'is_published = 1');
@@ -91,7 +91,7 @@ if ($page->IsAuthorized()) {
 		}
 
 		if ($obj->getId()) {
-			$form->FillFields($obj->GetAttributeValues());
+			$form->FillFields($obj->toArray());
 
 			$form->Elements['navigations']->SetValue($obj->GetLinkIds('navigations'));
 
@@ -119,9 +119,9 @@ if ($page->IsAuthorized()) {
 			$is_unique = (!isset($form->Elements['parent_id']) || App_Cms_Document::CheckUnique($form->Elements['parent_id']->GetValue(), $form->Elements['folder']->GetValue(), $obj->getId()));
 
 			if ($is_root && $is_unique) {
-				$obj->DataInit($form->GetSqlValues());
-				if (!$obj->getAttribute('parent_id')) {
-				    $obj->setAttribute('parent_id', 'NULL');
+				$obj->fillWithData($form->GetSqlValues());
+				if (!$obj->parent_id) {
+				    $obj->parentId = 'NULL';
 				}
 
 				if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
@@ -169,7 +169,7 @@ if ($page->IsAuthorized()) {
 				$form->UpdateStatus = FORM_ERROR;
 				$form->Elements['folder']->SetUpdateType((!$is_root) ? FIELD_ERROR_SPELLING : FIELD_ERROR_EXIST);
 				$form->Elements['folder']->SetErrorValue($form->Elements['folder']->GetValue());
-				$form->Elements['folder']->SetValue($obj->getAttribute('folder'));
+				$form->Elements['folder']->SetValue($obj->folder);
 			}
 		}
 
@@ -189,7 +189,7 @@ if ($page->IsAuthorized()) {
 
 		if ($obj->getId()) {
 			$module .= ' id="' . $obj->getId() . '" file_path="' . $obj->GetFilePath() . '">';
-			$module .= '<title><![CDATA[<a href="' . $obj->GetUrl() . '?' . ($obj->getAttribute('is_published') ? 'no_cache' : 'key=' . SITE_KEY) . '" target="_blank" title="Посмотреть на сайте">' . $obj->GetTitle() . '</a>]]></title>';
+			$module .= '<title><![CDATA[<a href="' . $obj->GetUrl() . '?' . ($obj->isPublished ? 'no_cache' : 'key=' . SITE_KEY) . '" target="_blank" title="Посмотреть на сайте">' . $obj->GetTitle() . '</a>]]></title>';
 		} else {
 			$module .= ' is_new="true">';
 			$module .= '><title><![CDATA[Добавление]]></title>';
@@ -201,7 +201,7 @@ if ($page->IsAuthorized()) {
 		$page->AddContent($module);
 
 	} else {
-		$about = $g_section->GetAttribute('description') ? '<p class="first">' . $g_section->GetAttribute('description') . '</p>' : '';
+		$about = $g_section->description ? '<p class="first">' . $g_section->description . '</p>' : '';
 		$page->AddContent('<module type="tree" name="' . $g_section->GetName() . '" is_able_to_add="true"><content><html><![CDATA[' . $about . ']]></html></content></module>');
 	}
 }

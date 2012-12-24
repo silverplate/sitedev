@@ -64,7 +64,7 @@ abstract class Core_Cms_Document_ToNavigation extends App_ActiveRecord
 		return parent::getList(
 			get_called_class(),
 			$tables,
-			self::GetBase()->GetAttributes(true),
+			self::GetBase()->getAttrNames(true),
 			null,
 			null,
 			$row_conditions

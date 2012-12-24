@@ -116,19 +116,19 @@ abstract class Core_Cms_BackOffice
 
         if (isset($data['type']) && $data['type'] == 'single' && !$parentId) {
             $obj = new $_className;
+            $obj->isPublished = 1;
 
             if ('integer' == $obj->getPrimaryKey()->getType()) {
                 $obj->setId(0);
             }
 
             if ($obj->hasAttribute('title')) {
-                $obj->setAttribute('title', 'Нет');
+                $obj->title = 'Нет';
 
             } else if ($obj->hasAttribute('name')) {
-                $obj->setAttribute('name', 'Нет');
+                $obj->name = 'Нет';
             }
 
-            $obj->setAttribute('is_published', 1);
             $xml = $obj->getXml(
                 'bo_list',
                 'item',

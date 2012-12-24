@@ -12,12 +12,12 @@ abstract class Core_Cms_Document_Data_Controller
 		$this->DocumentData = $_data;
 		$this->Document = $_document;
 
-        $dataDocumentId = $_data->getAttribute(App_Cms_Document::getPri());
+        $dataDocumentId = $_data->foDocumentId;
         $this->_dataDocument = $_document && $_document->getId() == $dataDocumentId
                              ? $_document
                              : App_Cms_Document::load($dataDocumentId);
 
-		$this->SetContent($this->DocumentData->GetAttribute('content'));
+		$this->SetContent($this->DocumentData->content);
 		$this->SetType($this->DocumentData->GetTypeId());
 	}
 
@@ -39,7 +39,7 @@ abstract class Core_Cms_Document_Data_Controller
 
 	public function getXml()
 	{
-	    $tag = $this->DocumentData->getAttribute('tag');
+	    $tag = $this->DocumentData->tag;
 
 	    return $this->getType() == 'xml'
 	         ? Ext_Xml::node($tag, Ext_Xml::decodeCdata($this->getContent()))

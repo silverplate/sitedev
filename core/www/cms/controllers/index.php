@@ -19,10 +19,10 @@ if ($page->IsAuthorized()) {
 		$form->Load('form.xml');
 
 		if ($obj->GetId()) {
-			$form->FillFields($obj->GetAttributeValues());
+			$form->FillFields($obj->toArray());
 			$form->Elements['content']->SetValue($obj->GetContent());
 
-			if ($obj->getAttribute('is_document_main')) {
+			if ($obj->isDocumentMain) {
 				$form->Elements['type_id']->SetValue(3);
 			}
 
@@ -35,11 +35,11 @@ if ($page->IsAuthorized()) {
 		$form->Execute();
 
 		if ($form->UpdateStatus == FORM_UPDATED) {
-			$obj->DataInit($form->GetSqlValues());
+			$obj->fillWithData($form->GetSqlValues());
 
 			if ($form->Elements['type_id']->GetValue() == 3) {
-				$obj->SetAttribute('type_id', 1);
-				$obj->SetAttribute('is_document_main', 1);
+				$obj->typeId = 1;
+				$obj->isDocumentMain = 1;
 			}
 
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
@@ -71,7 +71,7 @@ if ($page->IsAuthorized()) {
 						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
 					}
 
-					if ($obj->getAttribute('is_document_main')) {
+					if ($obj->isDocumentMain) {
 						App_Db::Get()->Execute('UPDATE ' . App_Cms_Controller::GetTbl() . ' SET is_document_main = 0 WHERE is_document_main = 1 AND ' . App_Cms_Controller::GetPri() . ' != ' . App_Db::escape($obj->GetId()));
 					}
 
@@ -81,7 +81,7 @@ if ($page->IsAuthorized()) {
 					$form->UpdateStatus = FORM_ERROR;
 					$form->Elements['filename']->SetUpdateType(FIELD_ERROR_EXIST);
 					$form->Elements['filename']->SetErrorValue($form->Elements['filename']->GetValue());
-					$form->Elements['filename']->SetValue($obj->getAttribute('filename'));
+					$form->Elements['filename']->SetValue($obj->filename);
 				}
 			}
 
@@ -121,7 +121,7 @@ if ($page->IsAuthorized()) {
 		$page->AddContent($module);
 
 	} else {
-		$about = $g_section->GetAttribute('description') ? '<p class="first">' . $g_section->GetAttribute('description') . '</p>' : '';
+		$about = $g_section->description ? '<p class="first">' . $g_section->description . '</p>' : '';
 		$page->AddContent('<module type="simple" is_able_to_add="true">' . $list_xml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
 	}
 }

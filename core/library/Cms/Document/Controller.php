@@ -47,15 +47,15 @@ abstract class Core_Cms_Document_Controller extends Core_Cms_FoPage
             foreach ($data as $item) {
                 switch ($item->GetTypeId()) {
                     case 'image':
-                        if ($item->GetAttribute('content')) {
-                            if (strpos($item->GetAttribute('content'), '://') !== true) {
-                                $image_file_path = DOCUMENT_ROOT . ltrim($item->GetAttribute('content'), '/');
+                        if ($item->content) {
+                            if (strpos($item->content, '://') !== true) {
+                                $image_file_path = DOCUMENT_ROOT . ltrim($item->content, '/');
                                 if (is_file($image_file_path)) {
                                     $image_file = App_File::factory($image_file_path);
 
                                     if ($image_file->isImage()) {
-                                        $item->SetAttribute('content', $image_file->getXml());
-                                        $item->SetTypeId('xml');
+                                        $item->content = $image_file->getXml();
+                                        $item->setTypeId('xml');
                                     }
                                 }
                             }
@@ -63,7 +63,7 @@ abstract class Core_Cms_Document_Controller extends Core_Cms_FoPage
                         break;
 
                     case 'xml':
-                        if ($item->GetAttribute('content')) {
+                        if ($item->content) {
                             $data_dom = Ext_Dom::get(Core_Cms_Ext_Xml::getDocument(
                                 $item->content,
                                 'data'
@@ -121,7 +121,7 @@ abstract class Core_Cms_Document_Controller extends Core_Cms_FoPage
                                 $content .= $data_dom->saveXml($child);
                             }
 
-                            $item->SetAttribute('content', $content);
+                            $item->content = $content;
                         }
                         break;
                 }

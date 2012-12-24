@@ -9,8 +9,8 @@ if ($page->IsAllowed()) {
 	/*
 	$sections_xml = '';
 	foreach ($g_user->GetSections() as $item) {
-		$append_xml = $item->GetAttribute('description')
-			? '<description><![CDATA[' . $item->GetAttribute('description') . ']]></description>'
+		$append_xml = $item->description
+			? '<description><![CDATA[' . $item->description . ']]></description>'
 			: '';
 		$sections_xml .= $item->GetXml('bo_navigation', 'item', $append_xml);
 	}

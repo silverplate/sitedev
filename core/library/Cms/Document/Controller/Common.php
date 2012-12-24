@@ -27,8 +27,8 @@ abstract class Core_Cms_Document_Controller_Common extends App_Cms_Document_Cont
 
         foreach ($navigation as $i) {
             $navigationXml .= App_Cms_Document_Navigation::getNavigationXml(
-                $i->getAttribute('name'),
-                $i->getAttribute('type')
+                $i->name,
+                $i->type
             );
         }
 

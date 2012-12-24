@@ -68,7 +68,7 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 
         foreach ($data as $row) {
             $document = new App_Cms_Document();
-            $document->dataInit($row);
+            $document->fillWithData($row);
             $documents[$document->getId()] = $document;
         }
 
@@ -124,7 +124,7 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 		switch ($_type) {
 			case 'bo_list':
 				$result .= '<' . $node_name . ' id="' . $this->GetId() .'"';
-				if ($this->getAttribute('is_published') == 1) $result .= ' is_published="true"';
+				if ($this->isPublished) $result .= ' is_published="true"';
 
 				$result .= '><title><![CDATA[' . $this->GetTitle() . ']]></title>';
 				$result .= $_append_xml;
@@ -164,8 +164,8 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 
 		if ($links) {
 			foreach ($links as $item) {
-				if ($item->GetAttribute($key)) {
-					array_push($result, $item->GetAttribute($key));
+				if ($item->$key) {
+					array_push($result, $item->$key);
 				}
 			}
 		}
@@ -188,19 +188,20 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 
 			foreach ($_value as $id => $item) {
 				$obj = new $class_name;
-				$obj->SetAttribute($this->GetPri(), $this->GetId());
+				$obj->setAttrValue($this->getPri(), $this->getId());
 
 				if (is_array($item)) {
-					$obj->SetAttribute($key, $id);
+					$obj->$key = $id;
+
 					foreach ($item as $attribute => $value) {
-						$obj->SetAttribute($attribute, $value);
+						$obj->$attribute = $value;
 					}
 
 				} else {
-					$obj->SetAttribute($key, $item);
+					$obj->$key = $item;
 				}
 
-				array_push($this->_links[$_name], $obj);
+				$this->_links[$_name][] = $obj;
 			}
 		}
 	}
@@ -242,7 +243,7 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 		return parent::getList(
 			get_called_class(),
 			self::GetTbl(),
-			self::GetBase()->GetAttributes(),
+			self::GetBase()->getAttrNames(),
 			$_attributes,
 			$_parameters,
 			$_rowConditions

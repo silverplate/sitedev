@@ -283,14 +283,14 @@ function documentNotFound()
 
         if ($document) {
             if (
-                $document->getAttribute('link') &&
-                $document->getAttribute('link') != $realUrl['path']
+                $document->link &&
+                $document->link != $realUrl['path']
             ) {
-                goToUrl($document->getAttribute('link'));
+                goToUrl($document->link);
 
             } else if (
                 $document->getController() && (
-                    $document->getAttribute('is_published') == 1 ||
+                    $document->is_published == 1 ||
                     (defined('IS_SHOW_HIDDEN') && IS_SHOW_HIDDEN)
                 )
             ) {

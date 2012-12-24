@@ -42,11 +42,6 @@ abstract class Core_ActiveRecord_Attribute
 
     public function setValue($_value)
     {
-        if ($_value == 'NULL') {
-            $this->_value = $_value;
-            return;
-        }
-
         switch ($this->_type) {
             case 'integer':
                 $this->_value = (integer) $_value;
@@ -66,35 +61,19 @@ abstract class Core_ActiveRecord_Attribute
         }
     }
 
-    public function getValue($_doEscape = true)
+    public function getSqlValue()
     {
-        if (
-            $this->_value == 'NULL' || (
-                $this->_value == '' &&
-                in_array($this->getType(), array('date', 'datetime'))
-            )
-        ) {
-            return 'NULL';
+        return $this->_value ? App_Db::escape($this->_value) : 'NULL';
+    }
 
-        } else if ($this->_value == '' && $_doEscape) {
-            return '\'\'';
-
-        } else {
-            switch ($this->_type) {
-                case 'integer':
-                case 'boolean':
-                case 'float':
-                    return $this->_value;
-
-                default:
-                    return $_doEscape ? App_Db::escape($this->_value) : $this->_value;
-            }
-        }
+    public function getValue()
+    {
+        return $this->_value;
     }
 
     public function isValue()
     {
-        return $this->_value !== '';
+        return !empty($this->_value);
     }
 
     public function getName()

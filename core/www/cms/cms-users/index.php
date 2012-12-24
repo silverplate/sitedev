@@ -23,11 +23,11 @@ if ($page->IsAuthorized()) {
 		}
 
 		if ($obj->getId()) {
-			$form->FillFields($obj->GetAttributeValues());
+			$form->FillFields($obj->toArray());
 			$form->Elements['passwd']->SetValue();
 			$form->Elements['sections']->SetValue($obj->GetLinkIds('sections'));
 
-			if ($obj->getAttribute('status_id') != 1) {
+			if ($obj->statusId != 1) {
 				$form->Elements['status_id']->SetValue(0);
 			}
 
@@ -49,7 +49,7 @@ if ($page->IsAuthorized()) {
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
 				if (App_Cms_Bo_User::CheckUnique($form->Elements['login']->GetValue(), $obj->getId())) {
-					$obj->DataInit($form->GetSqlValues());
+					$obj->fillWithData($form->GetSqlValues());
 
 					$password = $form->Elements['passwd']->GetValue();
 					if (isset($password['password'])) {
@@ -57,11 +57,11 @@ if ($page->IsAuthorized()) {
 					}
 
 					if ($form->Elements['status_id']->GetValue() != 1) {
-						$obj->SetAttribute('status_id', 2);
+						$obj->statusId = 2;
 					}
 
-					if ($obj->getAttribute('ip_restriction')) {
-						$obj->SetAttribute('ip_restriction', implode("\r\n", Ext_String::split($obj->getAttribute('ip_restriction'))));
+					if ($obj->ipRestriction) {
+						$obj->ipRestriction = implode("\r\n", Ext_String::split($obj->ipRestriction));
 					}
 
 					if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
@@ -87,7 +87,7 @@ if ($page->IsAuthorized()) {
 
 					$form->Elements['login']->SetUpdateType(FIELD_ERROR_EXIST);
 					$form->Elements['login']->SetErrorValue($form->Elements['login']->GetValue());
-					$form->Elements['login']->SetValue($obj->getAttribute('login'));
+					$form->Elements['login']->SetValue($obj->login);
 				}
 			}
 		}
@@ -127,7 +127,7 @@ if ($page->IsAuthorized()) {
 		$page->AddContent($module);
 
 	} else {
-		$about = $g_section->GetAttribute('description') ? '<p class="first">' . $g_section->GetAttribute('description') . '</p>' : '';
+		$about = $g_section->description ? '<p class="first">' . $g_section->description . '</p>' : '';
 		$page->AddContent('<module type="simple" is_able_to_add="true">' . $list_xml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
 	}
 }

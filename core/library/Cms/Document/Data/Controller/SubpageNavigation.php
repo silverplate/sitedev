@@ -50,10 +50,7 @@ extends App_Cms_Document_Data_Controller
         $xml = '';
 
         foreach ($children as $item) {
-            $link = $item->getAttribute('link')
-                  ? $item->getAttribute('link')
-                  : $item->getUri();
-
+            $link = $item->link ? $item->link : $item->getUri();
             $itemXml = Ext_Xml::cdata('title', $item->getTitle());
             $itemAttrs = array('uri' => $item->getUri(), 'link' => $link);
 

@@ -86,7 +86,7 @@ if ($page->IsAuthorized()) {
 		if (IS_USERS) {
 			$form->Groups['system']->AddElement($form->CreateElement('auth_status_id', 'chooser', 'Страница доступна'));
 			foreach (App_Cms_User::GetAuthGroups() as $id => $params) {
-				$form->Elements['auth_status_id']->AddOption($id, strtolower_utf8($params['title1']));
+				$form->Elements['auth_status_id']->AddOption($id, Ext_String::toLower($params['title1']));
 			}
 		}
 

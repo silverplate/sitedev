@@ -25,7 +25,7 @@ abstract class Core_Form_Element_Image extends App_Form_Element
                     'width' => $size[0],
                     'height' => $size[1],
                     'type' => $size[2],
-                    'size' => format_number(filesize($filepath) / 1024, 2)
+                    'size' => Ext_Number::format(filesize($filepath) / 1024)
                 );
             }
         }

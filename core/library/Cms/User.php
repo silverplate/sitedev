@@ -155,8 +155,9 @@ abstract class Core_Cms_User extends App_ActiveRecord
 		return $this->GetAttribute('last_name') . ' ' . $this->GetAttribute('first_name');
 	}
 
-	public function GeneratePassword() {
-		return get_random_string(8);
+	public static function generatePassword()
+	{
+	    return Ext_String::getRandomReadable(8);
 	}
 
 	public function SetPassword($_password) {

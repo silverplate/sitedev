@@ -44,7 +44,7 @@ function bo_log_get_filter($_is_parse_post = false) {
 	if ($_is_parse_post && $_POST) {
 		foreach ($_POST as $key => $value) {
 			if (is_array($value)) {
-				array_walk($_POST[$key], 'decode_array');
+// 				array_walk($_POST[$key], 'decode_array');
 				$_POST[$key] = $_POST[$key];
 			} else {
 				$_POST[$key] = $value;

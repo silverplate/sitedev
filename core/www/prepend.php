@@ -22,7 +22,7 @@ $url = isset($_SERVER['REQUEST_URI']) && $_SERVER['REQUEST_URI'] != ''
 if ($host !== false && $url !== false && isset($g_langs)) {
 	$lang_path = array();
 	foreach ($g_langs as $lang => $params) {
-		foreach (list_to_array($params[0]) as $item) {
+		foreach (Ext_String::split($params[0]) as $item) {
 			if (
 				$host == $item || (
 					'/' == $item &&

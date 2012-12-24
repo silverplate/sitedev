@@ -12,25 +12,25 @@ abstract class Core_Form_Element_AddingFiles extends Core_Form_Element
                     for ($i = 0; $i < count($data['name']); $i++) {
                         if (isset($data['name'][$i]) && $data['name'][$i] && isset($data['tmp_name'][$i]) && $data['tmp_name'][$i]) {
                             array_push($value, array(
-                            'name' => $data['name'][$i],
-                            'tmp_name' => $data['tmp_name'][$i]
+                                'name' => $data['name'][$i],
+                                'tmp_name' => $data['tmp_name'][$i]
                             ));
                         }
                     }
 
-                } elseif ($data['name'] && $data['tmp_name']) {
+                } else if ($data['name'] && $data['tmp_name']) {
                     array_push($value, array(
-                    'name' => $data['name'],
-                    'tmp_name' => $data['tmp_name']
+                        'name' => $data['name'],
+                        'tmp_name' => $data['tmp_name']
                     ));
                 }
             }
 
-        } elseif ($data && is_file($data)) {
+        } else if ($data && is_file($data)) {
             $value = array(
-                    'path' => $data,
-                    'url' => str_replace(DOCUMENT_ROOT, '/', $data),
-                    'size' => format_number(filesize($data) / 1024, 2)
+                'path' => $data,
+                'url' => str_replace(DOCUMENT_ROOT, '/', $data),
+                'size' => Ext_Number::format(filesize($data) / 1024)
             );
         }
 
@@ -55,13 +55,13 @@ abstract class Core_Form_Element_AddingFiles extends Core_Form_Element
             if ($value) {
                 if (is_array($value)) {
                     if (isset($value['path'])) {
-                        return array($this->Name => translit(basename($value['path'])));
+                        return array($this->Name => Ext_File::normalizeName(basename($value['path'])));
 
                     } else {
                         $result = array();
                         foreach ($value as $file) {
                             if (isset($file['name'])) {
-                                array_push($result, translit($file['name']));
+                                array_push($result, Ext_File::normalizeName($file['name']));
                             }
                         }
                         if ($result) {

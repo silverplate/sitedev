@@ -127,7 +127,7 @@ abstract class Core_Cms_Cache
 			}
 
 			$query = $this->GetSectionQueryImportant() && $this->GetRequestQuery()
-				? str_replace(array('&', '=', '[', ']', '"', '\''), '_', translit(urldecode($this->GetRequestQuery())))
+				? str_replace(array('&', '=', '[', ']', '"', '\''), '_', Ext_String::translit(urldecode($this->GetRequestQuery())))
 				: false;
 
 			$this->File = str_replace('//', '/', $this->File) . ($query && $this->GetSectionQueryImportant()

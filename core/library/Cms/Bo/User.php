@@ -21,7 +21,7 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 
 	public function UploadFile($_name, $_tmp_name) {
 		if ($_name && $_tmp_name) {
-			$name = translit($_name);
+		    $name = Ext_File::normalizeName($_name);
 			create_directory($this->GetFileFolder(), true);
 			move_uploaded_file($_tmp_name, $this->GetFileFolder() . $name);
 			@chmod($this->GetFileFolder() . $name, 0777);
@@ -40,7 +40,7 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 			$try = App_Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->GetAttributes(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE login = ' . App_Db::escape(func_get_arg(0)) . ' AND passwd = ' . App_Db::escape(md5(func_get_arg(1))) . ' AND status_id = 1');
 		}
 
-		if (isset($try) && $try && (!$try['ip_restriction'] || in_array($_SERVER['REMOTE_ADDR'], list_to_array($try['ip_restriction'])))) {
+		if (isset($try) && $try && (!$try['ip_restriction'] || in_array($_SERVER['REMOTE_ADDR'], Ext_String::split($try['ip_restriction'])))) {
 			$cname = get_called_class();
 			$obj = new $cname;
 			$obj->DataInit($try);
@@ -89,7 +89,7 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 				$this->Update();
 
 				$ip_restriction = '';
-				$ips = list_to_array($this->GetAttribute('ip_restriction'));
+				$ips = Ext_String::split($this->GetAttribute('ip_restriction'));
 				if ($ips) {
 					$ip_restriction = "\r\nРазрешённы" . (count($ips) > 1 ? 'е IP-адреса' : 'й IP-адрес') . ': ' . implode(', ', $ips);
 				}
@@ -108,8 +108,9 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 		return $this->GetAttribute('title') ? $this->GetAttribute('title') : $this->GetAttribute('login');
 	}
 
-	public function GeneratePassword() {
-		return get_random_string(8);
+	public static function generatePassword()
+	{
+	    return Ext_String::getRandomReadable(8);
 	}
 
 	public function SetPassword($_password) {

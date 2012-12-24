@@ -133,10 +133,10 @@ abstract class Core_Cms_Page
 		$result = '<url';
 		foreach (array_diff_key($this->Url, array('request_uri' => '')) as $name => $value) {
 			if ($value != '') {
-				$result .= ' ' . $name . '="' . str_replace('&', '&amp;', encode($value)) . '"';
+				$result .= ' ' . $name . '="' . str_replace('&', '&amp;', $value) . '"';
 			}
 		}
-		return $result . '><![CDATA[' . encode($this->Url['request_uri']) . ']]></url>';
+		return $result . '><![CDATA[' . $this->Url['request_uri'] . ']]></url>';
 	}
 
 	public function GetHtml() {

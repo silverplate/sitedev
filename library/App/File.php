@@ -165,9 +165,9 @@ class App_File extends Ext_File
         global $gMaxUploadFilesize, $gAmountMaxUploadFilesize;
 
         return 'Превышен максимальный размер для&nbsp;загрузки. Лимиты: ' .
-               format_number($gMaxUploadFilesize, 1) .
+               Ext_Number::format($gMaxUploadFilesize) .
                '&nbsp;МБ для&nbsp;одного файла и&nbsp;' .
-               format_number($gAmountMaxUploadFilesize, 1) .
+               Ext_Number::format($gAmountMaxUploadFilesize) .
                '&nbsp;МБ всего.';
     }
 
@@ -187,9 +187,9 @@ class App_File extends Ext_File
 
         return 'Общий размер всех загружаемых за&nbsp;раз файлов ' .
                'не&nbsp;должен превышать ' .
-               format_number($gAmountMaxUploadFilesize, 1) .
+               Ext_Number::format($gAmountMaxUploadFilesize) .
                '&nbsp;МБ и&nbsp;каждый файл должен быть меньше ' .
-               format_number($gMaxUploadFilesize, 1) .
+               Ext_Number::format($gMaxUploadFilesize) .
                '&nbsp;МБ.';
     }
 }

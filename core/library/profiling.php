@@ -79,13 +79,13 @@ function trace_time_get_report($_format = 'html')
             $time = $item['finish'] - $item['start'];
 
             if ($time > 3600) {
-                $timeTaken = format_number($time / 3600, 2) . ' hours';
+                $timeTaken = Ext_Number::format($time / 3600, 2) . ' hours';
 
             } else if ($time > 60) {
-                $timeTaken = format_number($time / 60, 2) . ' minutes';
+                $timeTaken = Ext_Number::format($time / 60, 2) . ' minutes';
 
             } else {
-                $timeTaken = format_number($time, 6) . ' seconds';
+                $timeTaken = Ext_Number::format($time, 6) . ' seconds';
             }
 
             if ($item['level']) {
@@ -98,7 +98,7 @@ function trace_time_get_report($_format = 'html')
                        ': ' . $timeTaken;
 
             if ($globalTime && $globalTime != $time) {
-                $result .= ' (' . format_number(($time * 100) / $globalTime, 2) . '%)';
+                $result .= ' (' . Ext_Number::format(($time * 100) / $globalTime, 2) . '%)';
             }
 
             $result .= $nl;

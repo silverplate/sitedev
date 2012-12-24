@@ -57,10 +57,7 @@ function __autoload($_class)
         $include = array_merge($include, $core);
     }
 
-    $class = $path[count($path) - 1];
-//     $class = strtolower(trim(preg_replace('/([A-Z])/', '-\1', $class), '-'));
-    $path[count($path) - 1] = "$class.php";
-//     $localPath = strtolower(implode('/', $path));
+    $path[count($path) - 1] = $path[count($path) - 1] . '.php';
     $localPath = implode('/', $path);
 
     foreach ($include as $dir) {
@@ -69,9 +66,6 @@ function __autoload($_class)
             break;
         }
     }
-
-//     if ($_class == 'App_ActiveRecord')
-//         d($path, $localPath, $include);
 }
 
 function get_lang_inner_uri() {
@@ -111,7 +105,7 @@ function send_email($_mail_pref, $_email, $_subject, $_body, $_is_html = false, 
         }
 
         if (isset($_mail_pref['bcc'])) {
-            foreach (list_to_array($_mail_pref['bcc']) as $item) {
+            foreach (Ext_String::split($_mail_pref['bcc']) as $item) {
                 $mailer->AddBCC($item);
             }
         }
@@ -120,7 +114,7 @@ function send_email($_mail_pref, $_email, $_subject, $_body, $_is_html = false, 
         $emails = is_array($_email) ? $_email : array($_email);
 
         foreach ($emails as $email) {
-            if (is_email($email)) {
+            if (Ext_String::isEmail($email)) {
                 $isEmail = true;
                 $mailer->AddAddress($email);
             }
@@ -156,7 +150,7 @@ function send_email($_mail_pref, $_email, $_subject, $_body, $_is_html = false, 
         }
 
         foreach (array('FromName', 'Subject', 'Body') as $name) {
-            $mailer->$name = decode($mailer->$name);
+            $mailer->$name = @iconv('utf-8', 'windows-1251', $mailer->$name);
         }
 
         return $isEmail ? $mailer->Send() : false;
@@ -226,4 +220,40 @@ function advGetCookie($_name)
     return isset($_COOKIE[$name]) ? $_COOKIE[$name] : false;
 }
 
-?>
+function d()
+{
+    $args = func_get_args();
+    $count = count($args);
+
+    if ($count == 1) {
+        debug($args[0]);
+
+    } else {
+        foreach ($args as $i => $var) {
+            if ($i != 0) echo PHP_EOL;
+            echo $i + 1 . ':';
+            echo PHP_EOL;
+
+            debug($var);
+        }
+    }
+
+    die();
+}
+
+function debug($_var)
+{
+    if (PHP_SAPI == 'cli') {
+        print_r($_var);
+        echo PHP_EOL;
+
+    } else {
+        echo '<pre>';
+
+        if (is_string($_var))   echo htmlspecialchars($_var);
+        else                    print_r($_var);
+
+        echo '</pre>';
+        echo PHP_EOL;
+    }
+}

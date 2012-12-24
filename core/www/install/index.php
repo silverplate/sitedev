@@ -19,7 +19,7 @@ $boSections = array(
 );
 
 $boUsers = array(
-    array('title' => 'Разработчик', 'login' => 'developer', 'passwd' => get_random_string_optimized(8), 'email' => 'support@sitedev.ru')
+    array('title' => 'Разработчик', 'login' => 'developer', 'passwd' => Ext_String::getRandomReadable(8), 'email' => 'support@sitedev.ru')
 );
 
 $foControllers = array(

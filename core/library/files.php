@@ -156,7 +156,7 @@ function get_size_measure($_size) {
 		$result['measure_en'] = 'bite';
 	}
 
-	$result['value'] = format_number($result['value']);
+	$result['value'] = Ext_Number::format($result['value']);
 	$result['string'] = $result['value'] . '&nbsp;' . $result['measure'];
 	$result['string_en'] = $result['value'] . '&nbsp;' . $result['measure_en'];
 

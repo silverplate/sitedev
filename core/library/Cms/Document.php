@@ -22,7 +22,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 	public function UploadFile($_name, $_tmp_name) {
 		if ($_name && $_tmp_name) {
-			$name = translit($_name);
+			$name = Ext_File::normalizeName($_name);
 			create_directory($this->GetFilePath(), true);
 			move_uploaded_file($_tmp_name, $this->GetFilePath() . $name);
 			@chmod($this->GetFilePath() . $name, 0777);
@@ -38,7 +38,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 				$result .= '<' . $node_name . ' id="' . $this->GetId() . '"';
 				if ($this->GetAttribute('is_published') == 1) $result .= ' is_published="true"';
 				if (IS_USERS && $this->GetAttribute('auth_status_id') != App_Cms_User::AUTH_GROUP_ALL && App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id'))) {
-					$result .= ' prefix="' . strtolower_utf8(substr_utf8(App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id')), 0, 1)) . '"';
+					$result .= ' prefix="' . Ext_String::toLower(substr(App_Cms_User::GetAuthGroupTitle($this->GetAttribute('auth_status_id')), 0, 1)) . '"';
 				}
 
 				if ($_append_attributes) {

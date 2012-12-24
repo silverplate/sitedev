@@ -61,7 +61,7 @@ if ($page->IsAuthorized()) {
 					}
 
 					if ($obj->GetAttribute('ip_restriction')) {
-						$obj->SetAttribute('ip_restriction', implode("\r\n", list_to_array($obj->GetAttribute('ip_restriction'))));
+						$obj->SetAttribute('ip_restriction', implode("\r\n", Ext_String::split($obj->GetAttribute('ip_restriction'))));
 					}
 
 					if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {

@@ -6,8 +6,9 @@ abstract class Core_Cms_Bo_Section extends App_ActiveRecord
 	protected $Links = array('users' => null);
 	const TABLE = 'bo_section';
 
-	public function GetName() {
-		return strtolower(str_replace(' ', '_', translit($this->GetTitle())));
+	public function getName()
+	{
+	    return Ext_File::normalizeName($this->getTitle());
 	}
 
 	public static function CheckUnique($_value, $_exclude = null) {

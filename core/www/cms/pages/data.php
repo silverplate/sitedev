@@ -55,12 +55,12 @@ if (is_null($document_id) || !App_Cms_Document::Load($document_id)) {
 	if (IS_USERS) {
 		$form->CreateElement('auth_status_id', 'chooser', 'Данные доступны');
 		foreach (App_Cms_User::GetAuthGroups() as $id => $params) {
-			$form->Elements['auth_status_id']->AddOption($id, strtolower_utf8($params['title1']));
+			$form->Elements['auth_status_id']->AddOption($id, Ext_String::toLower($params['title1']));
 		}
 	}
 
 	foreach (App_Cms_Document_Data::GetApplyTypes() as $id => $title) {
-		$form->Elements['apply_type_id']->AddOption($id, strtolower_utf8($title));
+		$form->Elements['apply_type_id']->AddOption($id, Ext_String::toLower($title));
 	}
 
 	if (!isset($obj) || !$obj) {

@@ -19,7 +19,7 @@ if ($page->IsAuthorized()) {
 		$form->Load('form.xml');
 
 		foreach (App_Cms_Document_Navigation::GetTypes() as $id => $params) {
-			$form->Elements['type']->AddOption($id, strtolower_utf8($params['title']));
+			$form->Elements['type']->AddOption($id, Ext_String::toLower($params['title']));
 		}
 
 		if ($obj->GetId()) {

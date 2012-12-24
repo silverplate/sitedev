@@ -7,7 +7,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 	private $Controller;
 	private $_template;
 	private $Language;
-	protected $Links = array('navigations' => null);
+	protected $_links = array('navigations' => null);
 
 	const TABLE = 'fo_document';
 
@@ -29,7 +29,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		}
 	}
 
-	public function GetXml($_type, $_node_name = null, $_append_xml = null, $_append_attributes = null) {
+	public function getXml($_type, $_node_name = null, $_append_xml = null, $_append_attributes = null) {
 		$node_name = ($_node_name) ? $_node_name : strtolower(get_called_class());
 		$result = '';
 
@@ -157,7 +157,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		$uri = '';
 
 		if (!is_null($_id)) {
-			$obj = self::Load($_id);
+			$obj = self::load($_id);
 			if ($obj) {
 				$id = $_id;
 				$uri = $obj->GetAttribute('uri');
@@ -178,9 +178,9 @@ abstract class Core_Cms_Document extends App_ActiveRecord
         }
 	}
 
-	public function Create() {
+	public function create() {
 		$this->ComputeUri();
-		return parent::Create();
+		return parent::create();
 	}
 
 	public function Update() {
@@ -195,12 +195,12 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		self::UpdateChildrenUri($this->GetId());
 	}
 
-	public function Delete() {
-		foreach (self::GetList(array('parent_id' => $this->GetId())) as $item) {
+	public function delete() {
+		foreach (self::getList(array('parent_id' => $this->GetId())) as $item) {
 			$item->Delete();
 		}
 
-		foreach (App_Cms_Document_Data::GetList(array(self::GetPri() => $this->GetId())) as $item) {
+		foreach (App_Cms_Document_Data::getList(array(self::GetPri() => $this->GetId())) as $item) {
 			$item->Delete();
 		}
 
@@ -210,7 +210,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 
 	public function IsChildren($_except_id = null) {
 		if (is_null($this->IsChildren)) {
-			$list = self::GetList(array('parent_id' => $this->GetId()));
+			$list = self::getList(array('parent_id' => $this->GetId()));
 
 			if (is_null($_except_id)) {
 				$this->IsChildren = ($list);
@@ -256,7 +256,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 	public function GetController() {
 		if (is_null($this->Controller)) {
 			$this->Controller = $this->GetAttribute(App_Cms_Controller::GetPri())
-				? App_Cms_Controller::Load($this->GetAttribute(App_Cms_Controller::GetPri()))
+				? App_Cms_Controller::load($this->GetAttribute(App_Cms_Controller::GetPri()))
 				: false;
 		}
 
@@ -338,14 +338,14 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		return $result;
 	}
 
-	public static function GetList($_attributes = array(), $_parameters = array(), $_row_conditions = array()) {
+	public static function getList($_attributes = array(), $_parameters = array(), $_row_conditions = array()) {
 		$conditions = self::GetQueryConditions($_attributes);
 
 		if ($_row_conditions) {
 			$conditions['row_conditions'] = array_merge($conditions['row_conditions'], $_row_conditions);
 		}
 
-		return parent::GetList(
+		return parent::getList(
 			get_called_class(),
 			$conditions['tables'],
 			self::GetBase()->GetAttributes(true),
@@ -358,22 +358,22 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 	public static function CheckUnique($_parent_id, $_folder, $_except_id = null) {
 		$row_conditions = array();
 		if ($_except_id) array_push($row_conditions, self::GetPri() . ' != ' . App_Db::escape($_except_id));
-		return !(self::GetList(array('parent_id' => $_parent_id, 'folder' => $_folder), array('count' => 1), $row_conditions));
+		return !(self::getList(array('parent_id' => $_parent_id, 'folder' => $_folder), array('count' => 1), $row_conditions));
 	}
 
 	public function GetLinks($_name, $_is_published = null) {
-		if (!$this->Links[$_name]) {
+		if (!$this->_links[$_name]) {
 			$conditions = array(self::GetPri() => $this->GetId());
 			if (!is_null($_is_published)) $conditions['is_published'] = $_is_published;
 
 			switch ($_name) {
 				case 'navigations':
-					$this->Links[$_name] = App_Cms_Document_ToNavigation::GetList($conditions);
+					$this->_links[$_name] = App_Cms_Document_ToNavigation::getList($conditions);
 					break;
 			}
 		}
 
-		return $this->Links[$_name];
+		return $this->_links[$_name];
 	}
 
 	public function GetLinkIds($_name, $_is_published = null) {
@@ -400,7 +400,7 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 	}
 
 	public function SetLinks($_name, $_value = null) {
-		$this->Links[$_name] = array();
+		$this->_links[$_name] = array();
 
 		switch ($_name) {
 			case 'navigations':
@@ -426,15 +426,15 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 					$obj->SetAttribute($key, $item);
 				}
 
-				array_push($this->Links[$_name], $obj);
+				array_push($this->_links[$_name], $obj);
 			}
 		}
 	}
 
 	public function __construct() {
 		parent::__construct(self::GetTbl());
-		foreach (self::GetBase()->Attributes as $item) {
-			$this->Attributes[$item->GetName()] = clone($item);
+		foreach (self::GetBase()->_attributes as $item) {
+			$this->_attributes[$item->GetName()] = clone($item);
 		}
 	}
 
@@ -470,8 +470,8 @@ abstract class Core_Cms_Document extends App_ActiveRecord
 		return DB_PREFIX . self::TABLE;
 	}
 
-	public static function Load($_value, $_attribute = null) {
-		return parent::Load(get_called_class(), $_value, $_attribute);
+	public static function load($_value, $_attribute = null) {
+		return parent::load(get_called_class(), $_value, $_attribute);
 	}
 }
 

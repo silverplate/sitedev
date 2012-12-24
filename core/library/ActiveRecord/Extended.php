@@ -47,8 +47,8 @@ abstract class Core_ActiveRecord_Extended extends Core_ActiveRecord
     {
         parent::__construct(self::getTbl());
 
-        foreach (self::getObjectBase()->Attributes as $item) {
-            $this->Attributes[$item->getName()] = clone($item);
+        foreach (self::getObjectBase()->_attributes as $item) {
+            $this->_attributes[$item->getName()] = clone($item);
         }
     }
 

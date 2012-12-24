@@ -17,9 +17,9 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 		}
 	}
 
-	public function Create() {
+	public function create() {
 		$this->CheckApplyType();
-		parent::Create();
+		parent::create();
 	}
 
 	public function Update() {
@@ -43,7 +43,7 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 		return $this->SetAttribute(App_Cms_Document_Data_ContentType::GetPri(), $_type_id);
 	}
 
-	public function GetXml($_additional_xml = null) {
+	public function getXml($_additional_xml = null) {
 		$result = '<document_data id="' . $this->GetId() . '"';
 
 		if ($this->GetTypeId()) {
@@ -89,7 +89,7 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 	public function GetController() {
 		if (is_null($this->Controller)) {
 			$this->Controller = $this->GetAttribute(App_Cms_Controller::GetPri())
-				? App_Cms_Controller::Load($this->GetAttribute(App_Cms_Controller::GetPri()))
+				? App_Cms_Controller::load($this->GetAttribute(App_Cms_Controller::GetPri()))
 				: false;
 		}
 
@@ -114,8 +114,8 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 
 	public function __construct() {
 		parent::__construct(self::GetTbl());
-		foreach (self::GetBase()->Attributes as $item) {
-			$this->Attributes[$item->GetName()] = clone($item);
+		foreach (self::GetBase()->_attributes as $item) {
+			$this->_attributes[$item->GetName()] = clone($item);
 		}
 	}
 
@@ -147,12 +147,12 @@ abstract class Core_Cms_Document_Data extends App_ActiveRecord
 		return self::GetBase()->GetTable();
 	}
 
-	public static function Load($_value, $_attribute = null) {
-		return parent::Load(get_called_class(), $_value, $_attribute);
+	public static function load($_value, $_attribute = null) {
+		return parent::load(get_called_class(), $_value, $_attribute);
 	}
 
-	public static function GetList($_attributes = array(), $_parameters = array(), $_row_conditions = array()) {
-		return parent::GetList(
+	public static function getList($_attributes = array(), $_parameters = array(), $_row_conditions = array()) {
+		return parent::getList(
 			get_called_class(),
 			self::GetTbl(),
 			self::GetBase()->GetAttributes(),

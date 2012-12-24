@@ -86,7 +86,7 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 		);
 	}
 
-	public function GetXml($_type, $_node_name = null, $_append_xml = null) {
+	public function getXml($_type, $_node_name = null, $_append_xml = null) {
 		$node_name = ($_node_name) ? $_node_name : get_called_class();
 		$result = '';
 
@@ -106,7 +106,7 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 					}
 				}
 
-				$result = parent::GetXml(null, $node_name, $append_xml, $append_attributes);
+				$result = parent::getXml(null, $node_name, $append_xml, $append_attributes);
 				break;
 		}
 
@@ -142,7 +142,7 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 		return $result;
 	}
 
-	public static function GetList($_conditions = array(), $_parameters = array(), $_row_conditions = array()) {
+	public static function getList($_conditions = array(), $_parameters = array(), $_row_conditions = array()) {
 		$conditions = self::GetQueryConditions($_conditions);
 
 		$parameters = $_parameters;
@@ -155,11 +155,11 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 			$row_conditions = array_merge($row_conditions, $_row_conditions);
 		}
 
-		return parent::GetList(get_called_class(), $conditions['tables'], self::GetBase()->GetAttributes(true), null, $parameters, $row_conditions);
+		return parent::getList(get_called_class(), $conditions['tables'], self::GetBase()->GetAttributes(true), null, $parameters, $row_conditions);
 	}
 
 
-	public static function GetCount($_conditions = array(), $_row_conditions = array()) {
+	public static function getCount($_conditions = array(), $_row_conditions = array()) {
 		$conditions = self::GetQueryConditions($_conditions);
 
 		$row_conditions = $conditions['row_conditions'];
@@ -167,13 +167,13 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 			$row_conditions = array_merge($row_conditions, $_row_conditions);
 		}
 
-		return parent::GetCount(get_called_class(), $conditions['tables'], null, $row_conditions);
+		return parent::getCount(get_called_class(), $conditions['tables'], null, $row_conditions);
 	}
 
 	public function __construct() {
 		parent::__construct(self::GetTbl());
-		foreach (self::GetBase()->Attributes as $item) {
-			$this->Attributes[$item->GetName()] = clone($item);
+		foreach (self::GetBase()->_attributes as $item) {
+			$this->_attributes[$item->GetName()] = clone($item);
 		}
 	}
 
@@ -209,8 +209,8 @@ abstract class Core_Cms_Bo_Log extends App_ActiveRecord
 		return self::GetBase()->GetTable();
 	}
 
-	public static function Load($_value, $_attribute = null) {
-		return parent::Load(get_called_class(), $_value, $_attribute);
+	public static function load($_value, $_attribute = null) {
+		return parent::load(get_called_class(), $_value, $_attribute);
 	}
 
 	public static function ComputeTblName()  {

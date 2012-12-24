@@ -23,7 +23,7 @@ if ($page->IsAuthorized()) {
 			$form->FillFields($obj->GetAttributeValues());
 			$form->Elements['passwd']->SetValue();
 
-			if ($obj->GetAttribute('status_id') != 1) {
+			if ($obj->getAttribute('status_id') != 1) {
 				$form->Elements['status_id']->SetValue(0);
 			}
 
@@ -70,7 +70,7 @@ if ($page->IsAuthorized()) {
 					$form->UpdateStatus = FORM_ERROR;
 					$form->Elements['email']->SetUpdateType(FIELD_ERROR_EXIST);
 					$form->Elements['email']->SetErrorValue($form->Elements['email']->GetValue());
-					$form->Elements['email']->SetValue($obj->GetAttribute('email'));
+					$form->Elements['email']->SetValue($obj->getAttribute('email'));
 				}
 			}
 		}

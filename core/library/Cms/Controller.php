@@ -50,13 +50,13 @@ abstract class Core_Cms_Controller extends App_ActiveRecord
 
 	public function CheckUnique() {
 		$attributes = array();
-		foreach ($this->Attributes as $attr) {
+		foreach ($this->_attributes as $attr) {
 			if ($attr->IsUnique()) {
 				$attributes[$attr->GetName()] = $attr->GetValue(false);
 			}
 		}
 
-		return !$attributes || !self::GetList($attributes, array('count' => 1), array(self::GetPri() . ' != ' . App_Db::escape($this->GetId())));
+		return !$attributes || !self::getList($attributes, array('count' => 1), array(self::GetPri() . ' != ' . App_Db::escape($this->GetId())));
 	}
 
 	private function GetPrefix() {
@@ -70,7 +70,7 @@ abstract class Core_Cms_Controller extends App_ActiveRecord
 		}
 	}
 
-	public function GetXml($_type, $_node_name = null, $_append_xml = null) {
+	public function getXml($_type, $_node_name = null, $_append_xml = null) {
 		$node_name = ($_node_name) ? $_node_name : strtolower(get_called_class());
 		$result = '';
 
@@ -88,16 +88,16 @@ abstract class Core_Cms_Controller extends App_ActiveRecord
 		return $result;
 	}
 
-	public function Delete() {
+	public function delete() {
 		App_Db::Get()->Execute('UPDATE ' . App_Cms_Document::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . App_Db::escape($this->GetId()));
 		App_Db::Get()->Execute('UPDATE ' . App_Cms_Document_Data::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . App_Db::escape($this->GetId()));
 
 		Ext_File::deleteFile($this->getFilename());
-		parent::Delete();
+		parent::delete();
 	}
 
 	public function Update() {
-		$prev = self::Load($this->GetId());
+		$prev = self::load($this->GetId());
 		parent::Update();
 
 		if ($prev->GetFilename() && $prev->GetFilename() != $this->GetFilename()) {
@@ -107,8 +107,8 @@ abstract class Core_Cms_Controller extends App_ActiveRecord
 
 	public function __construct() {
 		parent::__construct(self::GetTbl());
-		foreach (self::GetBase()->Attributes as $item) {
-			$this->Attributes[$item->GetName()] = clone($item);
+		foreach (self::GetBase()->_attributes as $item) {
+			$this->_attributes[$item->GetName()] = clone($item);
 		}
 	}
 
@@ -139,17 +139,17 @@ abstract class Core_Cms_Controller extends App_ActiveRecord
 		return DB_PREFIX . self::TABLE;
 	}
 
-	public static function Load($_value, $_attribute = null) {
-		return parent::Load(get_called_class(), $_value, $_attribute);
+	public static function load($_value, $_attribute = null) {
+		return parent::load(get_called_class(), $_value, $_attribute);
 	}
 
-	public static function GetList($_attributes = array(), $_parameters = array(), $_row_conditions = array()) {
+	public static function getList($_attributes = array(), $_parameters = array(), $_row_conditions = array()) {
 		$parameters = $_parameters;
 		if (!isset($parameters['sort_order'])) {
 			$parameters['sort_order'] = 'type_id, title';
 		}
 
-		return parent::GetList(
+		return parent::getList(
 			get_called_class(),
 			self::GetTbl(),
 			self::GetBase()->GetAttributes(),

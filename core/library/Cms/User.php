@@ -28,7 +28,7 @@ abstract class Core_Cms_User extends App_ActiveRecord
 
 		} elseif (isset($_POST['auth_reminder_submit']) || isset($_POST['auth_reminder_submit_x'])) {
 			$try = isset($_POST['auth_email']) && $_POST['auth_email']
-				? App_Cms_User::GetList(array('email' => $_POST['auth_email'], 'status_id' => 1))
+				? App_Cms_User::getList(array('email' => $_POST['auth_email'], 'status_id' => 1))
 				: false;
 
 			if ($try) {
@@ -48,7 +48,7 @@ abstract class Core_Cms_User extends App_ActiveRecord
 			}
 
 			if (isset($_GET['r'])) {
-				$try = $_GET['r'] ? App_Cms_User::Load($_GET['r'], 'reminder_key') : false;
+				$try = $_GET['r'] ? App_Cms_User::load($_GET['r'], 'reminder_key') : false;
 				if ($try && $try->ChangePassword() == 0) {
 					App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CHANGE_PWD);
 				} else {
@@ -168,13 +168,13 @@ abstract class Core_Cms_User extends App_ActiveRecord
 		$this->UpdateAttribute('passwd', md5($_password));
 	}
 
-	public function GetXml($_type, $_node_name = null, $_append_xml = null) {
+	public function getXml($_type, $_node_name = null, $_append_xml = null) {
 		$node_name = ($_node_name) ? $_node_name : 'user';
 		$result = '';
 
 		switch ($_type) {
 			case 'bo_list':
-				$result .= '<' . $node_name . ' id="' . $this->GetId() . '"';
+				$result .= '<' . $node_name . ' id="' . $this->getId() . '"';
 				if ($this->GetAttribute('status_id') == 1) $result .= ' is_published="true"';
 
 				$result .= '><title><![CDATA[' . $this->GetTitle() . ']]></title>';
@@ -183,7 +183,7 @@ abstract class Core_Cms_User extends App_ActiveRecord
 				break;
 
 			case 'page_system':
-				$result .= '<' . $node_name . ' id="' . $this->GetId() . '"';
+				$result .= '<' . $node_name . ' id="' . $this->getId() . '"';
 				$result .= '><title><![CDATA[' . $this->GetTitle() . ']]></title>';
 				$result .= $_append_xml;
 				$result .= '</' . $node_name . '>';
@@ -195,8 +195,8 @@ abstract class Core_Cms_User extends App_ActiveRecord
 
 	public function __construct() {
 		parent::__construct(self::GetTbl());
-		foreach (self::GetBase()->Attributes as $item) {
-			$this->Attributes[$item->GetName()] = clone($item);
+		foreach (self::GetBase()->_attributes as $item) {
+			$this->_attributes[$item->GetName()] = clone($item);
 		}
 	}
 
@@ -228,12 +228,12 @@ abstract class Core_Cms_User extends App_ActiveRecord
 		return self::GetBase()->GetTable();
 	}
 
-	public static function Load($_value, $_attribute = null) {
-		return parent::Load(get_called_class(), $_value, $_attribute);
+	public static function load($_value, $_attribute = null) {
+		return parent::load(get_called_class(), $_value, $_attribute);
 	}
 
-	public static function GetList($_attributes = array(), $_parameters = array(), $_row_conditions = array()) {
-		return parent::GetList(
+	public static function getList($_attributes = array(), $_parameters = array(), $_row_conditions = array()) {
+		return parent::getList(
 			get_called_class(),
 			self::GetTbl(),
 			self::GetBase()->GetAttributes(),
@@ -243,8 +243,8 @@ abstract class Core_Cms_User extends App_ActiveRecord
 		);
 	}
 
-	public static function GetCount($_attributes = array(), $_row_conditions = array()) {
-		return parent::GetCount(get_called_class(), self::GetTbl(), $_attributes, $_row_conditions);
+	public static function getCount($_attributes = array(), $_row_conditions = array()) {
+		return parent::getCount(get_called_class(), self::GetTbl(), $_attributes, $_row_conditions);
 	}
 
 	public static function ComputeTblName()  {

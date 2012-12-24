@@ -4,7 +4,7 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 {
 	private static $Base;
 	private static $NavItems = array();
-	protected $Links = array('documents' => null);
+	protected $_links = array('documents' => null);
 
 	const TABLE = 'fo_navigation';
 
@@ -117,14 +117,14 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 		return $result;
 	}
 
-	public function GetXml($_type, $_node_name = null, $_append_xml = null) {
+	public function getXml($_type, $_node_name = null, $_append_xml = null) {
 		$node_name = ($_node_name) ? $_node_name : strtolower(get_called_class());
 		$result = '';
 
 		switch ($_type) {
 			case 'bo_list':
 				$result .= '<' . $node_name . ' id="' . $this->GetId() .'"';
-				if ($this->GetAttribute('is_published') == 1) $result .= ' is_published="true"';
+				if ($this->getAttribute('is_published') == 1) $result .= ' is_published="true"';
 
 				$result .= '><title><![CDATA[' . $this->GetTitle() . ']]></title>';
 				$result .= $_append_xml;
@@ -136,18 +136,18 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 	}
 
 	public function GetLinks($_name, $_is_published = null) {
-		if (!$this->Links[$_name]) {
+		if (!$this->_links[$_name]) {
 			$conditions = array(self::GetPri() => $this->GetId());
 			if (!is_null($_is_published)) $conditions['is_published'] = $_is_published;
 
 			switch ($_name) {
 				case 'documents':
-					$this->Links[$_name] = App_Cms_Document_ToNavigation::GetList($conditions);
+					$this->_links[$_name] = App_Cms_Document_ToNavigation::getList($conditions);
 					break;
 			}
 		}
 
-		return $this->Links[$_name];
+		return $this->_links[$_name];
 	}
 
 	public function GetLinkIds($_name, $_is_published = null) {
@@ -174,7 +174,7 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 	}
 
 	public function SetLinks($_name, $_value = null) {
-		$this->Links[$_name] = array();
+		$this->_links[$_name] = array();
 
 		switch ($_name) {
 			case 'documents':
@@ -200,15 +200,15 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 					$obj->SetAttribute($key, $item);
 				}
 
-				array_push($this->Links[$_name], $obj);
+				array_push($this->_links[$_name], $obj);
 			}
 		}
 	}
 
 	public function __construct() {
 		parent::__construct(self::GetTbl());
-		foreach (self::GetBase()->Attributes as $item) {
-			$this->Attributes[$item->GetName()] = clone($item);
+		foreach (self::GetBase()->_attributes as $item) {
+			$this->_attributes[$item->GetName()] = clone($item);
 		}
 	}
 
@@ -234,12 +234,12 @@ abstract class Core_Cms_Document_Navigation extends App_ActiveRecord
 		return self::GetBase()->GetTable();
 	}
 
-	public static function Load($_value, $_attribute = null) {
-		return parent::Load(get_called_class(), $_value, $_attribute);
+	public static function load($_value, $_attribute = null) {
+		return parent::load(get_called_class(), $_value, $_attribute);
 	}
 
-	public static function GetList($_attributes = array(), $_parameters = array(), $_rowConditions = array()) {
-		return parent::GetList(
+	public static function getList($_attributes = array(), $_parameters = array(), $_rowConditions = array()) {
+		return parent::getList(
 			get_called_class(),
 			self::GetTbl(),
 			self::GetBase()->GetAttributes(),

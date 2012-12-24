@@ -2,123 +2,83 @@
 
 abstract class Core_ActiveRecord
 {
-    protected $Table;
-    protected $Attributes = array();
-    protected $Links = array();
-    protected $ForeignKeys = array();
+    protected $_table;
+    protected $_attributes = array();
+    protected $_links = array();
 
-    public function __construct($_table) {
-        $this->Table = $_table;
+    public function __construct($_table)
+    {
+        $this->_table = $_table;
     }
 
-    public function __get($_attribute) {
-        $fk_class_name = $fk_class_pk = '';
-        if (method_exists($this, 'GetBase')) {
-            for ($i = 0; $i < strlen($_attribute); $i++) {
-                if ($i == 0 || $_attribute{$i} == '_') {
-                    if ($_attribute{$i} == '_' && $i + 1 < strlen($_attribute)) $i++;
-                    $fk_class_name .= strtoupper($_attribute{$i});
+    public function getAttributeName($_name)
+    {
+        $name = Ext_String::underline($_name);
+
+        switch ($name) {
+            case 'id':
+                return $this->getPrimaryKey();
+
+            default:
+                if (in_array($_name, $this->getAttributes())) {
+                    return $_name;
+
+                } elseif (in_array($name, $this->getAttributes())) {
+                    return $name;
+
                 } else {
-                    $fk_class_name .= $_attribute{$i};
+                    throw new Exception(
+                        'There is no a such attribute "' . $name . '" ' .
+                        '(original "' . $_name . '") ' .
+                        'in ' . get_called_class() . '.'
+                    );
                 }
-            }
-            if (method_exists($fk_class_name, 'GetPri')) $fk_class_pk = call_user_func(array($fk_class_name, 'GetPri'));
-        }
-
-        if ($fk_class_pk && in_array($fk_class_pk, array_keys($this->GetBase()->ForeignKeys))) {
-            if (!isset($this->ForeignKeys[$fk_class_pk]) || is_null($this->ForeignKeys[$fk_class_pk])) {
-                $this->ForeignKeys[$fk_class_pk] = isset($this->Attributes[$fk_class_pk]) && $this->Attributes[$fk_class_pk]->GetValue(false)
-                    ? call_user_func(array($fk_class_name, 'Load'), $this->Attributes[$fk_class_pk]->GetValue(false))
-                    : false;
-            }
-            return $this->ForeignKeys[$fk_class_pk];
-
-        } elseif (isset($this->Attributes[$_attribute])) {
-            return $this->Attributes[$_attribute]->GetValue(false);
-
-        } else {
-            throw new Exception('call to undefined class member: ' . get_class($this) . '::' . $_attribute);
         }
     }
 
-    public function __set($_attribute, $_value) {
-        $fk_class_name = $fk_class_pk = '';
-        if (method_exists($this, 'GetBase')) {
-            for ($i = 0; $i < strlen($_attribute); $i++) {
-                if ($i == 0 || $_attribute{$i} == '_') {
-                    if ($_attribute{$i} == '_' && $i + 1 < strlen($_attribute)) $i++;
-                    $fk_class_name .= strtoupper($_attribute{$i});
-                } else {
-                    $fk_class_name .= $_attribute{$i};
-                }
-            }
-            if (method_exists($fk_class_name, 'GetPri')) $fk_class_pk = call_user_func(array($fk_class_name, 'GetPri'));
-        }
-
-        if ($fk_class_pk && in_array($fk_class_pk, array_keys($this->GetBase()->ForeignKeys))) {
-            if ($_value instanceof $fk_class_name) {
-                $this->Attributes[$fk_class_pk]->SetValue($_value->GetId());
-                $this->ForeignKeys[$fk_class_pk] = $_value;
-                return true;
-
-            } else {
-                throw new Exception($_attribute . ' must be instance of ' . $fk_class_name);
-
-            }
-
-        } elseif (isset($this->Attributes[$_attribute])) {
-            $this->Attributes[$_attribute]->SetValue($_value);
-            return true;
-
-        } else {
-            throw new Exception('call to undefined class member: ' . get_called_class() . '::' . $_attribute);
-
-        }
+    public function __get($name) {
+        return $this->getAttribute(
+            $this->getAttributeName($name)
+        );
     }
 
-    public function __isset($_attribute) {
-        $fk_class_name = $fk_class_pk = '';
-        if (method_exists($this, 'GetBase')) {
-            for ($i = 0; $i < strlen($_attribute); $i++) {
-                if ($i == 0 || $_attribute{$i} == '_') {
-                    if ($_attribute{$i} == '_' && $i + 1 < strlen($_attribute)) $i++;
-                    $fk_class_name .= strtoupper($_attribute{$i});
-                } else {
-                    $fk_class_name .= $_attribute{$i};
-                }
-            }
-            if (method_exists($fk_class_name, 'GetPri')) $fk_class_pk = call_user_func(array($fk_class_name, 'GetPri'));
-        }
-
-        if ($fk_class_pk && in_array($fk_class_pk, array_keys($this->GetBase()->ForeignKeys))) {
-            return !is_null($this->ForeignKeys[$fk_class_pk]);
-
-        } else {
-            return isset($this->Attributes[$_attribute]);
-        }
+    public function __set($name, $value) {
+        return $this->setAttribute(
+            $this->getAttributeName($name),
+            $value
+        );
     }
 
-    public function GetAttributeObject($_attribute) {
-        if ($this->HasAttribute($_attribute)) {
-            return $this->Attributes[$_attribute];
+//     public function getAttribute($name) {
+//         return $this->__get($name);
+//     }
+
+
+    public function getAttributeObject($_attribute)
+    {
+        if ($this->hasAttribute($_attribute)) {
+            return $this->_attributes[$_attribute];
         } else {
             return false;
         }
     }
 
-    public function HasAttribute($_attribute) {
-        return isset($this->Attributes[$_attribute]);
+    public function hasAttribute($_attribute)
+    {
+        return isset($this->_attributes[$_attribute]);
     }
 
-    public function GetAttribute($_attribute, $_is_escaped = false) {
-        return isset($this->Attributes[$_attribute])
-            ? $this->Attributes[$_attribute]->GetValue($_is_escaped)
+    public function getAttribute($_attribute, $_is_escaped = false)
+    {
+        return isset($this->_attributes[$_attribute])
+            ? $this->_attributes[$_attribute]->GetValue($_is_escaped)
             : false;
     }
 
-    public function SetAttribute($_attribute, $_value) {
-        if (isset($this->Attributes[$_attribute])) {
-            $this->Attributes[$_attribute]->SetValue($_value);
+    public function setAttribute($_attribute, $_value)
+    {
+        if (isset($this->_attributes[$_attribute])) {
+            $this->_attributes[$_attribute]->SetValue($_value);
             return true;
         } else {
             return false;
@@ -149,8 +109,9 @@ abstract class Core_ActiveRecord
         return $conditions;
     }
 
-    public function GetTable() {
-        return $this->Table;
+    public function getTable()
+    {
+        return $this->_table;
     }
 
     public function addAttribute($_name,
@@ -158,7 +119,7 @@ abstract class Core_ActiveRecord
                                  $_length = null,
                                  $_isPrimary = false,
                                  $_isUnique = false) {
-        $this->Attributes[$_name] = new App_ActiveRecord_Attribute(
+        $this->_attributes[$_name] = new App_ActiveRecord_Attribute(
             $_name, $_type, $_length, $_isPrimary, $_isUnique
         );
     }
@@ -170,8 +131,6 @@ abstract class Core_ActiveRecord
                             $key->getType(),
                             $key->getLength(),
                             $_isPrimary);
-
-        $this->ForeignKeys[$key->getName()] = null;
     }
 
     public function addPrimaryKey($_name, $_type, $_length = null)
@@ -181,7 +140,7 @@ abstract class Core_ActiveRecord
 
     public function getAttributes($_table = false)
     {
-        $attributes = array_keys($this->Attributes);
+        $attributes = array_keys($this->_attributes);
         $prefix = $_table === false
                 ? ''
                 : '`' . ($_table === true ? $this->getTable() : $_table) . '`.';
@@ -193,20 +152,22 @@ abstract class Core_ActiveRecord
         return $attributes;
     }
 
-    public function GetAttributeValues($_is_escaped = false) {
+    public function getAttributeValues($_is_escaped = false)
+    {
         $attributes = array();
 
-        foreach ($this->Attributes as $item) {
+        foreach ($this->_attributes as $item) {
             $attributes[$item->GetName()] = $item->GetValue($_is_escaped);
         }
 
         return $attributes;
     }
 
-    public function GetPrimaryKey() {
+    public function getPrimaryKey()
+    {
         $keys = array();
 
-        foreach ($this->Attributes as $item) {
+        foreach ($this->_attributes as $item) {
             if ($item->IsPrimary()) {
                 array_push($keys, $item);
             }
@@ -223,11 +184,12 @@ abstract class Core_ActiveRecord
         }
     }
 
-    public function getPrimary($_is_table = false) {
-        $keys = $this->GetPrimaryKey();
+    public function getPrimary($_is_table = false)
+    {
+        $keys = $this->getPrimaryKey();
 
         if ($keys) {
-            $table = $_is_table ? $this->GetTable() . '.' : '';
+            $table = $_is_table ? $this->getTable() . '.' : '';
 
             if (is_array($keys)) {
                 $names = array();
@@ -244,8 +206,9 @@ abstract class Core_ActiveRecord
         return false;
     }
 
-    public function GetPrimaryKeyStatment($_value = null) {
-        $key = $this->GetPrimaryKey();
+    public function getPrimaryKeyStatment($_value = null)
+    {
+        $key = $this->getPrimaryKey();
         $conditions = array();
 
         if ($key) {
@@ -279,8 +242,9 @@ abstract class Core_ActiveRecord
         return App_Db::escape($this->getId());
     }
 
-    public function GetId() {
-        $key = $this->GetPrimaryKey();
+    public function getId()
+    {
+        $key = $this->getPrimaryKey();
         $value = false;
 
         if (is_array($key)) {
@@ -295,8 +259,9 @@ abstract class Core_ActiveRecord
         return $value;
     }
 
-    public function SetId($_value) {
-        $key = $this->GetPrimaryKey();
+    public function setId($_value)
+    {
+        $key = $this->getPrimaryKey();
 
         if (is_array($key)) {
             if ($_value && is_array($_value)) {
@@ -314,7 +279,8 @@ abstract class Core_ActiveRecord
         }
     }
 
-    public function GetTitle() {
+    public function getTitle()
+    {
         if ($this->GetAttribute('title')) {
             return $this->GetAttribute('title');
 
@@ -326,29 +292,33 @@ abstract class Core_ActiveRecord
         }
     }
 
-    public function GetDate($_name) {
+    public function getDate($_name)
+    {
         $value = $this->GetAttribute($_name);
         return ($value && $value != '0000-00-00' && $value != '0000-00-00 00:00:00') ? strtotime($value) : false;
     }
 
-    public function SetDate($_name, $_date) {
-        $format = isset($this->Attributes[$_name]) && $this->Attributes[$_name]->GetType() == 'datetime' ? 'Y-m-d H:i:s' : 'Y-m-d';
-        $this->SetAttribute($_name, date($format, $_date));
+    public function setDate($_name, $_date)
+    {
+        $format = isset($this->_attributes[$_name]) && $this->_attributes[$_name]->GetType() == 'datetime' ? 'Y-m-d H:i:s' : 'Y-m-d';
+        $this->setAttribute($_name, date($format, $_date));
     }
 
-    public static function Load($_class_name, $_value, $_attribute = null) {
+    public static function load($_class_name, $_value, $_attribute = null)
+    {
         $obj = new $_class_name;
         return ($obj->Retrieve($_value, $_attribute)) ? $obj : false;
     }
 
-    public function Retrieve($_value, $_attribute = null) {
+    public function retrieve($_value, $_attribute = null)
+    {
         $condition = (is_null($_attribute) || !in_array($_attribute, $this->GetAttributes()))
-            ? $this->GetPrimaryKeyStatment($_value)
+            ? $this->getPrimaryKeyStatment($_value)
             : $_attribute . ' = ' . App_Db::escape($_value);
 
-        $record = App_Db::Get()->GetEntry('SELECT ' . implode(', ', $this->GetAttributes()) . ' FROM ' . $this->GetTable() . ' WHERE ' . $condition);
+        $record = App_Db::Get()->GetEntry('SELECT ' . implode(', ', $this->GetAttributes()) . ' FROM ' . $this->getTable() . ' WHERE ' . $condition);
         if ($record) {
-            foreach ($this->Attributes as $item) {
+            foreach ($this->_attributes as $item) {
                 if (isset($record[$item->GetName()])) {
                     $item->SetValue($record[$item->GetName()]);
                 }
@@ -360,20 +330,21 @@ abstract class Core_ActiveRecord
         }
     }
 
-    public function Create() {
+    public function create()
+    {
         $attributes = array();
-        foreach ($this->Attributes as $item) {
+        foreach ($this->_attributes as $item) {
             if (!$item->IsValue()) {
                 if ($item->IsPrimary()) {
                     if ($item->GetType() == 'varchar') {
-                        $item->SetValue(App_Db::get()->getUnique($this->GetTable(), $item->GetName(), $item->GetLength()));
+                        $item->SetValue(App_Db::get()->getUnique($this->getTable(), $item->GetName(), $item->GetLength()));
 
 //                     } else if ($item->GetType() == 'integer') {
 //                         $item->SetValue(App_Db::Get()->GetNextNumber($this->GetTable(), $item->GetName()));
                     }
 
                 } else if ($item->GetName() == 'sort_order') {
-                    $item->SetValue(App_Db::Get()->GetNextNumber($this->GetTable(), $item->GetName()));
+                    $item->SetValue(App_Db::Get()->GetNextNumber($this->getTable(), $item->GetName()));
 
                 } else if (
                     $item->getName() == 'creation_date' ||
@@ -398,14 +369,15 @@ abstract class Core_ActiveRecord
             }
         }
 
-        $result = App_Db::Get()->Execute('INSERT INTO ' . $this->GetTable() . App_Db::Get()->GetQueryFields($attributes, 'insert', true));
+        $result = App_Db::Get()->Execute('INSERT INTO ' . $this->getTable() . App_Db::Get()->GetQueryFields($attributes, 'insert', true));
         if ($result && App_Db::Get()->GetLastInsertedId()) {
-            $this->SetId(App_Db::Get()->GetLastInsertedId());
+            $this->setId(App_Db::Get()->GetLastInsertedId());
         }
         return $result;
     }
 
-    public function update(array $_fields = null) {
+    public function update(array $_fields = null)
+    {
         $fields = empty($_fields)
                 ? App_Db::get()->getQueryFields($this->getAttributeValues(true), 'update', true)
                 : App_Db::get()->getQueryFields($_fields, 'update');
@@ -417,19 +389,21 @@ abstract class Core_ActiveRecord
         );
     }
 
-    public function UpdateAttribute($_name, $_value = null) {
-        if ($this->Attributes[$_name]) {
-            $primary_key_condition = $this->GetPrimaryKeyStatment();
-            if (!is_null($_value)) $this->SetAttribute($_name, $_value);
-            return App_Db::Get()->Execute('UPDATE ' . $this->GetTable() . App_Db::Get()->GetQueryFields(array($this->Attributes[$_name]->GetName() => $this->Attributes[$_name]->GetValue(true)), 'update', true) . 'WHERE ' . $primary_key_condition);
+    public function updateAttribute($_name, $_value = null)
+    {
+        if ($this->_attributes[$_name]) {
+            $primary_key_condition = $this->getPrimaryKeyStatment();
+            if (!is_null($_value)) $this->setAttribute($_name, $_value);
+            return App_Db::Get()->Execute('UPDATE ' . $this->getTable() . App_Db::Get()->GetQueryFields(array($this->_attributes[$_name]->GetName() => $this->_attributes[$_name]->GetValue(true)), 'update', true) . 'WHERE ' . $primary_key_condition);
         } else {
             return false;
         }
     }
 
-    public function Delete() {
-        foreach (array_keys($this->Links) as $item) {
-            $this->UpdateLinks($item);
+    public function delete()
+    {
+        foreach (array_keys($this->_links) as $item) {
+            $this->updateLinks($item);
         }
 
         if ($this->GetImages()) {
@@ -444,12 +418,12 @@ abstract class Core_ActiveRecord
             }
         }
 
-        return App_Db::Get()->Execute('DELETE FROM ' . $this->GetTable() . ' WHERE ' . $this->GetPrimaryKeyStatment());
+        return App_Db::Get()->Execute('DELETE FROM ' . $this->getTable() . ' WHERE ' . $this->getPrimaryKeyStatment());
     }
 
     public function dataInit($_data)
     {
-        foreach ($this->Attributes as $item) {
+        foreach ($this->_attributes as $item) {
 //             if (isset($_data[$item->GetName()])) {
             if (key_exists($item->getName(), $_data)) {
                 $item->setValue($_data[$item->getName()]);
@@ -457,7 +431,8 @@ abstract class Core_ActiveRecord
         }
     }
 
-    public static function TableInit($_table, $_id = null, $_is_log = false) {
+    public static function tableInit($_table, $_id = null, $_is_log = false)
+    {
         $class_name = get_called_class();
         $obj = new $class_name($_table);
 
@@ -500,7 +475,8 @@ abstract class Core_ActiveRecord
         return $obj;
     }
 
-    public static function GetSortAttribute($_tables, $_attributes) {
+    public static function getSortAttribute($_tables, $_attributes)
+    {
         $try_attributes = array('sort_order', 'title', 'name');
 
         foreach ($try_attributes as $attribute) {
@@ -522,7 +498,8 @@ abstract class Core_ActiveRecord
         return false;
     }
 
-    public static function MassDelete($_table, $_conditions = null) {
+    public static function massDelete($_table, $_conditions = null)
+    {
         if ($_conditions) {
             $conditions = self::GetQueryCondition($_conditions);
             $condition = ($conditions) ? ' WHERE ' . implode(' AND ', $conditions) : '';
@@ -532,13 +509,14 @@ abstract class Core_ActiveRecord
         }
     }
 
-    public static function GetList($_class, $_tables, $_attributes, $_conditions = array(), $_parameters = array(), $_row_conditions = array()) {
+    public static function getList($_class, $_tables, $_attributes, $_conditions = array(), $_parameters = array(), $_row_conditions = array())
+    {
         $result = array();
         $tables = (is_array($_tables)) ? implode(', ', $_tables) : $_tables;
 
         $sort_order = isset($_parameters['sort_order'])
             ? $_parameters['sort_order']
-            : self::GetSortAttribute($_tables, $_attributes);
+            : self::getSortAttribute($_tables, $_attributes);
 
         if ($sort_order) {
             $sort_order = ' ORDER BY ' . $sort_order;
@@ -573,7 +551,7 @@ abstract class Core_ActiveRecord
                 $obj = new $_class;
                 //$obj->DataInit($item);
 
-                foreach ($obj->Attributes as $i) {
+                foreach ($obj->_attributes as $i) {
                     if (isset($item[$i->GetName()])) {
                         $i->SetValue($item[$i->GetName()]);
                     }
@@ -590,8 +568,9 @@ abstract class Core_ActiveRecord
         return $result;
     }
 
-    public static function IsUnique($_class, $_table, $_pk, $_attribute, $_value, $_exclude = null) {
-        return !(self::GetList(
+    public static function isUnique($_class, $_table, $_pk, $_attribute, $_value, $_exclude = null)
+    {
+        return !(self::getList(
             $_class,
             $_table,
             array($_pk),
@@ -601,7 +580,8 @@ abstract class Core_ActiveRecord
         ));
     }
 
-    public static function GetCount($_class, $_tables, $_conditions = array(), $_row_conditions = array()) {
+    public static function getCount($_class, $_tables, $_conditions = array(), $_row_conditions = array())
+    {
         $class_obj = new $_class;
         $tables = (is_array($_tables)) ? implode(', ', $_tables) : $_tables;
 
@@ -623,7 +603,8 @@ abstract class Core_ActiveRecord
         return ($result) ? (int) $result['count'] : 0;
     }
 
-    public function UpdateLinks($_name, $_value = null) {
+    public function updateLinks($_name, $_value = null)
+    {
         if ($this->GetLinks($_name)) {
             foreach ($this->GetLinks($_name) as $item) {
                 $item->Delete();
@@ -643,7 +624,8 @@ abstract class Core_ActiveRecord
         }
     }
 
-    public function GetXml($_type = null, $_node_name = null, $_append_xml = null, $_append_attributes = null) {
+    public function getXml($_type = null, $_node_name = null, $_append_xml = null, $_append_attributes = null)
+    {
         $node_name = ($_node_name) ? $_node_name : 'item';
         $result = '';
 
@@ -714,10 +696,11 @@ abstract class Core_ActiveRecord
         return $result;
     }
 
-    public function getFiles() {
-        if (property_exists($this, 'files')) {
-            if (is_null($this->files)) {
-                $this->files = array();
+    public function getFiles()
+    {
+        if (property_exists($this, '_files')) {
+            if (is_null($this->_files)) {
+                $this->_files = array();
 
                 if (
                     method_exists($this, 'getFilePath') &&
@@ -730,11 +713,11 @@ abstract class Core_ActiveRecord
                         $filePath = $this->getFilePath() . '/' . $item;
 
                         if ($item{0} != '.' && is_file($filePath)) {
-							$file = App_File::factory($filePath);
+                            $file = App_File::factory($filePath);
 
-							$this->files[
-							    Ext_String::toLower($file->getFileName())
-							] = $file;
+                            $this->_files[
+                                Ext_String::toLower($file->getFileName())
+                            ] = $file;
                         }
                     }
 
@@ -742,38 +725,41 @@ abstract class Core_ActiveRecord
                 }
             }
 
-            return $this->files;
+            return $this->_files;
         }
 
         return array();
     }
 
-    public function getImages() {
-        if (property_exists($this, 'images')) {
-            if (is_null($this->images)) {
-                $this->images = array();
+    public function getImages()
+    {
+        if (property_exists($this, '_images')) {
+            if (is_null($this->_images)) {
+                $this->_images = array();
 
-				foreach ($this->getFiles() as $key => $file) {
-				    if ($file->isImage()) {
-				        $this->images[$key] = $file;
+                foreach ($this->getFiles() as $key => $file) {
+                    if ($file->isImage()) {
+                        $this->_images[$key] = $file;
                     }
                 }
             }
 
-            return $this->images;
+            return $this->_images;
         }
 
         return array();
     }
 
-    public function getIllu($filename) {
+    public function getIllu($filename)
+    {
         $files = $this->getImages();
         return 0 < count($files) && isset($files[$filename])
             ? $files[$filename]
             : false;
     }
 
-    public function getIlluByName($name) {
+    public function getIlluByName($name)
+    {
         foreach ($this->getImages() as $file) {
             if ($name == $file->getName() || $name == $file->getFileName()) {
                 return $file;
@@ -782,14 +768,16 @@ abstract class Core_ActiveRecord
         return false;
     }
 
-    public function getFile($filename) {
+    public function getFile($filename)
+    {
         $files = $this->getFiles();
         return 0 < count($files) && isset($files[$filename])
             ? $files[$filename]
             : false;
     }
 
-    public function getFileByName($name) {
+    public function getFileByName($name)
+    {
         foreach ($this->getFiles() as $file) {
             if ($name == $file->getName() || $name == $file->getFileName()) {
                 return $file;

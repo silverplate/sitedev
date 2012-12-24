@@ -22,7 +22,7 @@ if ($page->IsAuthorized()) {
 			$form->FillFields($obj->GetAttributeValues());
 			$form->Elements['content']->SetValue($obj->GetContent());
 
-			if ($obj->GetAttribute('is_document_main')) {
+			if ($obj->getAttribute('is_document_main')) {
 				$form->Elements['type_id']->SetValue(3);
 			}
 
@@ -71,7 +71,7 @@ if ($page->IsAuthorized()) {
 						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
 					}
 
-					if ($obj->GetAttribute('is_document_main')) {
+					if ($obj->getAttribute('is_document_main')) {
 						App_Db::Get()->Execute('UPDATE ' . App_Cms_Controller::GetTbl() . ' SET is_document_main = 0 WHERE is_document_main = 1 AND ' . App_Cms_Controller::GetPri() . ' != ' . App_Db::escape($obj->GetId()));
 					}
 
@@ -81,7 +81,7 @@ if ($page->IsAuthorized()) {
 					$form->UpdateStatus = FORM_ERROR;
 					$form->Elements['filename']->SetUpdateType(FIELD_ERROR_EXIST);
 					$form->Elements['filename']->SetErrorValue($form->Elements['filename']->GetValue());
-					$form->Elements['filename']->SetValue($obj->GetAttribute('filename'));
+					$form->Elements['filename']->SetValue($obj->getAttribute('filename'));
 				}
 			}
 

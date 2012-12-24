@@ -83,18 +83,18 @@ if (is_null($document_id) || !App_Cms_Document::Load($document_id)) {
 
 		if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 			$obj->Delete();
-			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->GetId(), 'Блоки данных. Документ ' . $obj->GetAttribute(App_Cms_Document::GetPri()));
-			goToUrl($page->Url['path'] . '?parent_id=' . $obj->GetAttribute(App_Cms_Document::GetPri()) . '&DEL');
+			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->getId(), 'Блоки данных. Документ ' . $obj->getAttribute(App_Cms_Document::GetPri()));
+			goToUrl($page->Url['path'] . '?parent_id=' . $obj->getAttribute(App_Cms_Document::GetPri()) . '&DEL');
 
 		} elseif (isset($form->Buttons['create']) && $form->Buttons['create']->IsSubmited()) {
 			$obj->Create();
-			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), 'Блоки данных. Документ ' . $obj->GetAttribute(App_Cms_Document::GetPri()));
-			goToUrl($page->Url['path'] . '?id=' . $obj->GetId() . '&parent_id=' . $obj->GetAttribute(App_Cms_Document::GetPri()) . '&OK');
+			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->getId(), 'Блоки данных. Документ ' . $obj->getAttribute(App_Cms_Document::GetPri()));
+			goToUrl($page->Url['path'] . '?id=' . $obj->getId() . '&parent_id=' . $obj->getAttribute(App_Cms_Document::GetPri()) . '&OK');
 
 		} elseif (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited()) {
 			$obj->Update();
-			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), 'Блоки данных. Документ ' . $obj->GetAttribute(App_Cms_Document::GetPri()));
-			goToUrl($page->Url['path'] . '?id=' . $obj->GetId() . '&parent_id=' . $obj->GetAttribute(App_Cms_Document::GetPri()) . '&OK');
+			App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->getId(), 'Блоки данных. Документ ' . $obj->getAttribute(App_Cms_Document::GetPri()));
+			goToUrl($page->Url['path'] . '?id=' . $obj->getId() . '&parent_id=' . $obj->getAttribute(App_Cms_Document::GetPri()) . '&OK');
 		}
 	}
 

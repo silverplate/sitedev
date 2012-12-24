@@ -3,7 +3,7 @@
 abstract class Core_Cms_Bo_User extends App_ActiveRecord
 {
 	private static $Base;
-	protected $Links = array('sections' => null);
+	protected $_links = array('sections' => null);
 	const TABLE = 'bo_user';
 
 	private $Files;
@@ -52,7 +52,7 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 	}
 
 	public function GetSections($_is_published = true) {
-		return App_Cms_Bo_Section::GetList(array('is_published' => 1, App_Cms_Bo_Section::GetPri() => $this->GetLinkIds('sections', $_is_published)));
+		return App_Cms_Bo_Section::getList(array('is_published' => 1, App_Cms_Bo_Section::GetPri() => $this->GetLinkIds('sections', $_is_published)));
 	}
 
 	public function IsSection($_id) {
@@ -63,8 +63,8 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 		global $g_section_start_url, $g_bo_mail;
 
 		if ($this->GetAttribute('email')) {
-			$this->SetAttribute('reminder_key', App_Db::Get()->GetUnique(self::GetTbl(), 'reminder_key', 30));
-			$this->SetAttribute('reminder_date', date('Y-m-d H:i:s'));
+			$this->setAttribute('reminder_key', App_Db::Get()->GetUnique(self::GetTbl(), 'reminder_key', 30));
+			$this->setAttribute('reminder_date', date('Y-m-d H:i:s'));
 			$this->Update();
 
 			return send_email($g_bo_mail, $this->GetAttribute('email'), 'Смена пароля',
@@ -84,8 +84,8 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 				$password = $this->GeneratePassword();
 
 				$this->SetPassword($password);
-				$this->SetAttribute('reminder_key', '');
-				$this->SetAttribute('reminder_date', '');
+				$this->setAttribute('reminder_key', '');
+				$this->setAttribute('reminder_date', '');
 				$this->Update();
 
 				$ip_restriction = '';
@@ -114,7 +114,7 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 	}
 
 	public function SetPassword($_password) {
-		$this->SetAttribute('passwd', md5($_password));
+		$this->setAttribute('passwd', md5($_password));
 	}
 
 	public function UpdatePassword($_password) {
@@ -134,7 +134,7 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 		return $result;
 	}
 
-	public static function GetList($_conditions = array(), $_parameters = array(), $_row_conditions = array()) {
+	public static function getList($_conditions = array(), $_parameters = array(), $_row_conditions = array()) {
 		$conditions = self::GetQueryConditions($_conditions);
 
 		$parameters = $_parameters;
@@ -148,10 +148,10 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 			$row_conditions = array_merge($row_conditions, $_row_conditions);
 		}
 
-		return parent::GetList(get_called_class(), $conditions['tables'], self::GetBase()->GetAttributes(true), null, $parameters, $row_conditions);
+		return parent::getList(get_called_class(), $conditions['tables'], self::GetBase()->GetAttributes(true), null, $parameters, $row_conditions);
 	}
 
-	public function GetXml($_type, $_node_name = null, $_append_xml = null) {
+	public function getXml($_type, $_node_name = null, $_append_xml = null) {
 		$node_name = ($_node_name) ? $_node_name : 'user';
 		$result = '';
 
@@ -178,18 +178,18 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 	}
 
 	public function GetLinks($_name, $_is_published = null) {
-		if (!$this->Links[$_name]) {
+		if (!$this->_links[$_name]) {
 			$conditions = array(self::GetPri() => $this->GetId());
 			if (!is_null($_is_published)) $conditions['is_published'] = $_is_published;
 
 			switch ($_name) {
 				case 'sections':
-					$this->Links[$_name] = App_Cms_Bo_UserToSection::GetList($conditions);
+					$this->_links[$_name] = App_Cms_Bo_UserToSection::getList($conditions);
 					break;
 			}
 		}
 
-		return $this->Links[$_name];
+		return $this->_links[$_name];
 	}
 
 	public function GetLinkIds($_name, $_is_published = null) {
@@ -216,7 +216,7 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 	}
 
 	public function SetLinks($_name, $_value = null) {
-		$this->Links[$_name] = array();
+		$this->_links[$_name] = array();
 
 		switch ($_name) {
 			case 'sections':
@@ -242,15 +242,15 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 					$obj->SetAttribute($key, $item);
 				}
 
-				array_push($this->Links[$_name], $obj);
+				array_push($this->_links[$_name], $obj);
 			}
 		}
 	}
 
 	public function __construct() {
 		parent::__construct(self::GetTbl());
-		foreach (self::GetBase()->Attributes as $item) {
-			$this->Attributes[$item->GetName()] = clone($item);
+		foreach (self::GetBase()->_attributes as $item) {
+			$this->_attributes[$item->GetName()] = clone($item);
 		}
 	}
 
@@ -279,8 +279,8 @@ abstract class Core_Cms_Bo_User extends App_ActiveRecord
 		return self::GetBase()->GetTable();
 	}
 
-	public static function Load($_value, $_attribute = null) {
-		return parent::Load(get_called_class(), $_value, $_attribute);
+	public static function load($_value, $_attribute = null) {
+		return parent::load(get_called_class(), $_value, $_attribute);
 	}
 
 	public static function ComputeTblName()  {

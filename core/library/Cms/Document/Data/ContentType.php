@@ -27,15 +27,15 @@ abstract class Core_Cms_Document_Data_ContentType extends App_ActiveRecord
 		}
 	}
 
-	public function Delete() {
+	public function delete() {
 		App_Db::Get()->Execute('UPDATE ' . App_Cms_Document_Data::GetTbl() . ' SET ' . self::GetPri() . ' = "" WHERE ' . self::GetPri() . ' = ' . App_Db::escape($this->GetId()));
-		parent::Delete();
+		parent::delete();
 	}
 
 	public function __construct() {
 		parent::__construct(self::GetTbl());
-		foreach (self::GetBase()->Attributes as $item) {
-			$this->Attributes[$item->GetName()] = clone($item);
+		foreach (self::GetBase()->_attributes as $item) {
+			$this->_attributes[$item->GetName()] = clone($item);
 		}
 	}
 
@@ -63,12 +63,12 @@ abstract class Core_Cms_Document_Data_ContentType extends App_ActiveRecord
 		return DB_PREFIX . self::TABLE;
 	}
 
-	public static function Load($_value, $_attribute = null) {
-		return parent::Load(get_called_class(), $_value, $_attribute);
+	public static function load($_value, $_attribute = null) {
+		return parent::load(get_called_class(), $_value, $_attribute);
 	}
 
-	public static function GetList($_attributes = array(), $_parameters = array()) {
-		return parent::GetList(
+	public static function getList($_attributes = array(), $_parameters = array()) {
+		return parent::getList(
 			get_called_class(),
 			self::GetTbl(),
 			self::GetBase()->GetAttributes(),

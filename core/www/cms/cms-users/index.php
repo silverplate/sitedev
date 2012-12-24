@@ -22,12 +22,12 @@ if ($page->IsAuthorized()) {
 			$form->Elements['sections']->AddOption($item->GetId(), $item->GetTitle());
 		}
 
-		if ($obj->GetId()) {
+		if ($obj->getId()) {
 			$form->FillFields($obj->GetAttributeValues());
 			$form->Elements['passwd']->SetValue();
 			$form->Elements['sections']->SetValue($obj->GetLinkIds('sections'));
 
-			if ($obj->GetAttribute('status_id') != 1) {
+			if ($obj->getAttribute('status_id') != 1) {
 				$form->Elements['status_id']->SetValue(0);
 			}
 
@@ -44,11 +44,11 @@ if ($page->IsAuthorized()) {
 		if ($form->UpdateStatus == FORM_UPDATED) {
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 				$obj->Delete();
-				App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
+				App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->getId(), $obj->GetTitle());
 				goToUrl($page->Url['path'] . '?DEL');
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
-				if (App_Cms_Bo_User::CheckUnique($form->Elements['login']->GetValue(), $obj->GetId())) {
+				if (App_Cms_Bo_User::CheckUnique($form->Elements['login']->GetValue(), $obj->getId())) {
 					$obj->DataInit($form->GetSqlValues());
 
 					$password = $form->Elements['passwd']->GetValue();
@@ -60,34 +60,34 @@ if ($page->IsAuthorized()) {
 						$obj->SetAttribute('status_id', 2);
 					}
 
-					if ($obj->GetAttribute('ip_restriction')) {
-						$obj->SetAttribute('ip_restriction', implode("\r\n", Ext_String::split($obj->GetAttribute('ip_restriction'))));
+					if ($obj->getAttribute('ip_restriction')) {
+						$obj->SetAttribute('ip_restriction', implode("\r\n", Ext_String::split($obj->getAttribute('ip_restriction'))));
 					}
 
 					if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
 						$obj->Create();
-						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->getId(), $obj->GetTitle());
 					} else {
 						$obj->Update();
-						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->getId(), $obj->GetTitle());
 					}
 
 					if (isset($form->Elements['sections'])) {
 						$obj->UpdateLinks('sections', $form->Elements['sections']->GetValue());
 					}
 
-					if ($form->Elements['passwd']->GetValue() && App_Cms_Session::Get()->GetUserId() != $obj->GetId()) {
-						App_Cms_Session::Clean($obj->GetId());
+					if ($form->Elements['passwd']->GetValue() && App_Cms_Session::Get()->GetUserId() != $obj->getId()) {
+						App_Cms_Session::Clean($obj->getId());
 					}
 
-					goToUrl($page->Url['path'] . '?id=' . $obj->GetId() . '&OK');
+					goToUrl($page->Url['path'] . '?id=' . $obj->getId() . '&OK');
 
 				} else {
 					$form->UpdateStatus = FORM_ERROR;
 
 					$form->Elements['login']->SetUpdateType(FIELD_ERROR_EXIST);
 					$form->Elements['login']->SetErrorValue($form->Elements['login']->GetValue());
-					$form->Elements['login']->SetValue($obj->GetAttribute('login'));
+					$form->Elements['login']->SetValue($obj->getAttribute('login'));
 				}
 			}
 		}
@@ -112,8 +112,8 @@ if ($page->IsAuthorized()) {
 	if (isset($obj)) {
 		$module = '<module type="simple" is_able_to_add="true"';
 
-		if ($obj->GetId()) {
-			$module .= ' id="' . $obj->GetId() . '">';
+		if ($obj->getId()) {
+			$module .= ' id="' . $obj->getId() . '">';
 			$module .= '<title><![CDATA[' . $obj->GetTitle() . ']]></title>';
 		} else {
 			$module .= ' is_new="true">';

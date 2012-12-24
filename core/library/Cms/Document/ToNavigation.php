@@ -22,7 +22,7 @@ abstract class Core_Cms_Document_ToNavigation extends App_ActiveRecord
 		return App_Cms_Document_Navigation::GetTbl();
 	}
 
-	public static function GetList($_attributes = array()) {
+	public static function getList($_attributes = array()) {
 		$tables = array(self::GetTbl());
 		$attributes = $_attributes;
 		$row_conditions = array();
@@ -61,7 +61,7 @@ abstract class Core_Cms_Document_ToNavigation extends App_ActiveRecord
 			$row_conditions = parent::GetQueryCondition($attributes);
 		}
 
-		return parent::GetList(
+		return parent::getList(
 			get_called_class(),
 			$tables,
 			self::GetBase()->GetAttributes(true),
@@ -73,8 +73,8 @@ abstract class Core_Cms_Document_ToNavigation extends App_ActiveRecord
 
 	public function __construct() {
 		parent::__construct(self::GetTbl());
-		foreach (self::GetBase()->Attributes as $item) {
-			$this->Attributes[$item->GetName()] = clone($item);
+		foreach (self::GetBase()->_attributes as $item) {
+			$this->_attributes[$item->GetName()] = clone($item);
 		}
 	}
 
@@ -92,8 +92,8 @@ abstract class Core_Cms_Document_ToNavigation extends App_ActiveRecord
 		return self::GetBase()->GetTable();
 	}
 
-	public static function Load($_value, $_attribute = null) {
-		return parent::Load(get_called_class(), $_value, $_attribute);
+	public static function load($_value, $_attribute = null) {
+		return parent::load(get_called_class(), $_value, $_attribute);
 	}
 
 	public static function ComputeTblName()  {

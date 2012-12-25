@@ -77,20 +77,19 @@ abstract class Core_ActiveRecord
 
     public function __get($_name)
     {
-        if (property_exists($this, $_name)) {
-            return $this->$_name;
-        }
-
-        return $this->getAttrValue($_name);
+        return property_exists($this, $_name)
+             ? $this->$_name
+             : $this->getAttrValue($_name);
     }
 
     public function __set($_name, $_value)
     {
         if (property_exists($this, $_name)) {
             $this->$_name = $_value;
-        }
 
-        $this->setAttrValue($_name, $_value);
+        } else {
+            $this->setAttrValue($_name, $_value);
+        }
     }
 
     /**

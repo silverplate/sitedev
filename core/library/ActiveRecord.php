@@ -130,17 +130,19 @@ abstract class Core_ActiveRecord
 
     public function getAttrNames($_table = false)
     {
-        $names = array_keys($this->_attributes);
-
         if ($_table) {
+            $names = array();
             $p = '`' . ($_table === true ? $this->getTable() : $_table) . '`.';
 
-             foreach ($names as $key => $value) {
-                 $names[$value] = $p . $value;
+             foreach (array_keys($this->_attributes) as $name) {
+                 $names[$name] = $p . $name;
              }
-        }
 
-        return $names;
+             return $names;
+
+        } else {
+            return array_keys($this->_attributes);
+        }
     }
 
     public function addAttribute($_name,

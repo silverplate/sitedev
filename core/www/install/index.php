@@ -81,7 +81,13 @@ $foData = array(
 $sqlTables = file_get_contents('tables.sql');
 $sqlTables = str_replace('~db prefix~', DB_PREFIX, $sqlTables);
 
-App_Db::get()->multiExecute($sqlTables);
+foreach (explode(';', $sqlTables) as $query) {
+    if (trim($query)) {
+        App_Db::get()->execute($query);
+    }
+}
+
+// App_Db::get()->multiExecute($sqlTables);
 
 
 // Insert start entries
@@ -91,7 +97,7 @@ $boSectionObjs = array();
 foreach ($boSections as $i) {
     $obj = new App_Cms_Bo_Section;
     $obj->fillWithData($i);
-    $obj->isPublished = !empty($i['is_published']);
+    $obj->isPublished = !isset($i['is_published']) || $i['is_published'];
     $obj->create();
 
     $boSectionObjs[$obj->getId()] = $obj;
@@ -132,7 +138,7 @@ $foControllerObjs = array();
 foreach ($foControllers as $key => $i) {
     $obj = new App_Cms_Controller();
     $obj->fillWithData($i);
-    $obj->isPublished = !empty($i['is_published']);
+    $obj->isPublished = true;
     $obj->create();
 
     $foControllerObjs[$key] = $obj;
@@ -147,7 +153,7 @@ $templatesObjs = array();
 foreach ($templates as $key => $i) {
     $obj = new App_Cms_Template();
     $obj->getDb()->fillWithData($i);
-    $obj->isPublished = !empty($i['is_published']);
+    $obj->isPublished = true;
     $obj->isMultiple = !empty($i['is_multiple']);
     $obj->isDocumentMain = !empty($i['is_document_main']);
     $obj->create();
@@ -164,7 +170,7 @@ $foNavigationObjs = array();
 foreach ($foNavigations as $key => $i) {
     $obj = new App_Cms_Document_Navigation();
     $obj->fillWithData($i);
-    $obj->isPublished = !empty($i['is_published']);
+    $obj->isPublished = !isset($i['is_published']) || $i['is_published'];
     $obj->create();
 
     $foNavigationObjs[$key] = $obj;
@@ -180,14 +186,14 @@ foreach ($foDocuments as $level) {
     foreach ($level as $uri => $i) {
         $obj = new App_Cms_Document();
         $obj->fillWithData($i);
-        $obj->isPublished = !empty($i['is_published']);
+        $obj->isPublished = true;
 
         if (isset($i['сontroller']) && isset($foControllerObjs[$i['сontroller']])) {
-            $obj->controllerId = $foControllerObjs[$i['сontroller']]->getId();
+            $obj->foControllerId = $foControllerObjs[$i['сontroller']]->getId();
         }
 
         if (isset($i['template']) && isset($templatesObjs[$i['template']])) {
-            $obj->templateId = $templatesObjs[$i['template']]->getId();
+            $obj->foTemplateId = $templatesObjs[$i['template']]->getId();
         }
 
         $parentUri = str_replace($i['folder'] . '/', '', $uri);
@@ -223,7 +229,7 @@ foreach ($foDataContentType as $id => $i) {
     $obj = new App_Cms_Document_Data_ContentType();
     $obj->fillWithData($i);
     $obj->id = $id;
-    $obj->isPublished = !empty($i['is_published']);
+    $obj->isPublished = true;
     $obj->create();
 
     $foDataContentTypeObjs[$obj->getId()] = $obj;
@@ -240,9 +246,10 @@ foreach ($foData as $uri => $blocks) {
         foreach ($blocks as $i) {
             $obj = new App_Cms_Document_Data();
             $obj->fillWithData($i);
+            $obj->authStatusId = App_Cms_User::AUTH_GROUP_ALL;
             $obj->foDocumentId = $foDocumentObjs[$uri]->getId();
-            $obj->isPublished = !empty($i['is_published']);
-            $obj->isMount = !empty($i['is_mount']);
+            $obj->isPublished = true;
+            $obj->isMount = true;
 
             if (
                 isset($i['сontroller']) &&

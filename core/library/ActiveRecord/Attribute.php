@@ -63,7 +63,7 @@ abstract class Core_ActiveRecord_Attribute
 
     public function getSqlValue()
     {
-        return $this->_value ? App_Db::escape($this->_value) : 'NULL';
+        return (string) $this->_value == '' ? 'NULL' : App_Db::escape($this->_value);
     }
 
     public function getValue()

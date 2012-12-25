@@ -8,11 +8,11 @@ $result = array();
 // Init for DB
 
 $boSections = array(
-    array('title' => 'Страницы', 'uri' => 'pages', 'description' => 'Работа с навигацией и информационным наполнением страниц сайта.'),
+    array('title' => 'Страницы', 'uri' => 'cms-pages', 'description' => 'Работа с навигацией и информационным наполнением страниц сайта.'),
     array('title' => 'Пользователи', 'uri' => 'users', 'description' => 'Редактирование пользователей сайта.', 'is_published' => 0),
-    array('title' => 'Обработчики', 'uri' => 'controllers', 'description' => 'Управление обработчиками страниц сайта и блоков данных.'),
-    array('title' => 'Шаблоны', 'uri' => 'templates', 'description' => 'Управление шаблонами сайта.'),
-    array('title' => 'Типы навигации', 'uri' => 'navigation', 'description' => 'Редактирование типов навигации.', 'is_published' => 0),
+    array('title' => 'Обработчики', 'uri' => 'cms-controllers', 'description' => 'Управление обработчиками страниц сайта и блоков данных.'),
+    array('title' => 'Шаблоны', 'uri' => 'cms-templates', 'description' => 'Управление шаблонами сайта.'),
+    array('title' => 'Типы навигации', 'uri' => 'cms-navigation', 'description' => 'Редактирование типов навигации.', 'is_published' => 0),
     array('title' => 'Пользователи СУ', 'uri' => 'cms-users', 'description' => 'Редактирование пользователей СУ.'),
     array('title' => 'Разделы СУ', 'uri' => 'cms-sections', 'description' => 'Редактирование разделов СУ.'),
     array('title' => 'Логи СУ', 'uri' => 'cms-logs', 'description' => 'Просмотр действий пользователей системы управления.', 'is_published' => 0)

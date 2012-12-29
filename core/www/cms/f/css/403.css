@@ -1,70 +1,85 @@
-/*** Authorization page
-*********************************************************/
-table.auth_form {
-	width: 300px;
-	margin: 50px 50px 30px 50px;
+/**
+ * Authorization page
+ */
+
+table.auth-form
+{
+    width: 300px;
+    margin: 50px 50px 30px 50px;
 }
 
-#auth_reminder {
-	width: 300px;
-	margin: 0 50px 50px 50px;
-	display: none;
+#auth_reminder
+{
+    width: 300px;
+    margin: 0 50px 50px 50px;
+    display: none;
 }
 
-table.auth_form label,
-#auth_reminder label {
-	display: block;
-	font-size: 0.84em;
+table.auth-form label,
+#auth_reminder label
+{
+    display: block;
+    font-size: 0.84em;
 }
 
-table.auth_form td.auth_login {
-	padding: 0 0.5em 1em 0;
-	width: 50%;
+table.auth-form td.auth-login
+{
+    padding: 0 0.5em 1em 0;
+    width: 50%;
 }
 
-table.auth_form td.auth_password {
-	padding: 0 0 1em 0.5em;
-	width: 50%;
+table.auth-form td.auth-password
+{
+    padding: 0 0 1em 0.5em;
+    width: 50%;
 }
 
-table.auth_form td.auth_login input,
-table.auth_form td.auth_password input {
-	width: 100%;
+table.auth-form td.auth-login input,
+table.auth-form td.auth-password input
+{
+    width: 100%;
 }
 
-#auth_reminder td.auth_email input {
-	width: 300px;
+#auth_reminder td.auth-email input
+{
+    width: 300px;
 }
 
-#auth_reminder td.auth_email {
-	padding-bottom: 1em;
+#auth_reminder td.auth-email
+{
+    padding-bottom: 1em;
 }
 
-table.auth_form #auth_submit,
-#auth_reminder #auth_reminder_submit {
-	float: right;
+table.auth-form #auth_submit,
+#auth_reminder #auth_reminder_submit
+{
+    float: right;
 }
 
-table.auth_form td.error,
-table.auth_form td.success,
+table.auth-form td.error,
+table.auth-form td.success,
 #auth_reminder td.error,
-#auth_reminder td.success {
-	padding-top: 1em;
-	font-size: 0.84em;
-	color: red;
+#auth_reminder td.success
+{
+    padding-top: 1em;
+    font-size: 0.84em;
+    color: red;
 }
 
-table.auth_form td.success,
-#auth_reminder td.success {
-	color: green;
+table.auth-form td.success,
+#auth_reminder td.success
+{
+    color: green;
 }
 
-div#auth_forgot {
-	margin: 0 50px 50px 50px;
-	font-size: 0.7em;
+div#auth_forgot
+{
+    margin: 0 50px 50px 50px;
+    font-size: 0.7em;
 }
 
-div#auth_forgot span {
-	cursor: pointer;
-	border-bottom: 1px black dashed;
+div#auth_forgot span
+{
+    cursor: pointer;
+    border-bottom: 1px black dashed;
 }

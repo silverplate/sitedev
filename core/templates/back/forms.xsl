@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE xsl:stylesheet SYSTEM "entities.dtd">
+<!DOCTYPE xsl:stylesheet SYSTEM "../entities.dtd">
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:include href="bo_project_forms.xsl" />
-
 	<xsl:template match="form">
 		<xsl:if test="not(@status) or @status != 'updated'">
 			<xsl:if test="group and count(group) > 1">
 				<script type="text/javascript" language="JavaScript">
-					<xsl:text>var form_groups = new Array(</xsl:text>
+					<xsl:text>var formGroups = new Array(</xsl:text>
 					<xsl:for-each select="group[@name]">
 						<xsl:value-of select="concat('&quot;', @name, '&quot;')" />
 						<xsl:if test="position() != last()">, </xsl:if>
 					</xsl:for-each>
 					<xsl:text>);</xsl:text>
 				</script>
-				<xsl:call-template name="form_group_tabs" />
+
+				<xsl:call-template name="form-group-tabs" />
 			</xsl:if>
 
 			<form method="post" enctype="multipart/form-data">
@@ -48,21 +47,21 @@
 		</xsl:if>
 	</xsl:template>
 
-	<xsl:template name="form_group_tabs">
-		<table class="form_group_tabs">
+	<xsl:template name="form-group-tabs">
+		<table class="form-group-tabs">
 			<xsl:for-each select="group[@name and title/text()]">
 				<td id="form_group_{@name}_tab">
-					<xsl:if test="position() = 1 or @is_selected">
+					<xsl:if test="position() = 1 or @is-selected">
 						<xsl:attribute name="class">
 							<xsl:if test="position() = 1">first</xsl:if>
-							<xsl:if test="@is_selected or (position() = 1 and not(parent::node()/group[@name and title/text() and @is_selected]))">
+							<xsl:if test="@is-selected or (position() = 1 and not(parent::node()/group[@name and title/text() and @is-selected]))">
 								<xsl:if test="position() = 1"><xsl:text> </xsl:text></xsl:if>
 								<xsl:text>selected</xsl:text>
 							</xsl:if>
 						</xsl:attribute>
 					</xsl:if>
 
-					<a onclick="show_form_group('{@name}'); return false"><xsl:value-of select="title/text()" disable-output-escaping="yes" /></a>
+					<a onclick="showFormGroup('{@name}'); return false"><xsl:value-of select="title/text()" disable-output-escaping="yes" /></a>
 				</td>
 			</xsl:for-each>
 		</table>
@@ -70,7 +69,7 @@
 
 	<xsl:template match="group">
 		<div id="form_group_{@name}">
-			<xsl:if test="not(@is_selected or (position() = 1 and not(parent::node()/group[@name and title/text() and @is_selected])))">
+			<xsl:if test="not(@is-selected or (position() = 1 and not(parent::node()/group[@name and title/text() and @is-selected])))">
 				<xsl:attribute name="style">display: none;</xsl:attribute>
 			</xsl:if>
 
@@ -183,7 +182,7 @@
                                 </xsl:attribute>
 
                                 <xsl:value-of select="label" disable-output-escaping="yes" />
-                                <xsl:if test="@is_required"><sup class="required">&bull;</sup></xsl:if>
+                                <xsl:if test="@is-required"><sup class="required">&bull;</sup></xsl:if>
                             </label>
                         </xsl:otherwise>
                     </xsl:choose>
@@ -199,21 +198,21 @@
 			        <xsl:if test="count(parent::node()/element) = 1"> alone</xsl:if>
 			    </xsl:attribute>
 
-				<xsl:call-template name="form_element" />
+				<xsl:call-template name="form-element" />
 
-				<xsl:if test="@update_type != '' and
-				              @update_type != 'no_update' and
-				              @update_type != 'success'">
+				<xsl:if test="@update-type != '' and
+				              @update-type != 'no_update' and
+				              @update-type != 'success'">
 
-					<div class="field_error_message">
+					<div class="field-error-message">
 						<xsl:choose>
 							<xsl:when test="error-message">
 							    <xsl:value-of select="error-message"
 							                  disable-output-escaping="yes" />
 							</xsl:when>
-							<xsl:when test="@update_type = 'error_required'">Поле обязательно для&nbsp;заполнения.</xsl:when>
-							<xsl:when test="@update_type = 'error_spelling'">Некорректное значение.</xsl:when>
-							<xsl:when test="@update_type = 'error_exist'">Значение уже&nbsp;используется.</xsl:when>
+							<xsl:when test="@update-type = 'error_required'">Поле обязательно для&nbsp;заполнения.</xsl:when>
+							<xsl:when test="@update-type = 'error_spelling'">Некорректное значение.</xsl:when>
+							<xsl:when test="@update-type = 'error_exist'">Значение уже&nbsp;используется.</xsl:when>
 							<xsl:otherwise>Некорректное значение.</xsl:otherwise>
 						</xsl:choose>
 					</div>
@@ -228,18 +227,18 @@
 		</tr>
 	</xsl:template>
 
-	<xsl:template name="form_element">
+	<xsl:template name="form-element">
 		<xsl:choose>
             <xsl:when test="@type = 'boolean' and @is-readonly and value[text() = '1']">
-                <div class="form_float_ele" title="Да">&bull;</div>
+                <div class="form-float-ele" title="Да">&bull;</div>
             </xsl:when>
 
             <xsl:when test="@type = 'boolean' and @is-readonly">
-                <div class="form_float_ele">Нет</div>
+                <div class="form-float-ele">Нет</div>
             </xsl:when>
 
 			<xsl:when test="@type = 'boolean'">
-				<div class="form_float_ele">
+				<div class="form-float-ele">
 					<input type="checkbox" name="{@name}" id="form_ele_{@name}" value="1">
 						<xsl:if test="value/text() and value/text() != '0'">
 							<xsl:attribute name="checked">true</xsl:attribute>
@@ -249,7 +248,7 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'email' or @type = 'string' or @type = 'folder' or @type = 'filename' or @type = 'word' or @type = 'uri' or @type = 'login'">
-                <div class="form_float_ele">
+                <div class="form-float-ele">
                     <xsl:choose>
                         <xsl:when test="@is-readonly">
                             <xsl:value-of select="value" />
@@ -269,9 +268,9 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'name'">
-				<table class="form_name form_float_ele">
+				<table class="form-name form-float-ele">
 					<tr>
-						<td class="last_name">
+						<td class="last-name">
 							<input type="text" name="{@name}_last_name" id="form_ele_{@name}" maxlength="255">
 								<xsl:attribute name="value">
 									<xsl:choose>
@@ -281,7 +280,7 @@
 								</xsl:attribute>
 							</input>
 						</td>
-						<td class="first_name">
+						<td class="first-name">
 							<input type="text" name="{@name}_first_name" id="form_ele_{@name}_first_name" maxlength="255">
 								<xsl:attribute name="value">
 									<xsl:choose>
@@ -291,7 +290,7 @@
 								</xsl:attribute>
 							</input>
 						</td>
-						<td class="patronymic_name">
+						<td class="patronymic-name">
 							<input type="text" name="{@name}_patronymic_name" id="form_ele_{@name}_patronymic_name" maxlength="255">
 								<xsl:attribute name="value">
 									<xsl:choose>
@@ -307,15 +306,15 @@
 							<td>
 								<label for="form_ele_{@name}">
 									<xsl:text>Фамилия</xsl:text>
-									<xsl:if test="@is_required">
+									<xsl:if test="@is-required">
 										<sup class="required">&bull;</sup>
 									</xsl:if>
 								</label>
 							</td>
-							<td class="first_name">
+							<td class="first-name">
 								<label for="form_ele_{@name}_first_name">
 									<xsl:text>Имя</xsl:text>
-									<xsl:if test="@is_required">
+									<xsl:if test="@is-required">
 										<sup class="required">&bull;</sup>
 									</xsl:if>
 								</label>
@@ -338,7 +337,7 @@
 							<xsl:otherwise>none;</xsl:otherwise>
 						</xsl:choose>
 					</xsl:attribute-->
-					<a onclick="document_parent_chooser('{@name}')" class="parent_document_change">Выбрать</a>
+					<a onclick="documentParentChooser('{@name}')" class="parent-document-change">Выбрать</a>
 				</div>
 
 				<div id="{@name}_chooser">
@@ -350,10 +349,10 @@
 							<xsl:otherwise>block;</xsl:otherwise>
 						</xsl:choose>
 					</xsl:attribute-->
-					<a onclick="document_parent_chooser('{@name}')" class="parent_document_change">Скрыть</a>
-					<div id="{@name}_tree" class="object_tree" />
+					<a onclick="documentParentChooser('{@name}')" class="parent-document-change">Скрыть</a>
+					<div id="{@name}_tree" class="object-tree" />
 					<script type="text/javascript" language="JavaScript">
-						<xsl:text>document_parent_update_branch('</xsl:text>
+						<xsl:text>documentParentUpdateBranch('</xsl:text>
 						<xsl:value-of select="@name" />
 						<xsl:text>_tree', '</xsl:text>
 						<xsl:value-of select="@name" />
@@ -367,18 +366,18 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'multiple_tree' or @type = 'single_tree'">
-				<xsl:variable name="module_name" select="ancestor::node()[name() = 'module']/@name" />
-				<xsl:variable name="field_name" select="@name" />
+				<xsl:variable name="module-name" select="ancestor::node()[name() = 'module']/@name" />
+				<xsl:variable name="field-name" select="@name" />
 
-				<div id="{$field_name}_tree_open_btn">
+				<div id="{$field-name}_tree_open_btn">
 					<xsl:if test="not(ancestor::node()[name() = 'module']/@id)"><xsl:attribute name="style">display: none;</xsl:attribute></xsl:if>
-					<a onclick="treeSwitcher('{$field_name}')" class="tree_switcher">Выбрать</a>
+					<a onclick="treeSwitcher('{$field-name}')" class="tree-switcher">Выбрать</a>
 				</div>
 
-				<div id="{$field_name}_tree_container">
+				<div id="{$field-name}_tree_container">
 					<xsl:if test="ancestor::node()[name() = 'module']/@id"><xsl:attribute name="style">display: none;</xsl:attribute></xsl:if>
-					<a onclick="treeSwitcher('{$field_name}')" class="tree_switcher">Скрыть</a>
-					<div id="{$field_name}_tree" class="tree" />
+					<a onclick="treeSwitcher('{$field-name}')" class="tree-switcher">Скрыть</a>
+					<div id="{$field-name}_tree" class="tree" />
 				</div>
 
 				<xsl:variable name="type"><xsl:choose>
@@ -387,7 +386,7 @@
 				</xsl:choose></xsl:variable>
 
 				<script type="text/javascript" language="JavaScript">
-					<xsl:value-of select="concat('var formTreeValues_', $field_name, ' = new Array(')" />
+					<xsl:value-of select="concat('var formTreeValues_', $field-name, ' = new Array(')" />
 					<xsl:choose>
 						<xsl:when test="@type = 'single_tree' and value/text()"><xsl:value-of select="concat('&quot;', value/text(), '&quot;')" /></xsl:when>
 						<xsl:when test="@type = 'single_tree' and not(value/item)">""</xsl:when>
@@ -396,7 +395,7 @@
 							<xsl:if test="position() != last()">, </xsl:if>
 						</xsl:for-each></xsl:when>
 					</xsl:choose>
-					<xsl:value-of select="concat('); treeLoad(&quot;', $field_name, '_tree&quot;, &quot;', $module_name, '&quot;, &quot;', $field_name, '&quot;, &quot;&quot;, &quot;', $type, '&quot;);')" />
+					<xsl:value-of select="concat('); treeLoad(&quot;', $field-name, '_tree&quot;, &quot;', $module-name, '&quot;, &quot;', $field-name, '&quot;, &quot;&quot;, &quot;', $type, '&quot;);')" />
 				</script>
 			</xsl:when>
 
@@ -408,7 +407,7 @@
 					</xsl:choose>
 				</xsl:variable>
 
-				<div class="form_float_ele">
+				<div class="form-float-ele">
 					<xsl:choose>
 						<xsl:when test="options/group/item">
 							<select name="{@name}" id="form_ele_{@name}" class="simple">
@@ -444,7 +443,7 @@
 						</xsl:when>
 						<xsl:when test="count(options/item) > 0">
 							<xsl:for-each select="options/item">
-								<table class="chooser_item">
+								<table class="chooser-item">
 									<tr>
 										<td>
 											<input type="radio" name="{ancestor::node()[2]/@name}" id="{generate-id()}" value="{@value}">
@@ -453,7 +452,7 @@
 												</xsl:if>
 											</input>
 										</td>
-										<td class="chooser_label"><label for="{generate-id()}"><xsl:value-of select="text()" disable-output-escaping="yes" /></label></td>
+										<td class="chooser-label"><label for="{generate-id()}"><xsl:value-of select="text()" disable-output-escaping="yes" /></label></td>
 									</tr>
 								</table>
 							</xsl:for-each>
@@ -464,7 +463,7 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'multiple'">
-				<div class="form_float_ele">
+				<div class="form-float-ele">
 					<xsl:choose>
 						<!-- В четыре колонки -->
 						<xsl:when test="count(options/item) > 25">
@@ -472,10 +471,10 @@
 								<col width="25%" />
 								<xsl:for-each select="options/item[position() mod 4 = 1]">
 									<tr>
-										<td class="multiple multiple_small multiple-first"><xsl:apply-templates select="self::node()" mode="checkbox" /></td>
-										<td class="multiple multiple_small"><xsl:apply-templates select="following-sibling::node()[name() = 'item'][1]" mode="checkbox" /></td>
-										<td class="multiple multiple_small"><xsl:apply-templates select="following-sibling::node()[name() = 'item'][2]" mode="checkbox" /></td>
-										<td class="multiple multiple_small"><xsl:apply-templates select="following-sibling::node()[name() = 'item'][3]" mode="checkbox" /></td>
+										<td class="multiple multiple-small multiple-first"><xsl:apply-templates select="self::node()" mode="checkbox" /></td>
+										<td class="multiple multiple-small"><xsl:apply-templates select="following-sibling::node()[name() = 'item'][1]" mode="checkbox" /></td>
+										<td class="multiple multiple-small"><xsl:apply-templates select="following-sibling::node()[name() = 'item'][2]" mode="checkbox" /></td>
+										<td class="multiple multiple-small"><xsl:apply-templates select="following-sibling::node()[name() = 'item'][3]" mode="checkbox" /></td>
 									</tr>
 								</xsl:for-each>
 							</table>
@@ -493,9 +492,9 @@
 						</xsl:when>
 						<!-- Столбиком -->
 						<xsl:when test="count(options/item) > 3">
-							<table class="chooser_item">
+							<table class="chooser-item">
 								<xsl:apply-templates select="options/item" mode="checkbox">
-									<xsl:with-param name="without_table">true</xsl:with-param>
+									<xsl:with-param name="without-table">true</xsl:with-param>
 								</xsl:apply-templates>
 							</table>
 						</xsl:when>
@@ -512,7 +511,7 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'text' or @type = 'short_text' or @type = 'large_text'">
-				<div class="form_float_ele">
+				<div class="form-float-ele">
 					<textarea name="{@name}" id="form_ele_{@name}">
 						<xsl:attribute name="class">
 							<xsl:value-of select="@type" />
@@ -526,7 +525,7 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'date'">
-				<table class="form_date form_float_ele">
+				<table class="form-date form-float-ele">
 					<tr>
 						<td class="day">
 							<input type="text" name="{@name}_day" id="{@name}" maxlength="2">
@@ -538,7 +537,7 @@
 								</xsl:attribute>
 							</input>
 						</td>
-						<td class="date_separator">.</td>
+						<td class="date-separator">.</td>
 						<td class="month">
 							<input type="text" name="{@name}_month" id="{@name}_month" maxlength="2">
 								<xsl:attribute name="value">
@@ -549,7 +548,7 @@
 								</xsl:attribute>
 							</input>
 						</td>
-						<td class="date_separator">.</td>
+						<td class="date-separator">.</td>
 						<td class="year">
 							<input type="text" name="{@name}_year" id="{@name}_year" maxlength="4">
 								<xsl:attribute name="value">
@@ -565,7 +564,7 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'datetime'">
-				<table class="form_date form_float_ele">
+				<table class="form-date form-float-ele">
 					<tr>
 						<td class="day">
 							<input type="text" name="{@name}_day" id="{@name}" maxlength="2">
@@ -577,7 +576,7 @@
 								</xsl:attribute>
 							</input>
 						</td>
-						<td class="date_separator">.</td>
+						<td class="date-separator">.</td>
 						<td class="month">
 							<input type="text" name="{@name}_month" id="{@name}_month" maxlength="2">
 								<xsl:attribute name="value">
@@ -588,7 +587,7 @@
 								</xsl:attribute>
 							</input>
 						</td>
-						<td class="date_separator">.</td>
+						<td class="date-separator">.</td>
 						<td class="year">
 							<input type="text" name="{@name}_year" id="{@name}_year" maxlength="4">
 								<xsl:attribute name="value">
@@ -599,7 +598,7 @@
 								</xsl:attribute>
 							</input>
 						</td>
-						<td class="datetime_separator"></td>
+						<td class="datetime-separator"></td>
 						<td class="hours">
 							<input type="text" name="{@name}_hours" id="{@name}_hours" maxlength="2">
 								<xsl:attribute name="value">
@@ -610,7 +609,7 @@
 								</xsl:attribute>
 							</input>
 						</td>
-						<td class="time_separator">:</td>
+						<td class="time-separator">:</td>
 						<td class="minutes">
 							<input type="text" name="{@name}_minutes" id="{@name}_minutes" maxlength="2">
 								<xsl:attribute name="value">
@@ -626,7 +625,7 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'calendar'">
-				<div class="form_calendar form_float_ele">
+				<div class="form-calendar form-float-ele">
 					<input type="hidden" name="{@name}" id="{@name}">
 						<xsl:attribute name="value">
 							<xsl:choose>
@@ -635,14 +634,14 @@
 							</xsl:choose>
 						</xsl:attribute>
 					</input>
-					<input type="text" id="{@name}_input" onblur="calendar_parse_input('{@name}');" />
-					<button onclick="calendar_switcher('{@name}', event); return false;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
-					<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('calendar_init(&quot;', @name , '&quot;);')" /></script>
+					<input type="text" id="{@name}_input" onblur="calendarParseInput('{@name}');" />
+					<button onclick="calendarSwitcher('{@name}', event); return false;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
+					<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('calendarInit(&quot;', @name , '&quot;);')" /></script>
 				</div>
 			</xsl:when>
 
 			<xsl:when test="@type = 'calendar_datetime'">
-				<div class="form_calendar form_float_ele">
+				<div class="form-calendar form-float-ele">
 					<input type="hidden" name="{@name}" id="{@name}">
 						<xsl:attribute name="value">
 							<xsl:choose>
@@ -651,16 +650,16 @@
 							</xsl:choose>
 						</xsl:attribute>
 					</input>
-                    <input type="text" id="{@name}_input" onblur="calendar_parse_input('{@name}');" />
-                    <button onclick="calendar_switcher('{@name}', event); return false;" style="margin-right: 5px;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
-					<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('calendar_init(&quot;', @name , '&quot;);')" /></script>
+                    <input type="text" id="{@name}_input" onblur="calendarParseInput('{@name}');" />
+                    <button onclick="calendarSwitcher('{@name}', event); return false;" style="margin-right: 5px;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
+					<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('calendarInit(&quot;', @name , '&quot;);')" /></script>
 
-                    <xsl:variable name="hours_value"><xsl:choose>
+                    <xsl:variable name="hours-value"><xsl:choose>
                         <xsl:when test="error/value/hours/text()"><xsl:value-of select="error/value/hours/text()" /></xsl:when>
                         <xsl:otherwise><xsl:value-of select="value/hours/text()" /></xsl:otherwise>
                     </xsl:choose></xsl:variable>
 
-                    <xsl:variable name="minutes_value"><xsl:choose>
+                    <xsl:variable name="minutes-value"><xsl:choose>
                         <xsl:when test="error/value/minutes/text()"><xsl:value-of select="error/value/minutes/text()" /></xsl:when>
                         <xsl:otherwise><xsl:value-of select="value/minutes/text()" /></xsl:otherwise>
                     </xsl:choose></xsl:variable>
@@ -669,7 +668,7 @@
                         <td><select name="{@name}_hours">
                             <xsl:for-each select="additional/hours/item">
                                 <option value="{@value}" style="text-align: right;">
-                                    <xsl:if test="$hours_value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
+                                    <xsl:if test="$hours-value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
                                     <xsl:value-of select="text()" />
                                 </option>
                             </xsl:for-each>
@@ -678,7 +677,7 @@
                         <td><select name="{@name}_minutes">
                             <xsl:for-each select="additional/minutes/item">
                                 <option value="{@value}" style="text-align: right;">
-                                    <xsl:if test="$minutes_value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
+                                    <xsl:if test="$minutes-value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
                                     <xsl:value-of select="text()" />
                                 </option>
                             </xsl:for-each>
@@ -690,26 +689,26 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'date_period' or @type = 'datetime_period'">
-				<div class="form_calendar form_float_ele">
+				<div class="form-calendar form-float-ele">
 					<div style="float: left; margin-bottom: 0.5em;">
-						<input type="text" id="{@name}_from_input" onblur="calendar_parse_input('{@name}_from');" />
-						<button style="margin-right: 5px;" onclick="calendar_switcher('{@name}_from', event); return false;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
+						<input type="text" id="{@name}_from_input" onblur="calendarParseInput('{@name}_from');" />
+						<button style="margin-right: 5px;" onclick="calendarSwitcher('{@name}_from', event); return false;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
 						<xsl:if test="@type = 'datetime_period'">
-							<xsl:variable name="from_hours_value"><xsl:choose>
-								<xsl:when test="error/value/from_hours/text()"><xsl:value-of select="error/value/from_hours/text()" /></xsl:when>
-								<xsl:otherwise><xsl:value-of select="value/from_hours/text()" /></xsl:otherwise>
+							<xsl:variable name="from-hours-value"><xsl:choose>
+								<xsl:when test="error/value/from-hours/text()"><xsl:value-of select="error/value/from-hours/text()" /></xsl:when>
+								<xsl:otherwise><xsl:value-of select="value/from-hours/text()" /></xsl:otherwise>
 							</xsl:choose></xsl:variable>
 
-							<xsl:variable name="from_minutes_value"><xsl:choose>
-								<xsl:when test="error/value/from_minutes/text()"><xsl:value-of select="error/value/from_minutes/text()" /></xsl:when>
-								<xsl:otherwise><xsl:value-of select="value/from_minutes/text()" /></xsl:otherwise>
+							<xsl:variable name="from-minutes-value"><xsl:choose>
+								<xsl:when test="error/value/from-minutes/text()"><xsl:value-of select="error/value/from-minutes/text()" /></xsl:when>
+								<xsl:otherwise><xsl:value-of select="value/from-minutes/text()" /></xsl:otherwise>
 							</xsl:choose></xsl:variable>
 
 							<table style="float: left;"><tr>
 								<td><select name="{@name}_from_hours">
                                     <xsl:for-each select="additional/hours/item">
                                         <option value="{@value}" style="text-align: right;">
-                                            <xsl:if test="$from_hours_value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
+                                            <xsl:if test="$from-hours-value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
                                             <xsl:value-of select="text()" />
                                         </option>
                                     </xsl:for-each>
@@ -718,7 +717,7 @@
 								<td><select name="{@name}_from_minutes">
                                     <xsl:for-each select="additional/minutes/item">
                                         <option value="{@value}" style="text-align: right;">
-                                            <xsl:if test="$from_minutes_value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
+                                            <xsl:if test="$from-minutes-value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
                                             <xsl:value-of select="text()" />
                                         </option>
                                     </xsl:for-each>
@@ -730,24 +729,24 @@
 					<div style="float: left; margin: 1px 3px 0.5em 3px; font-size: 1.25em;">&mdash;</div>
 
 					<div style="float: left;">
-						<input type="text" id="{@name}_till_input" onblur="calendar_parse_input('{@name}_till');" />
-						<button style="margin-right: 5px;" onclick="calendar_switcher('{@name}_till', event); return false;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
+						<input type="text" id="{@name}_till_input" onblur="calendarParseInput('{@name}_till');" />
+						<button style="margin-right: 5px;" onclick="calendarSwitcher('{@name}_till', event); return false;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
 						<xsl:if test="@type = 'datetime_period'">
-							<xsl:variable name="till_hours_value"><xsl:choose>
-								<xsl:when test="error/value/till_hours/text()"><xsl:value-of select="error/value/till_hours/text()" /></xsl:when>
-								<xsl:otherwise><xsl:value-of select="value/till_hours/text()" /></xsl:otherwise>
+							<xsl:variable name="till-hours-value"><xsl:choose>
+								<xsl:when test="error/value/till-hours/text()"><xsl:value-of select="error/value/till-hours/text()" /></xsl:when>
+								<xsl:otherwise><xsl:value-of select="value/till-hours/text()" /></xsl:otherwise>
 							</xsl:choose></xsl:variable>
 
-							<xsl:variable name="till_minutes_value"><xsl:choose>
-								<xsl:when test="error/value/till_minutes/text()"><xsl:value-of select="error/value/till_minutes/text()" /></xsl:when>
-								<xsl:otherwise><xsl:value-of select="value/till_minutes/text()" /></xsl:otherwise>
+							<xsl:variable name="till-minutes-value"><xsl:choose>
+								<xsl:when test="error/value/till-minutes/text()"><xsl:value-of select="error/value/till-minutes/text()" /></xsl:when>
+								<xsl:otherwise><xsl:value-of select="value/till-minutes/text()" /></xsl:otherwise>
 							</xsl:choose></xsl:variable>
 
 							<table style="float: left;"><tr>
 								<td><select name="{@name}_till_hours">
                                     <xsl:for-each select="additional/hours/item">
                                         <option value="{@value}" style="text-align: right;">
-                                            <xsl:if test="$till_hours_value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
+                                            <xsl:if test="$till-hours-value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
                                             <xsl:value-of select="text()" />
                                         </option>
                                     </xsl:for-each>
@@ -756,7 +755,7 @@
 								<td><select name="{@name}_till_minutes">
                                     <xsl:for-each select="additional/minutes/item">
                                         <option value="{@value}" style="text-align: right;">
-                                            <xsl:if test="$till_minutes_value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
+                                            <xsl:if test="$till-minutes-value = @value"><xsl:attribute name="selected">true</xsl:attribute></xsl:if>
                                             <xsl:value-of select="text()" />
                                         </option>
                                     </xsl:for-each>
@@ -783,8 +782,8 @@
 					</input>
 
 					<script type="text/javascript" language="JavaScript">
-						<xsl:value-of select="concat('calendar_init(&quot;', @name , '_from&quot;);')" />
-						<xsl:value-of select="concat('calendar_init(&quot;', @name , '_till&quot;);')" />
+						<xsl:value-of select="concat('calendarInit(&quot;', @name , '_from&quot;);')" />
+						<xsl:value-of select="concat('calendarInit(&quot;', @name , '_till&quot;);')" />
 					</script>
 
 					<br clear="all" />
@@ -792,17 +791,17 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'image'">
-				<div class="form_float_ele">
+				<div class="form-float-ele">
 					<xsl:choose>
 						<xsl:when test="value/url/text() and value/width/text()">
-							<div class="field_image_params">
-								<table class="chooser_item">
+							<div class="field-image-params">
+								<table class="chooser-item">
 									<tr>
 										<td>
 											<input type="checkbox" name="{@name}_delete" id="{generate-id()}" value="1" />
 											<input type="hidden" name="{@name}_present" value="{value/path/text()}" />
 										</td>
-										<td class="chooser_label">
+										<td class="chooser-label">
 											<label for="{generate-id()}">
 												<xsl:text>Удалить</xsl:text><br />
 
@@ -842,7 +841,7 @@
 										</td>
 									</tr>
 								</table>
-								<div class="field_image_replace">
+								<div class="field-image-replace">
 									<xsl:text>Заменить:</xsl:text><br />
 									<input type="file" name="{@name}" id="form_ele_{@name}" class="file" />
 								</div>
@@ -856,7 +855,7 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'year'">
-				<div class="form_float_ele">
+				<div class="form-float-ele">
 					<input name="{@name}" id="form_ele_{@name}" type="text" maxlength="4" class="{@type}">
 						<xsl:attribute name="value">
 							<xsl:choose>
@@ -869,19 +868,19 @@
 			</xsl:when>
 
             <xsl:when test="(@type = 'integer' or @type = 'float') and @is-readonly">
-                <div class="form_float_ele">
+                <div class="form-float-ele">
                     <xsl:value-of select="value" />
                 </div>
             </xsl:when>
 
 			<xsl:when test="@type = 'integer' or @type = 'float'">
-				<div class="form_float_ele">
+				<div class="form-float-ele">
 					<input name="{@name}" id="form_ele_{@name}" type="text" maxlength="10" class="{@type}">
 						<xsl:attribute name="value">
 							<xsl:choose>
 								<xsl:when test="error/value/text()"><xsl:value-of select="error/value/text()" /></xsl:when>
 								<xsl:when test="value/text()"><xsl:value-of select="value/text()" /></xsl:when>
-								<xsl:when test="@is_required">0</xsl:when>
+								<xsl:when test="@is-required">0</xsl:when>
 							</xsl:choose>
 						</xsl:attribute>
 					</input>
@@ -891,16 +890,16 @@
 			<xsl:when test="@type = 'adding_files'">
 				<div>
 					<xsl:if test="description">
-						<div class="add_files_description"><xsl:value-of select="description/text()" disable-output-escaping="yes" /></div>
+						<div class="add-files-description"><xsl:value-of select="description/text()" disable-output-escaping="yes" /></div>
 					</xsl:if>
-					<div id="add_form_files_{@name}" class="add_files" onclick="add_form_file_inputs('{@name}');">Добавить</div>
+					<div id="add_form_files_{@name}" class="add-files" onclick="addFormFileInputs('{@name}');">Добавить</div>
 				</div>
 
 				<xsl:for-each select="additional[*[@path]]">
 					<div class="files">
 						<xsl:for-each select="*[@path]">
 							<div class="file">
-								<span onclick="delete_file(this, '{@path}');" title="Удалить файл немедленно?">&times;</span>
+								<span onclick="deleteFile(this, '{@path}');" title="Удалить файл немедленно?">&times;</span>
 								<xsl:text>&nbsp;</xsl:text>
 								<a href="{@uri}"><xsl:value-of select="@filename" /></a>
 								<xsl:text> </xsl:text>
@@ -912,8 +911,8 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'password'">
-				<div class="form_float_ele">
-					<table class="form_password">
+				<div class="form-float-ele">
+					<table class="form-password">
 						<tr>
 							<td class="password"><input type="password" name="{@name}" id="form_ele_{@name}" value="{value/password/text()}" maxlength="255" /></td>
 							<td class="check"><input type="password" name="{@name}_check" id="form_ele_{@name}_check" value="{value/password/text()}" maxlength="255" /></td>
@@ -930,7 +929,7 @@
 			</xsl:when>
 
 			<xsl:when test="@type = 'phone'">
-				<table class="form_phone form_float_ele">
+				<table class="form-phone form-float-ele">
 					<tr>
 						<td class="code">
 							<input type="text" name="{@name}_code" id="form_ele_{@name}" maxlength="5">
@@ -967,16 +966,16 @@
 			-->
 			<xsl:when test="@type = 'module_items'">
 				<a
-					href="{additional/module_items/@module_uri}?parent_id={ancestor::module/@id}&amp;NEW"
-					class="add_element">Добавить</a>
+					href="{additional/module-items/@module-uri}?parent_id={ancestor::module/@id}&amp;NEW"
+					class="add-element">Добавить</a>
 				<br clear="all" />
 
-				<div class="form_float_ele">
+				<div class="form-float-ele">
 					<xsl:choose>
-						<xsl:when test="additional[module_items[item]]">
-							<xsl:for-each select="additional/module_items/item">
-								<a href="{parent::node()/@module_uri}?id={@id}">
-									<xsl:if test="not(@is_published) and not(@is-published)">
+						<xsl:when test="additional[module-items[item]]">
+							<xsl:for-each select="additional/module-items/item">
+								<a href="{parent::node()/@module-uri}?id={@id}">
+									<xsl:if test="not(@is-published) and not(@is-published)">
 										<xsl:attribute name="class">hidden</xsl:attribute>
 									</xsl:if>
 
@@ -1019,7 +1018,7 @@
             </additional>
 			-->
 			<xsl:when test="@type = 'triple_link'">
-                <div class="form_float_ele">
+                <div class="form-float-ele">
                     <div class="function"
                          style="float: left;"
                          onclick="addTripleLink('{@name}');">Добавить</div>
@@ -1033,13 +1032,13 @@
             </xsl:when>
 
 			<xsl:otherwise>
-				<xsl:apply-templates select="self::node()" mode="project_form_element" />
+				<xsl:apply-templates select="self::node()" mode="project-form-element" />
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template match="item" mode="checkbox">
-		<xsl:param name="without_table">false</xsl:param>
+		<xsl:param name="without-table">false</xsl:param>
 
 		<xsl:variable name="value" select="@value" />
 		<xsl:variable name="content">
@@ -1058,18 +1057,18 @@
 						</xsl:choose>
 					</input>
 				</td>
-				<td class="chooser_label" width="99%">
+				<td class="chooser-label" width="99%">
 					<label for="{generate-id()}"><xsl:value-of select="text()" disable-output-escaping="yes" /></label>
 				</td>
 			</tr>
 		</xsl:variable>
 
 		<xsl:choose>
-			<xsl:when test="$without_table = 'true'">
+			<xsl:when test="$without-table = 'true'">
 				<xsl:copy-of select="$content" />
 			</xsl:when>
 			<xsl:otherwise>
-				<table class="chooser_item">
+				<table class="chooser-item">
 					<xsl:copy-of select="$content" />
 				</table>
 			</xsl:otherwise>
@@ -1097,14 +1096,14 @@
                     <xsl:apply-templates select="ancestor::additional/options[@is-key-2]"
                                          mode="triple-link">
                         <xsl:with-param name="name" select="$name" />
-                        <xsl:with-param name="selected_id" select="key-2/@id" />
+                        <xsl:with-param name="selected-id" select="key-2/@id" />
                     </xsl:apply-templates>
                 </td>
                 <td>
                     <xsl:apply-templates select="ancestor::additional/options[@is-key-3]"
                                          mode="triple-link">
                         <xsl:with-param name="name" select="$name" />
-                        <xsl:with-param name="selected_id" select="key-3/@id" />
+                        <xsl:with-param name="selected-id" select="key-3/@id" />
                     </xsl:apply-templates>
                 </td>
             </tr>
@@ -1152,14 +1151,14 @@
     </xsl:template>
 
     <xsl:template match="options" mode="triple-link">
-        <xsl:param name="selected_id" />
+        <xsl:param name="selected-id" />
         <xsl:param name="name" />
 
         <select name="{$name}_{@key}">
             <xsl:for-each select="option">
                 <option value="{@value}">
                     <xsl:choose>
-                        <xsl:when test="@value = $selected_id">
+                        <xsl:when test="@value = $selected-id">
                             <xsl:attribute name="selected">true</xsl:attribute>
                         </xsl:when>
                         <xsl:when test="@is-selected">
@@ -1170,5 +1169,21 @@
                 </option>
             </xsl:for-each>
         </select>
+    </xsl:template>
+
+    <xsl:template match="upload-file">
+        <xsl:apply-templates select="html" />
+
+        <form method="post" enctype="multipart/form-data">
+            <input type="file" name="file" />
+            <xsl:text> </xsl:text>
+            <input type="submit" name="submit" value="Загрузить" />
+        </form>
+
+        <xsl:if test="error">
+            <p style="color: #f00; font-size: 0.84em;">
+                <xsl:value-of select="error/text()" disable-output-escaping="yes" />
+            </p>
+        </xsl:if>
     </xsl:template>
 </xsl:stylesheet>

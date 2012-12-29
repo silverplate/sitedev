@@ -1,1 +1,0 @@
-../core/templates/bo_http_requests.xsl

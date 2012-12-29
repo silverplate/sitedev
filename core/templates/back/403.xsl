@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE xsl:stylesheet SYSTEM "entities.dtd">
+<!DOCTYPE xsl:stylesheet SYSTEM "../entities.dtd">
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:output method="html" indent="no" encoding="utf-8" />
 
+	<xsl:include href="../common.xsl" />
 	<xsl:include href="common.xsl" />
-	<xsl:include href="bo_common.xsl" />
 
 	<xsl:template match="page">
 		<html>
@@ -15,7 +15,7 @@
 
 				<title>
 					<xsl:if test="url/@path != '/cms/'">
-						<xsl:call-template name="get_page_title" />
+						<xsl:call-template name="get-page-title" />
 						<xsl:text> - </xsl:text>
 					</xsl:if>
 					<xsl:text>Система управления</xsl:text>
@@ -44,26 +44,26 @@
 				<table width="100%" height="100%">
 					<tr>
 						<td height="99%" valign="top">
-							<xsl:call-template name="page_navigation" />
+							<xsl:call-template name="page-navigation" />
 
 							<form action="{/node()/url}" method="post">
-								<table class="auth_form">
+								<table class="auth-form">
 									<tr>
-										<td class="auth_login">
+										<td class="auth-login">
 											<label for="auth_login">Логин</label>
 											<input type="text" name="auth_login" id="auth_login" maxlength="30" tabindex="1" />
 										</td>
-										<td class="auth_password">
+										<td class="auth-password">
 											<label for="auth_password">Пароль</label>
 											<input type="password" name="auth_password" id="auth_password" maxlength="255" tabindex="2" />
 										</td>
 									</tr>
 									<tr>
 										<td colspan="3">
-											<table class="chooser_item">
+											<table class="chooser-item">
 												<tr>
 													<td><input type="checkbox" name="auth_is_remember_me" id="auth_is_remember_me" value="1" tabindex="3" /></td>
-													<td class="chooser_label"><label for="auth_is_remember_me">Авторизовывайте меня сразу</label></td>
+													<td class="chooser-label"><label for="auth_is_remember_me">Авторизовывайте меня сразу</label></td>
 												</tr>
 											</table>
 											<input type="submit" name="auth_submit" id="auth_submit" value="Войти" tabindex="5" />
@@ -76,7 +76,7 @@
 									<xsl:if test="/node()/system/session[@action = 6 or @action = 7]">
 										<xsl:attribute name="style">display: none;</xsl:attribute>
 									</xsl:if>
-									<span onclick="password_reminder(true);">Я не помню пароль</span>
+									<span onclick="passwordReminder(true);">Я не помню пароль</span>
 								</div>
 
 								<table id="auth_reminder">
@@ -84,7 +84,7 @@
 										<xsl:attribute name="style">display: block;</xsl:attribute>
 									</xsl:if>
 									<tr>
-										<td class="auth_email">
+										<td class="auth-email">
 											<label for="auth_email">Сделайте мне новый пароль. Мой адрес</label>
 											<input type="text" name="auth_email" id="auth_email" maxlength="255" />
 										</td>
@@ -99,7 +99,7 @@
 					</tr>
 					<tr>
 						<td height="1%" valign="bottom">
-							<xsl:call-template name="page_footer" />
+							<xsl:call-template name="page-footer" />
 						</td>
 					</tr>
 				</table>

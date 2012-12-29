@@ -21,7 +21,7 @@
 				<link href="/favicon.ico" type="image/x-icon" rel="icon" /-->
 
 				<title>
-					<xsl:call-template name="get_page_title" />
+					<xsl:call-template name="get-page-title" />
 					<xsl:if test="url/@path != '/'">
 						<xsl:for-each select="system/navigation/main/item[@uri = '/']">
 							<xsl:text> - </xsl:text>

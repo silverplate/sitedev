@@ -22,26 +22,25 @@ abstract class Core_Cms_Front_Document_Controller extends Core_Cms_Front_Page
                 $this->SetRootNodeAttribute('xml:lang', $this->Document->GetLang());
             }
 
-            $conditions = array('is_published' => 1);
+            $where = array('is_published' => 1);
 
-            $params = array();
             $ancestors = App_Cms_Front_Document::GetAncestors($this->Document->GetId());
             if ($ancestors) $ancestors = array_values(array_diff($ancestors, array($this->Document->GetId())));
 
             if ($ancestors) {
-                $params[] =
+                $where[] =
                     '((' . App_Cms_Front_Document::GetPri() . ' IN (' . App_Db::escape($ancestors) . ') AND apply_type_id IN (2, 3)) OR (' .
                     App_Cms_Front_Document::GetPri() . ' = ' . App_Db::escape($this->Document->GetId()) . ' AND apply_type_id IN (1, 3)))';
 
             } else {
-                $params[] = '(' . App_Cms_Front_Document::GetPri() . ' = ' . App_Db::escape($this->Document->GetId()) . ' AND apply_type_id IN (1, 3))';
+                $where[] = '(' . App_Cms_Front_Document::GetPri() . ' = ' . App_Db::escape($this->Document->GetId()) . ' AND apply_type_id IN (1, 3))';
             }
 
             if (!is_null(App_Cms_User::GetAuthGroup())) {
-                $params[] = '(auth_status_id = 0 OR auth_status_id & ' . App_Cms_User::GetAuthGroup() . ')';
+                $where[] = '(auth_status_id = 0 OR auth_status_id & ' . App_Cms_User::GetAuthGroup() . ')';
             }
 
-            $data = App_Cms_Front_Data::GetList($conditions, null, $params);
+            $data = App_Cms_Front_Data::getList($where);
             $dataXml = array();
 
             foreach ($data as $item) {

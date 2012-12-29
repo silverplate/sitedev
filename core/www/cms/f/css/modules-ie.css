@@ -1,12 +1,16 @@
-/*** Loading bar
-*********************************************************/
+/**
+ * Loading bar
+ */
+
 /*
-body {
+body
+{
 	background-attachment: fixed;
 }
 */
 
-#loading {
+#loading
+{
 	position: absolute;
 	top: expression(parseInt(document.body.scrollTop) + "px");
 	filter: alpha(opacity=85);

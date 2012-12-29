@@ -29,8 +29,8 @@ $foControllers = array(
 );
 
 $templates = array(
-    'common' => array('title' => 'Основной', 'filename' => 'fo.xsl'),
-    'modules' => array('title' => 'Общее', 'filename' => 'fo-common.xsl', 'is_document_main' => 0)
+    'common' => array('title' => 'Основной', 'filename' => 'page.xsl'),
+    'modules' => array('title' => 'Общее', 'filename' => 'site-common.xsl', 'is_document_main' => 0)
 );
 
 $foDocuments = array(

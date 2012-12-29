@@ -1,113 +1,134 @@
-function get_random() {
+function getRandom()
+{
 	return Math.round(Math.random() * Math.random() * 100000);
 }
 
-function open_window(url, width, height, name) {
-	var w = (width) ? width : 600;
-	var h = (height) ? height : 400;
-	var window_name = (name) ? name : 'bo_' + get_random();
+function openWindow(_url, _width, _height, _name)
+{
+	var w = _width ? _width : 600;
+	var h = _height ? _height : 400;
+	var windowName = _name ? _name : "back_" + getRandom();
 
-	window.open(url, window_name, 'width=' + w + ',height=' + h + ',location=no,status=yes,resizable=yes,scrollbars=yes,titlebar=yes');
+	window.open(
+	    url,
+	    windowName,
+	    "width=" + w + ",height=" + h + ",location=no,status=yes,resizable=yes,scrollbars=yes,titlebar=yes"
+    );
 }
 
-function show_form_group(name) {
-	if (form_groups) {
-		for (var i = 0; i < form_groups.length; i++) {
-			change_element_visibility('form_group_' + form_groups[i], (form_groups[i] == name));
+function showFormGroup(_name)
+{
+	if (formGroups) {
+		for (var i = 0; i < formGroups.length; i++) {
+			changeElementVisibility("form_group_" + formGroups[i], (formGroups[i] == _name));
 
-			var tab_ele = document.getElementById('form_group_' + form_groups[i] + '_tab');
-			if (tab_ele) {
-				var class_name = '';
+			var tabEle = document.getElementById("form_group_" + formGroups[i] + "_tab");
+			if (tabEle) {
+				var className = "";
 
-				if (i == 0) class_name += (class_name != '' ? ' ' : '') + 'first';
-				if (form_groups[i] == name) class_name += (class_name != '' ? ' ' : '') + 'selected';
+				if (i == 0) className += (className != "" ? " " : "") + "first";
+				if (formGroups[i] == name) className += (className != "" ? " " : "") + "selected";
 
-				tab_ele.className = class_name;
+				tabEle.className = className;
 			}
 		}
 
-		setCookie('form_group', name);
+		setCookie("form_group", _name);
 	}
 }
 
-function change_element_visibility(id, is_visible) {
-	var element = document.getElementById(id);
+function changeElementVisibility(_id, _isVisible)
+{
+	var element = document.getElementById(_id);
+
 	if (element) {
-		element.style.display = is_visible || (is_visible == null && element.style.display != 'block') ? 'block' : 'none';
+		element.style.display = _isVisible ||
+		                        (_isVisible == null && element.style.display != "block") ? "block" : "none";
 	}
 }
 
 
 /*** Files
 *********************************************************/
-function get_form_file_adding_link(name) {
-	return document.getElementById('add_form_files_' + name);
+
+function getFormFileAddingLink(_name)
+{
+	return document.getElementById("add_form_files_" + _name);
 }
 
-function get_form_file_container(name) {
-	return document.getElementById('form_files_' + name);
+function getFormFileContainer(_name)
+{
+	return document.getElementById("form_files_" + _name);
 }
 
-function get_form_file_count(name) {
-	return get_form_file_container(name).getElementsByTagName('tr').length;
+function getFormFileCount(_name)
+{
+	return getFormFileContainer(_name).getElementsByTagName("tr").length;
 }
 
-function add_form_file_inputs(name) {
-	var table = document.createElement('table');
-	table.className = 'form_files';
-	table.setAttribute('id', 'form_files_' + name);
+function addFormFileInputs(_name)
+{
+	var table = document.createElement("table");
+	table.className = "form-files";
+	table.setAttribute("id", "form_files_" + _name);
 
-	get_form_file_adding_link(name).parentNode.appendChild(table);
-	add_form_file_input(name);
+	getFormFileAddingLink(name).parentNode.appendChild(table);
+	addFormFileInput(_name);
 }
 
-function add_form_file_input(name) {
-	var table = get_form_file_container(name);
+function addFormFileInput(_name)
+{
+	var table = getFormFileContainer(_name);
 
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
+	if (navigator.userAgent.indexOf("MSIE") != -1) {
 		var tr = table.insertRow();
+
 	} else {
-		var tr = document.createElement('tr');
-		get_form_file_container(name).appendChild(tr);
+		var tr = document.createElement("tr");
+		getFormFileContainer(_name).appendChild(tr);
 	}
 
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
-		var remove_ele = tr.insertCell();
+	if (navigator.userAgent.indexOf("MSIE") != -1) {
+		var removeEle = tr.insertCell();
+
 	} else {
-		var remove_ele = document.createElement('td');
-		tr.appendChild(remove_ele);
+		var removeEle = document.createElement("td");
+		tr.appendChild(removeEle);
 	}
 
-	remove_ele.className = 'system';
-	remove_ele.onclick = function () {
-	    remove_form_file_input(name, remove_ele);
+	removeEle.className = "system";
+	removeEle.onclick = function () {
+	    removeFormFileInput(_name, removeEle);
 	}
-	remove_ele.innerHTML = '&times;';
+	removeEle.innerHTML = "&times;";
 
-	if (navigator.userAgent.indexOf('MSIE') != -1) {
-		var input_ele = tr.insertCell();
+	if (navigator.userAgent.indexOf("MSIE") != -1) {
+		var inputEle = tr.insertCell();
+
 	} else {
-		var input_ele = document.createElement('td');
-		tr.appendChild(input_ele);
+		var inputEle = document.createElement("td");
+		tr.appendChild(inputEle);
 	}
 
-	input_ele.innerHTML = '<input type="file" name="' + name + '[]" class="file" multiple="true" />';
+	inputEle.innerHTML = "<input type="file" name="" + _name + "[]" class="file" multiple="true" />";
 }
 
-function remove_form_file_input(name, element) {
-	element.parentNode.parentNode.removeChild(element.parentNode);
+function removeFormFileInput(_name, _element)
+{
+	_element.parentNode.parentNode.removeChild(_element.parentNode);
 
-	if (get_form_file_count(name) == 0) {
-		get_form_file_container(name).parentNode.removeChild(get_form_file_container(name));
+	if (getFormFileCount(_name) == 0) {
+		getFormFileContainer(_name).parentNode.removeChild(getFormFileContainer(_name));
 	}
 }
 
-function delete_file(_ele, _path) {
+function deleteFile(_ele, _path)
+{
 	if (confirm("Удалить файл немедленно?")) {
 		showLoadingBar();
 
         $.post(
-            "/cms/ajax_delete_file.php",
+            "/cms/ajax-delete-file.php",
             "f=" + _path,
             function (_response) {
                 if (_response == "1") {
@@ -136,7 +157,7 @@ function delete_file(_ele, _path) {
 
 function itemSort(_event, _ui)
 {
-	var inputs = _ui.item.parent().find("input[type = 'hidden']");
+	var inputs = _ui.item.parent().find("input[type = "hidden"]");
 	var postBody = "";
 
 	for (var i = 0; i < inputs.length; i++) {
@@ -150,8 +171,11 @@ function itemSort(_event, _ui)
 }
 
 
-/*** Список элементов из таблицы с тройным составным первичным ключом
-*********************************************************/
+/**
+ * Список элементов из таблицы с тройным
+ * составным первичным ключом
+ */
+
 var tripleLinkCounter = 0;
 
 function addTripleLink(_name)
@@ -163,7 +187,7 @@ function addTripleLink(_name)
         var count = containerEle.getElementsByTagName("table").length;
 
         $.post(
-            "ajax_" + _name + ".php",
+            "ajax-" + _name + ".php",
             "name=" + _name + "&position=" + tripleLinkCounter + "&count=" + count,
             function (_response) {
                 if (_response) {
@@ -181,9 +205,9 @@ function addTripleLink(_name)
 
 function deleteTripleLink(_button)
 {
-    var ele = getParentElement(_button.parentNode, 'ins');
+    var ele = getParentElement(_button.parentNode, "ins");
     if (!ele) {
-        ele = getParentElement(_button.parentNode, 'table');
+        ele = getParentElement(_button.parentNode, "table");
     }
 
     if (ele) {
@@ -191,7 +215,7 @@ function deleteTripleLink(_button)
     }
 }
 
-var orderItemsCounter = 0;
+var tripleLinkCounter = 0;
 
 function addTripleLink(_name)
 {
@@ -202,7 +226,7 @@ function addTripleLink(_name)
         var count = containerEle.getElementsByTagName("table").length;
 
         $.post(
-            "ajax_" + _name + ".php",
+            "ajax-" + _name + ".php",
             "name=" + _name + "&position=" + tripleLinkCounter + "&count=" + count,
             function (_response) {
                 if (_response) {
@@ -220,9 +244,9 @@ function addTripleLink(_name)
 
 function deleteTripleLink(_button)
 {
-    var ele = getParentElement(_button.parentNode, 'ins');
+    var ele = getParentElement(_button.parentNode, "ins");
     if (!ele) {
-        ele = getParentElement(_button.parentNode, 'table');
+        ele = getParentElement(_button.parentNode, "table");
     }
 
     if (ele) {
@@ -231,8 +255,10 @@ function deleteTripleLink(_button)
 }
 
 
-/*** Формы
-*********************************************************/
+/**
+ * Формы
+ */
+
 function replaceTextareaCdata()
 {
     var elems = document.getElementsByTagName("textarea");

@@ -1,8 +1,8 @@
 var treeIconPlus = new Image(9, 9);
-treeIconPlus.src = '/cms/f/icon_plus.gif';
+treeIconPlus.src = "/cms/f/icon-plus.gif";
 
 var treeIconMinus = new Image(9, 9);
-treeIconMinus.src = '/cms/f/icon_minus.gif';
+treeIconMinus.src = "/cms/f/icon-minus.gif";
 
 function treeLoad(_updateEleId, _moduleName, _fieldName, _parentId, _type)
 {
@@ -31,7 +31,7 @@ function treeLoad(_updateEleId, _moduleName, _fieldName, _parentId, _type)
 	}
 
     $.post(
-        "ajax_tree.php",
+        "ajax-tree.php",
         postBody,
         function(_response) {
             $("#" + _updateEleId).html(_response);
@@ -44,10 +44,12 @@ function treeLoad(_updateEleId, _moduleName, _fieldName, _parentId, _type)
                     placeholder: "sort-placeholer",
                     forcePlaceholderSize: true,
  */
-                    items: "div.sort_item",
+                    items: "div.sort-item",
                     update: function() {
-                        updateTree(document.getElementById(_updateEleId),
-                                   _fieldName);
+                        updateTree(
+                            document.getElementById(_updateEleId),
+                            _fieldName
+                        );
                     }
                 });
 
@@ -59,87 +61,97 @@ function treeLoad(_updateEleId, _moduleName, _fieldName, _parentId, _type)
     );
 }
 
-function updateTree(ele, fieldName) {
+function updateTree(_ele, _fieldName)
+{
 	treeBranches = new Array();
-	getTreeBranchIds('tree_list', ele, fieldName);
+	getTreeBranchIds("tree_list", _ele, _fieldName);
 
 	if (treeBranches.length > 0) {
 		showLoadingBar();
-		var postBody = '';
+		var postBody = "";
 		var j;
 
 		for (var i = 0; i < treeBranches.length; i++) {
-			postBody += '&branches[]=' + treeBranches[i][0];
+			postBody += "&branches[]=" + treeBranches[i][0];
 			for (j = 0; j < treeBranches[i][1].length; j++) {
-				postBody += '&branch_' + treeBranches[i][0] + '[]=' + treeBranches[i][1][j];
+				postBody += "&branch_" + treeBranches[i][0] + "[]=" + treeBranches[i][1][j];
 			}
 		}
 
-        $.post("ajax_tree_sort.php", postBody.substr(1), hideLoadingBar);
+        $.post("ajax-tree-sort.php", postBody.substr(1), hideLoadingBar);
     }
 }
 
-function getTreeBranchIds(parentEleId, ele, fieldName) {
-	var parentId = parentEleId == 'tree_list' ? '' : parentEleId;
+function getTreeBranchIds(_parentEleId, _ele, _fieldName)
+{
+	var parentId = _parentEleId == "tree_list" ? "" : _parentEleId;
 	var child;
 	var idEle;
 	var subItems;
 
-	for (var i = 0; i < ele.childNodes.length; i++) {
-		child = ele.childNodes[i];
-		if (child.nodeName == 'DIV' && child.className == 'sort_item') {
-			idEle = document.getElementById(child.getAttribute('id') + '_id');
+	for (var i = 0; i < _ele.childNodes.length; i++) {
+		child = _ele.childNodes[i];
+
+		if (child.nodeName == "DIV" && child.className == "sort-item") {
+			idEle = document.getElementById(child.getAttribute("id") + "_id");
+
 			if (idEle) {
-				addTreeBranchId(parentId, idEle.getAttribute('value'));
-				subItems = document.getElementById(fieldName + '_' + idEle.getAttribute('value'));
+				addTreeBranchId(parentId, idEle.getAttribute("value"));
+				subItems = document.getElementById(_fieldName + "_" + idEle.getAttribute("value"));
+
 				if (subItems) {
-					getTreeBranchIds(idEle.getAttribute('value'), subItems, fieldName);
+					getTreeBranchIds(idEle.getAttribute("value"), subItems, _fieldName);
 				}
 			}
 		}
 	}
 }
 
-function addTreeBranchId(branchId, id) {
+function addTreeBranchId(_branchId, _id)
+{
 	var isBranch = false;
 	for (var i = 0; i < treeBranches.length; i++) {
-		if (treeBranches[i][0] == branchId) {
-			treeBranches[i][1][treeBranches[i][1].length] = id;
+		if (treeBranches[i][0] == _branchId) {
+			treeBranches[i][1][treeBranches[i][1].length] = _id;
 			isBranch = true;
 			break;
 		}
 	}
 
 	if (!isBranch) {
-		treeBranches[treeBranches.length] = new Array(branchId, new Array(id));
+		treeBranches[treeBranches.length] = new Array(_branchId, new Array(_id));
 	}
 }
 
-function treeCollapse(aObj, moduleName, fieldName, parentId, type) {
-	var updateEleId = fieldName + '_' + parentId;
+function treeCollapse(_obj, _moduleName, _fieldName, _parentId, _type)
+{
+	var updateEleId = _fieldName + "_" + _parentId;
 	var ele = document.getElementById(updateEleId);
 
-	if (ele.innerHTML == '') {
-		ele.style.display = 'block';
-		treeLoad(updateEleId, moduleName, fieldName, parentId, type);
+	if (ele.innerHTML == "") {
+		ele.style.display = "block";
+		treeLoad(updateEleId, _moduleName, _fieldName, _parentId, _type);
+
 	} else {
-		ele.style.display = ele.style.display == 'block' ? 'none' : 'block';
+		ele.style.display = ele.style.display == "block" ? "none" : "block";
 	}
 
-	treeImageRoll(aObj.getElementsByTagName('img')[0], ele);
+	treeImageRoll(_obj.getElementsByTagName("img")[0], ele);
 
-	var cookieName = 'bo_tree_' + moduleName + '_' + fieldName;
-	if (ele.style.display == 'block') saveIntoCookieList(cookieName, parentId, null);
+	var cookieName = "back_tree_" + _moduleName + "_" + _fieldName;
+	if (ele.style.display == "block") saveIntoCookieList(cookieName, _parentId, null);
 	else removeFromCookieList(cookieName, parentId, null);
 }
 
-function treeImageRoll(img, ele) {
-	img.src = ele.style.display == 'block' ? treeIconMinus.src : treeIconPlus.src;
+function treeImageRoll(_img, _ele)
+{
+	_img.src = _ele.style.display == "block" ? treeIconMinus.src : treeIconPlus.src;
 }
 
-function treeSwitcher(name) {
-	var eleOpenBtn = document.getElementById(name + '_tree_open_btn');
-	var eleContainer = document.getElementById(name + '_tree_container');
-	eleOpenBtn.style.display = eleOpenBtn.style.display == 'none' ? 'block' : 'none';
-	eleContainer.style.display = eleOpenBtn.style.display == 'none' ? 'block' : 'none';
+function treeSwitcher(_name)
+{
+	var eleOpenBtn = document.getElementById(_name + "_tree_open_btn");
+	var eleContainer = document.getElementById(_name + "_tree_container");
+	eleOpenBtn.style.display = eleOpenBtn.style.display == "none" ? "block" : "none";
+	eleContainer.style.display = eleOpenBtn.style.display == "none" ? "block" : "none";
 }

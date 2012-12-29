@@ -13,9 +13,9 @@ if (!$result_items['items'] && $result_items['total'] > 0 && $filter['page'] != 
 
 $page = new App_Cms_Page();
 $page->SetRootNodeName('http_request');
-$page->SetRootNodeAttribute('type', 'bo_logs');
+$page->SetRootNodeAttribute('type', 'back-logs');
 
-$page->SetTemplate(TEMPLATES . 'bo_http_requests.xsl');
+$page->SetTemplate(TEMPLATES . 'back/http-requests.xsl');
 
 if ($result_items['items']) {
 	$users = App_Cms_Back_User::GetList();
@@ -48,7 +48,7 @@ if ($result_items['items']) {
 			$append_xml .= "<{$name}><![CDATA[{$value}]]></{$name}>";
 		}
 
-		$page->AddContent($item->GetXml('bo_list', 'item', $append_xml));
+		$page->AddContent($item->getBackOfficeXml($append_xml));
 	}
 
 	$page->AddContent('<list_navigation page="' . $filter['page'] . '" per_page="' . $filter['per_page'] . '" total="' . $result_items['total'] . '" />');

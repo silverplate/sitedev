@@ -10,7 +10,7 @@
 		<description><![CDATA[Можно использовать латинские буквы, цифры и&nbsp;знак подчеркивания.]]></description>
 	</element>
 
-	<element name="fo_data_content_type_id" type="chooser">
+	<element name="front_data_content_type_id" type="chooser">
 		<label>Тип данных</label>
 	</element>
 
@@ -18,7 +18,7 @@
 		<label>Содержание</label>
 	</element>
 
-	<element name="fo_controller_id" type="chooser">
+	<element name="front_controller_id" type="chooser">
 		<label>Обработчик</label>
 	</element>
 

@@ -1,1 +1,0 @@
-../core/templates/bo_project_forms.xsl

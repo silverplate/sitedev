@@ -52,11 +52,11 @@
 			<label>Добавлять в&nbsp;навигацию</label>
 		</element>
 
-		<element name="fo_controller_id" type="chooser">
+		<element name="front_controller_id" type="chooser">
 			<label>Обработчик</label>
 		</element>
 
-		<element name="fo_template_id" type="chooser">
+		<element name="front_template_id" type="chooser">
 			<label>Шаблон</label>
 		</element>
     </group>

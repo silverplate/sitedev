@@ -1,1 +1,0 @@
-../core/templates/bo_403.xsl

@@ -1,6 +1,6 @@
 /*** Общие функции (можно вынести в общий файл)
 *********************************************************/
-function element_position(ele) {
+function elementEosition(ele) {
     this.x = ele.offsetLeft;
     this.y = ele.offsetTop;
     this.ele = ele;
@@ -12,7 +12,7 @@ function element_position(ele) {
     }
 }
 
-function add_event(ele, type, func) {
+function addEvent(ele, type, func) {
 	if (ele.addEventListener) {
 		ele.addEventListener(type, func, false);
 
@@ -21,7 +21,7 @@ function add_event(ele, type, func) {
 	}
 }
 
-function remove_event(ele, type, func) {
+function removeEvent(ele, type, func) {
 	if (ele.removeEventListener) {
 		ele.removeEventListener(type, func, false);
 
@@ -30,7 +30,7 @@ function remove_event(ele, type, func) {
 	}
 }
 
-function cancel_event(e) {
+function cancelEvent(e) {
 	var evt = e ? e : window.event;
 	evt.cancelBubble = true;
 }
@@ -40,7 +40,7 @@ function cancel_event(e) {
 *********************************************************/
 var calendars = new Array();
 
-function get_calendar(name) {
+function getCalendar(name) {
 	for (var i = 0; i < calendars.length; i++) {
 		if (calendars[i].name == name) {
 			return calendars[i];
@@ -49,30 +49,30 @@ function get_calendar(name) {
 	return false;
 }
 
-function calendar_init(name, lang) {
+function calendarInit(name, lang) {
 	calendars[calendars.length] = new calendar(name, lang);
 }
 
-function calendar_parse_input(name) {
-	get_calendar(name).parse_input();
+function calendarParseInput(name) {
+	getCalendar(name).parseInput();
 }
 
-function calendar_remove() {
+function calendarRemove() {
 	for (var i = 0; i < calendars.length; i++) {
 		calendars[i].remove();
 	}
 }
 
-function calendar_switcher(name, e) {
-	get_calendar(name).calendar(e);
+function calendarSwitcher(name, e) {
+	getCalendar(name).calendar(e);
 }
 
-function calendar_draw(name, y, m, d) {
-	get_calendar(name).draw(y, m, d);
+function calendarDraw(name, y, m, d) {
+	getCalendar(name).draw(y, m, d);
 }
 
-function calendar_set(name, y, m, d) {
-	get_calendar(name).set(y, m, d);
+function calendarSet(name, y, m, d) {
+	getCalendar(name).set(y, m, d);
 }
 
 function calendar(name, lang) {
@@ -87,27 +87,27 @@ function calendar(name, lang) {
 		? new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December')
 		: new Array('Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь');
 
-	this.get_ele_name = function() {
+	this.getEleName = function() {
 		return this.name + '_calendar_ele';
 	}
 
-	this.get_input_name = function() {
+	this.getInputName = function() {
 		return this.name + '_input';
 	}
 
-	this.get_ele = function() {
-		return document.getElementById(this.get_ele_name());
+	this.getEle = function() {
+		return document.getElementById(this.getEleName());
 	}
 
-	this.get_date_ele = function() {
+	this.getDateEle = function() {
 		return document.getElementById(this.name);
 	}
 
-	this.get_input_ele = function() {
-		return document.getElementById(this.get_input_name());
+	this.getInputEle = function() {
+		return document.getElementById(this.getInputName());
 	}
 
-	this.string_to_date = function(string) {
+	this.stringToDate = function(string) {
 		var regexp = /^\s*(\d+)[\s|\/|.|\-](.+)[\s|\/|.|\-](\d+)\s*$/i;
 		var parse = regexp.exec(string);
 		var now = new Date();
@@ -138,7 +138,7 @@ function calendar(name, lang) {
 		return date;
 	}
 
-	this.get_sql_date = function(date) {
+	this.getSqlDate = function(date) {
 		var m = (date.getMonth() + 1).toString();
 		if (m.length == 1) m = '0' + m;
 
@@ -148,102 +148,102 @@ function calendar(name, lang) {
 		return date.getFullYear() + '-' + m + '-' + d;
 	}
 
-	this.get_date = function() {
-		return this.string_to_date(this.get_input_ele().value);
+	this.getDate = function() {
+		return this.stringToDate(this.getInputEle().value);
 	}
 
-	this.set_date = function(y, m, d) {
+	this.setDate = function(y, m, d) {
 		var date = new Date(y, m, d);
-		this.get_input_ele().value = date.getDate() + ' ' + this.months[date.getMonth()].substr(0, 3).toLowerCase() + ' ' + date.getFullYear();
-		this.get_date_ele().value = this.get_sql_date(date);
+		this.getInputEle().value = date.getDate() + ' ' + this.months[date.getMonth()].substr(0, 3).toLowerCase() + ' ' + date.getFullYear();
+		this.getDateEle().value = this.getSqlDate(date);
 	}
 
-    this.is_date_set = function()
+    this.isDateSet = function()
     {
-        return this.get_date_ele().value != '';
+        return this.getDateEle().value != '';
     }
 
-	this.clear_date = function() {
-		this.get_input_ele().value = '';
-		this.get_date_ele().value = '';
+	this.clearDate = function() {
+		this.getInputEle().value = '';
+		this.getDateEle().value = '';
 	}
 
 	this.set = function(y, m, d) {
-		this.set_date(y, m, d);
+		this.setDate(y, m, d);
 		this.remove();
 	}
 
 	this.calendar = function(e) {
-		cancel_event(e);
+		cancelEvent(e);
 
-		if (this.get_ele()) {
+		if (this.getEle()) {
 			this.remove();
 
 		} else {
-			calendar_remove();
+			calendarRemove();
 			this.draw();
 		}
 	}
 
 	this.remove = function() {
-		if (this.get_ele()) {
-			this.get_ele().parentNode.removeChild(this.get_ele());
-			remove_event(document, 'click', calendar_remove);
+		if (this.getEle()) {
+			this.getEle().parentNode.removeChild(this.getEle());
+			removeEvent(document, 'click', calendarRemove);
 		}
 	}
 
-	this.parse_input = function() {
-		if (this.get_input_ele().value) {
-			var date = this.get_date();
-			this.set_date(date.getFullYear(), date.getMonth(), date.getDate());
+	this.parseInput = function() {
+		if (this.getInputEle().value) {
+			var date = this.getDate();
+			this.setDate(date.getFullYear(), date.getMonth(), date.getDate());
 		} else {
-			this.clear_date();
+			this.clearDate();
 		}
 	}
 
 	this.init = function() {
-		if (this.get_date_ele().value && this.get_date_ele().value != '0000-00-00') {
-			var date = this.string_to_date(this.get_date_ele().value);
-			this.set_date(date.getFullYear(), date.getMonth(), date.getDate());
+		if (this.getDateEle().value && this.getDateEle().value != '0000-00-00') {
+			var date = this.stringToDate(this.getDateEle().value);
+			this.setDate(date.getFullYear(), date.getMonth(), date.getDate());
 		}
 	}
 
 	this.draw = function(y, m, d) {
 		this.remove();
 
-		var body_ele = document.getElementsByTagName('body')[0];
+		var bodyEle = document.getElementsByTagName('body')[0];
 		var ele = document.createElement('div');
-		var pos = new element_position(this.get_input_ele());
+		var pos = new elementPosition(this.getInputEle());
 
 		ele.className = 'calendar';
-		ele.id = this.get_ele_name();
+		ele.id = this.getEleName();
 		ele.style.left = pos.x + 'px';
-		ele.style.top = pos.y + this.get_input_ele().offsetHeight + 5 + 'px';
+		ele.style.top = pos.y + this.getInputEle().offsetHeight + 5 + 'px';
 
-		body_ele.appendChild(ele);
-		add_event(ele, 'click', cancel_event);
-		add_event(document, 'click', calendar_remove);
+		bodyEle.appendChild(ele);
+		addEvent(ele, 'click', cancelEvent);
+		addEvent(document, 'click', calendarRemove);
 
-		var selected = this.is_date_set() ? this.get_date() : false;
+		var selected = this.isDateSet() ? this.getDate() : false;
 		var now = new Date();
 		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-		var calendar = y ? new Date(y, m, d) : this.get_date();
+		var calendar = y ? new Date(y, m, d) : this.getDate();
 		var y = calendar.getFullYear();
 		var m = calendar.getMonth();
 		var d = calendar.getDate();
-		var prev_m = m == 0 ? new Date(y - 1, 11, 1) : new Date(y, m - 1, 1);
-		var next_m = m == 11 ? new Date(y + 1, 0, 1) : new Date(y, m + 1, 1);
+		var prevM = m == 0 ? new Date(y - 1, 11, 1) : new Date(y, m - 1, 1);
+		var nextM = m == 11 ? new Date(y + 1, 0, 1) : new Date(y, m + 1, 1);
 
 		var content = '<table><thead>';
-		content += '<tr class="year"><td><a class="calc_arr_l" onclick="calendar_draw(\'' + this.name + '\',' + (y - 1) + ',' + m + ',' + d + '); return false;"><img src="/cms/f/calendar/left.gif" width="4" height="7" alt="" /></a></td>';
-		content += '<td><a class="calc_arr_l" onclick="calendar_draw(\'' + this.name + '\',' + (y - 10) + ',' + m + ',' + d + '); return false;"><img src="/cms/f/calendar/left.gif" width="4" height="7" alt="" /><img src="/cms/f/calendar/left.gif" width="4" height="7" alt="" /></a></td>';
+		content += '<tr class="year"><td><a class="calc-arr-l" onclick="calendarDraw(\'' + this.name + '\',' + (y - 1) + ',' + m + ',' + d + '); return false;"><img src="/cms/f/calendar/left.gif" width="4" height="7" alt="" /></a></td>';
+		content += '<td><a class="calc-arr-l" onclick="calendarDraw(\'' + this.name + '\',' + (y - 10) + ',' + m + ',' + d + '); return false;"><img src="/cms/f/calendar/left.gif" width="4" height="7" alt="" /><img src="/cms/f/calendar/left.gif" width="4" height="7" alt="" /></a></td>';
 		content += '<td colspan="3">' + y + '</td>';
-		content += '<td><a class="calc_arr_r" onclick="calendar_draw(\'' + this.name + '\',' + (y + 10) + ',' + m + ',' + d + '); return false;"><img src="/cms/f/calendar/right.gif" width="4" height="7" alt="" /><img src="/cms/f/calendar/right.gif" width="4" height="7" alt="" /></a></td>';
-		content += '<td><a class="calc_arr_r" onclick="calendar_draw(\'' + this.name + '\',' + (y + 1) + ',' + m + ',' + d + '); return false;"><img src="/cms/f/calendar/right.gif" width="4" height="7" alt="" /></a></td></tr>';
-		content += '<tr class="month"><td><a class="calc_arr_l" onclick="calendar_draw(\'' + this.name + '\',' + prev_m.getFullYear() + ',' + prev_m.getMonth() + ',' + prev_m.getDate() + '); return false;"><img src="/cms/f/calendar/left.gif" width="4" height="7" alt="" /></a></td>';
+		content += '<td><a class="calc-arr-r" onclick="calendarDraw(\'' + this.name + '\',' + (y + 10) + ',' + m + ',' + d + '); return false;"><img src="/cms/f/calendar/right.gif" width="4" height="7" alt="" /><img src="/cms/f/calendar/right.gif" width="4" height="7" alt="" /></a></td>';
+		content += '<td><a class="calc-arr-r" onclick="calendarDraw(\'' + this.name + '\',' + (y + 1) + ',' + m + ',' + d + '); return false;"><img src="/cms/f/calendar/right.gif" width="4" height="7" alt="" /></a></td></tr>';
+		content += '<tr class="month"><td><a class="calc-arr-l" onclick="calendarDraw(\'' + this.name + '\',' + prevM.getFullYear() + ',' + prevM.getMonth() + ',' + prevM.getDate() + '); return false;"><img src="/cms/f/calendar/left.gif" width="4" height="7" alt="" /></a></td>';
 		content += '<td colspan="5">' + this.months[m] + '</td>';
-		content += '<td><a class="calc_arr_r" onclick="calendar_draw(\'' + this.name + '\',' + next_m.getFullYear() + ',' + next_m.getMonth() + ',' + next_m.getDate() + '); return false;"><img src="/cms/f/calendar/right.gif" width="4" height="7" alt="" /></a></td></tr>';
+		content += '<td><a class="calc-arr-r" onclick="calendarDraw(\'' + this.name + '\',' + nextM.getFullYear() + ',' + nextM.getMonth() + ',' + nextM.getDate() + '); return false;"><img src="/cms/f/calendar/right.gif" width="4" height="7" alt="" /></a></td></tr>';
 
 		content += '<tr class="weekdays">';
 		for (var i = 0; i < this.weekdays.length; i++) {
@@ -255,25 +255,25 @@ function calendar(name, lang) {
 			calendar.setDate(calendar.getDate() - 1);
 		}
 
-		var class_name = '';
-		while (!(calendar.getDay() == 1 && calendar.getMonth() == next_m.getMonth())) {
-			if (calendar.getMonth() != m) class_name += 'notnow';
-			if (calendar.getDay() == 0 || calendar.getDay() == 6) class_name += (class_name ? ' ' : '') + 'weekend';
+		var className = '';
+		while (!(calendar.getDay() == 1 && calendar.getMonth() == nextM.getMonth())) {
+			if (calendar.getMonth() != m) className += 'notnow';
+			if (calendar.getDay() == 0 || calendar.getDay() == 6) className += (className ? ' ' : '') + 'weekend';
 
             if (calendar.valueOf() == today.valueOf()) {
-                class_name += (class_name ? ' ' : '') + 'today';
+                className += (className ? ' ' : '') + 'today';
             }
 
 			if (selected && calendar.valueOf() == selected.valueOf()) {
-			    class_name += (class_name ? ' ' : '') + 'selected';
+			    className += (className ? ' ' : '') + 'selected';
 			}
 
-			content += '<td' + (class_name ? ' class="' + class_name + '"' : '') + '>';
-			content += '<a onclick="calendar_set(\'' + this.name + '\',' + calendar.getFullYear() + ',' + calendar.getMonth() + ',' + calendar.getDate() + '); return false;">' + calendar.getDate() + '</a></td>';
+			content += '<td' + (className ? ' class="' + className + '"' : '') + '>';
+			content += '<a onclick="calendarSet(\'' + this.name + '\',' + calendar.getFullYear() + ',' + calendar.getMonth() + ',' + calendar.getDate() + '); return false;">' + calendar.getDate() + '</a></td>';
 
 			if (calendar.getDay() == 0) content += '</tr><tr>';
 			calendar.setDate(calendar.getDate() + 1);
-			class_name = '';
+			className = '';
 		}
 
 		content += '</tr></tbody></table>';

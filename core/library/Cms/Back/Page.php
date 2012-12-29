@@ -8,9 +8,9 @@ abstract class Core_Cms_Back_Page extends App_Cms_Page
 		parent::__construct();
 
 		if ($_is_authorize) {
-			if ($this->IsAllowed()) $this->SetTemplate(TEMPLATES . 'bo.xsl');
-			elseif ($this->IsAuthorized()) $this->SetTemplate(TEMPLATES . 'bo_404.xsl');
-			else $this->SetTemplate(TEMPLATES . 'bo_403.xsl');
+			if ($this->IsAllowed()) $this->SetTemplate(TEMPLATES . 'back/page.xsl');
+			else if ($this->IsAuthorized()) $this->SetTemplate(TEMPLATES . 'back/404.xsl');
+			else $this->SetTemplate(TEMPLATES . 'back/403.xsl');
 		}
 
 		$this->AddSystem($this->_getUserNavigationXml());
@@ -38,7 +38,7 @@ abstract class Core_Cms_Back_Page extends App_Cms_Page
 				$xml .= $item->getXml();
 			}
 
-			$xml = Ext_Xml::node('navigation', $xml);
+			$xml = Ext_Xml::notEmptyNode('navigation', $xml);
 		}
 
 		return $xml;
@@ -50,14 +50,18 @@ abstract class Core_Cms_Back_Page extends App_Cms_Page
 
 		$xml = '';
 
-		foreach ($g_user->getSections() as $key => $section) {
-			$xml .= $section->getXml(
-		        null,
-		        Ext_Xml::notEmptyCdata('description', $section->description)
-	        );
+		if (!empty($g_user)) {
+    		foreach ($g_user->getSections() as $key => $section) {
+    			$xml .= $section->getXml(
+    		        null,
+    		        Ext_Xml::notEmptyCdata('description', $section->description)
+    	        );
+    		}
+
+    		$xml = Ext_Xml::notEmptyNode('cms-sections', $xml);
 		}
 
-		return Ext_Xml::notEmptyNode('cms-sections', $xml);
+		return $xml;
 	}
 
 	public function SetUpdateStatus($_type, $_message = null) {
@@ -71,7 +75,7 @@ abstract class Core_Cms_Back_Page extends App_Cms_Page
 			$this->AddSystem('<title><![CDATA[' . SITE_TITLE . ']]></title>');
 		}
 
-		if ($g_user) $this->AddSystem($g_user->GetXml('bo_user'));
+		if ($g_user) $this->AddSystem($g_user->getXml());
 		$this->AddSystem(App_Cms_Session::Get()->getXml(null, App_Cms_Session::Get()->GetWorkmateXml()));
 
 		if ($this->UpdateStatus) {

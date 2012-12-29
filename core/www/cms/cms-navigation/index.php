@@ -66,7 +66,7 @@ if ($page->IsAuthorized()) {
 
 	$list_xml = '<local_navigation>';
 	foreach (App_Cms_Front_Navigation::GetList() as $item) {
-		$list_xml .= $item->GetXml('bo_list', 'item');
+		$list_xml .= $item->getBackOfficeXml();
 	}
 	$list_xml .= '</local_navigation>';
 

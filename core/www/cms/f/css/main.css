@@ -1,6 +1,9 @@
-/*** Global
-*********************************************************/
-body {
+/**
+ * Global
+ */
+
+body
+{
 	font-family: Arial, sans-serif;
 	margin: 0;
 	padding: 20px;
@@ -8,38 +11,48 @@ body {
 	color: #333;
 }
 
-table {
+table
+{
 	border-collapse: collapse;
 }
 
-td {
+td
+{
 	padding: 0;
 }
 
-form {
+form
+{
 	margin: 0;
 }
 
-img {
+img
+{
 	border: 0;
 }
 
-a {
+a
+{
 	color: black;
 }
 
-table.debug td, table.debug th {
+table.debug td, table.debug th
+{
 	border: 1px dotted red;
 }
 
-body.wait {
+body.wait
+{
 	cursor: wait;
 }
 
 
-/*** Navigation
-*********************************************************/
-td#logo {
+/**
+ * Navigation
+ */
+
+td#logo
+{
 	text-align: center;
 	width: 7%;
 	vertical-align: top;
@@ -47,7 +60,8 @@ td#logo {
 	white-space: nowrap;
 }
 
-#user_info {
+#user_info
+{
 	float: right;
 	margin: 0 0 5px 20px;
 	font-size: 0.7em;
@@ -55,118 +69,147 @@ td#logo {
 	padding: 1em 0.7em;
 }
 
-div.workmate_warning {
+div.workmate-warning
+{
 	margin: 10px 0;
 	color: #f60;
 }
 
-td#navigation {
+td#navigation
+{
 	width: 93%;
 	vertical-align: top;
 }
 
-td#navigation div.nav_item {
+td#navigation div.nav-item
+{
 	float: left;
 	font-size: 0.84em;
 /*	margin: 0 0 5px 20px;*/
 	margin-left: 20px;
 }
 
-td#navigation div.nav_item a,
-td#navigation div.selected {
+td#navigation div.nav-item a,
+td#navigation div.selected
+{
 	white-space: nowrap;
 }
 
 td#navigation div.selected a,
-td#navigation div.selected {
+td#navigation div.selected
+{
 	color: #36c;
 	font-weight: bold;
 }
 
-td#navigation div.group_item {
+/*
+td#navigation div.group-item
+{
 	float: left;
 	font-size:0.84em;
 	margin-left:20px;
 	_line-height:1.3em;
 }
 
-td#navigation div.group_item a {
-	text-decoration:none;
-	border-bottom:1px dashed #000;
+td#navigation div.group-item a
+{
+	text-decoration: none;
+	border-bottom: 1px dashed #000;
 }
 
-td#navigation div.group_item a:hover {
-	border-bottom:none;
+td#navigation div.group-item a:hover
+{
+	border-bottom: none;
 }
+*/
 
-/*** Page footer
-*********************************************************/
-div#footer {
+
+/**
+ * Page footer
+ */
+
+div#footer
+{
 	font-size: 0.7em;
 	margin-top: 60px;
 }
 
 div#footer,
-div#footer a {
+div#footer a
+{
 	color: #999;
 }
 
 
-/*** Main content
-*********************************************************/
-#content {
+/**
+ * Main content
+ */
+
+#content
+{
 	margin-top: 30px;
 }
 
-#title {
+#title
+{
 	height: 40px;
 	margin-bottom: 20px;
 }
 
-h1 {
+h1
+{
 	margin: 0;
 	font-size: 1.5em;
 	line-height: 1em;
 }
 
-table.cms_sections tr td {
+table.cms-sections tr td
+{
 	padding: 0 40px 20px 0;
 	vertical-align: top;
 	width: 50%;
 }
 
-table.cms_sections tr td.last {
+table.cms-sections tr td.last
+{
 	padding-right: 0;
 }
 
-table.cms_sections tr.last td {
+table.cms-sections tr.last td
+{
 	padding-bottom: 0;
 }
 
-table.cms_sections tr td a.title {
+table.cms-sections tr td a.title
+{
 	font-size: 1.15em;
 }
 
-table.cms_sections tr td div.description {
+table.cms-sections tr td div.description
+{
 	margin-top: 3px;
 	font-size: 0.84em;
 }
 
-table.cms_sections tr td h3 {
+table.cms-sections tr td h3
+{
 	margin: 1.5em 0 1em 0;
 	font-size: 1.2em;
 }
 
-table.cms_sections tr td h3.first {
+table.cms-sections tr td h3.first
+{
 	margin-top: 0;
 }
 
-p.first {
+p.first
+{
 	margin-top: 0;
 }
 
 td.text,
 p.text,
-div.text {
+div.text
+{
 	font-size: 0.8em;
 }

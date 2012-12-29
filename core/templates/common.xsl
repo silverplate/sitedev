@@ -17,10 +17,10 @@
 		<xsl:value-of select="." disable-output-escaping="yes" />
 	</xsl:template>
 
-	<xsl:template name="get_page_title">
+	<xsl:template name="get-page-title">
 		<xsl:choose>
-			<xsl:when test="/node()/content/page_title/text()">
-				<xsl:value-of select="/node()/content/page_title/text()" disable-output-escaping="yes" />
+			<xsl:when test="/node()/content/page-title/text()">
+				<xsl:value-of select="/node()/content/page-title/text()" disable-output-escaping="yes" />
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="/node()/title/text()" disable-output-escaping="yes" />
@@ -28,11 +28,11 @@
 		</xsl:choose>
 	</xsl:template>
 
-	<xsl:template name="get_page_url">
-		<xsl:param name="is_http">true</xsl:param>
+	<xsl:template name="get-page-url">
+		<xsl:param name="is-http">true</xsl:param>
 
 		<xsl:for-each select="/node()/url">
-			<xsl:if test="$is_http = 'true'">http://</xsl:if>
+			<xsl:if test="$is-http = 'true'">http://</xsl:if>
 			<xsl:value-of select="concat(@host, text())" />
 		</xsl:for-each>
 	</xsl:template>
@@ -143,92 +143,92 @@
         </xsl:call-template>
 	</xsl:template>
 
-	<xsl:template name="list_navigation">
+	<xsl:template name="list-navigation">
 		<xsl:param name="total" />
-		<xsl:param name="per_page" />
+		<xsl:param name="per-page" />
 		<xsl:param name="page" />
 		<xsl:param name="type" />
-		<xsl:param name="url_subquery" />
+		<xsl:param name="url-subquery" />
 		<xsl:param name="separator" />
-		<xsl:param name="is_tiny" />
+		<xsl:param name="is-tiny" />
 		<xsl:param name="step" />
-		<xsl:param name="js_func" />
+		<xsl:param name="js-func" />
 		<xsl:param name="lang" />
 
-		<xsl:variable name="total_pages" select="ceiling($total div $per_page)" />
-		<xsl:variable name="item_separator">
+		<xsl:variable name="total-pages" select="ceiling($total div $per-page)" />
+		<xsl:variable name="item-separator">
 			<xsl:choose>
 				<xsl:when test="$separator">
-					<span class="list_navigation_spacer"><xsl:value-of select="$separator" /></span>
+					<span class="list-navigation-spacer"><xsl:value-of select="$separator" /></span>
 				</xsl:when>
 				<xsl:otherwise>&nbsp;</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
 		<xsl:variable name="from" select="floor(($page - 1) div $step) * $step + 1" />
 
-		<xsl:if test="$total_pages &gt; 1">
-			<div id="list_navigation">
-				<xsl:if test="$page != 1 and $total_pages &gt; $per_page">
+		<xsl:if test="$total-pages > 1">
+			<div id="list-navigation">
+				<xsl:if test="$page != 1 and $total-pages > $per-page">
 					<a>
 						<xsl:attribute name="href">
-							<xsl:call-template name="list_navigation_url">
+							<xsl:call-template name="list-navigation-url">
 								<xsl:with-param name="page" select="1" />
-								<xsl:with-param name="url_subquery" select="$url_subquery" />
+								<xsl:with-param name="url-subquery" select="$url-subquery" />
 								<xsl:with-param name="type" select="$type" />
-								<xsl:with-param name="js_func" select="$js_func" />
+								<xsl:with-param name="js-func" select="$js-func" />
 							</xsl:call-template>
 						</xsl:attribute>
 						<xsl:choose>
-							<xsl:when test="$is_tiny = 1">|&lt;</xsl:when>
+							<xsl:when test="$is-tiny = 1">|&lt;</xsl:when>
 							<xsl:when test="$lang = 'en'">First</xsl:when>
 							<xsl:otherwise>В&nbsp;начало</xsl:otherwise>
 						</xsl:choose>
 					</a>
-					<xsl:copy-of select="$item_separator" />
+					<xsl:copy-of select="$item-separator" />
 				</xsl:if>
 				<xsl:if test="$page - $step &gt;= 1">
 					<a>
 						<xsl:attribute name="href">
-							<xsl:call-template name="list_navigation_url">
+							<xsl:call-template name="list-navigation-url">
 								<xsl:with-param name="page" select="$page - $step" />
-								<xsl:with-param name="url_subquery" select="$url_subquery" />
+								<xsl:with-param name="url-subquery" select="$url-subquery" />
 								<xsl:with-param name="type" select="$type" />
-								<xsl:with-param name="js_func" select="$js_func" />
+								<xsl:with-param name="js-func" select="$js-func" />
 							</xsl:call-template>
 						</xsl:attribute>
 						<xsl:choose>
-							<xsl:when test="$is_tiny = 1">&lt;&lt;</xsl:when>
+							<xsl:when test="$is-tiny = 1">&lt;&lt;</xsl:when>
 							<xsl:otherwise>&minus;<xsl:value-of select="$step" /></xsl:otherwise>
 						</xsl:choose>
 					</a>
-					<xsl:copy-of select="$item_separator" />
+					<xsl:copy-of select="$item-separator" />
 				</xsl:if>
 				<xsl:if test="$page != 1">
 					<a>
 						<xsl:attribute name="href">
-							<xsl:call-template name="list_navigation_url">
+							<xsl:call-template name="list-navigation-url">
 								<xsl:with-param name="page" select="$page - 1" />
-								<xsl:with-param name="url_subquery" select="$url_subquery" />
+								<xsl:with-param name="url-subquery" select="$url-subquery" />
 								<xsl:with-param name="type" select="$type" />
-								<xsl:with-param name="js_func" select="$js_func" />
+								<xsl:with-param name="js-func" select="$js-func" />
 							</xsl:call-template>
 						</xsl:attribute>
 						<xsl:choose>
-							<xsl:when test="$is_tiny = 1">&lt;</xsl:when>
+							<xsl:when test="$is-tiny = 1">&lt;</xsl:when>
 							<xsl:when test="$lang = 'en'">Previous</xsl:when>
 							<xsl:otherwise>Предыдущая</xsl:otherwise>
 						</xsl:choose>
 					</a>
-					<xsl:copy-of select="$item_separator" />
+					<xsl:copy-of select="$item-separator" />
 				</xsl:if>
-				<xsl:call-template name="list_navigation_item">
-					<xsl:with-param name="total" select="$total_pages" />
+				<xsl:call-template name="list-navigation-item">
+					<xsl:with-param name="total" select="$total-pages" />
 					<xsl:with-param name="page" select="1" />
 					<xsl:with-param name="selected" select="$page" />
 					<xsl:with-param name="from">
 						<xsl:choose>
-							<xsl:when test="$total_pages - $page &lt; $step and $from &gt; $step">
-								<xsl:value-of select="$total_pages - $step" />
+							<xsl:when test="$total-pages - $page &lt; $step and $from &gt; $step">
+								<xsl:value-of select="$total-pages - $step" />
 							</xsl:when>
 							<xsl:otherwise>
 								<xsl:value-of select="$from - 1" />
@@ -236,59 +236,59 @@
 						</xsl:choose>
 					</xsl:with-param>
 					<xsl:with-param name="type" select="$type" />
-					<xsl:with-param name="url_subquery" select="$url_subquery" />
+					<xsl:with-param name="url-subquery" select="$url-subquery" />
 					<xsl:with-param name="separator" select="$separator" />
 					<xsl:with-param name="step" select="$step" />
-					<xsl:with-param name="js_func" select="$js_func" />
+					<xsl:with-param name="js-func" select="$js-func" />
 				</xsl:call-template>
-				<xsl:if test="$page != $total_pages">
-					<xsl:copy-of select="$item_separator" />
+				<xsl:if test="$page != $total-pages">
+					<xsl:copy-of select="$item-separator" />
 					<a>
 						<xsl:attribute name="href">
-							<xsl:call-template name="list_navigation_url">
+							<xsl:call-template name="list-navigation-url">
 								<xsl:with-param name="page" select="$page + 1" />
-								<xsl:with-param name="url_subquery" select="$url_subquery" />
+								<xsl:with-param name="url-subquery" select="$url-subquery" />
 								<xsl:with-param name="type" select="$type" />
-								<xsl:with-param name="js_func" select="$js_func" />
+								<xsl:with-param name="js-func" select="$js-func" />
 							</xsl:call-template>
 						</xsl:attribute>
 						<xsl:choose>
-							<xsl:when test="$is_tiny = 1">&gt;</xsl:when>
+							<xsl:when test="$is-tiny = 1">&gt;</xsl:when>
 							<xsl:when test="$lang = 'en'">Next</xsl:when>
 							<xsl:otherwise>Следующая</xsl:otherwise>
 						</xsl:choose>
 					</a>
 				</xsl:if>
-				<xsl:if test="$total_pages - $page &gt;= $step">
-					<xsl:copy-of select="$item_separator" />
+				<xsl:if test="$total-pages - $page &gt;= $step">
+					<xsl:copy-of select="$item-separator" />
 					<a>
 						<xsl:attribute name="href">
-							<xsl:call-template name="list_navigation_url">
+							<xsl:call-template name="list-navigation-url">
 								<xsl:with-param name="page" select="$page + $step" />
-								<xsl:with-param name="url_subquery" select="$url_subquery" />
+								<xsl:with-param name="url-subquery" select="$url-subquery" />
 								<xsl:with-param name="type" select="$type" />
-								<xsl:with-param name="js_func" select="$js_func" />
+								<xsl:with-param name="js-func" select="$js-func" />
 							</xsl:call-template>
 						</xsl:attribute>
 						<xsl:choose>
-							<xsl:when test="$is_tiny = 1">&gt;&gt;</xsl:when>
+							<xsl:when test="$is-tiny = 1">&gt;&gt;</xsl:when>
 							<xsl:otherwise>+<xsl:value-of select="$step" /></xsl:otherwise>
 						</xsl:choose>
 					</a>
 				</xsl:if>
-				<xsl:if test="$total_pages != $page and $total_pages &gt; $per_page">
-					<xsl:copy-of select="$item_separator" />
+				<xsl:if test="$total-pages != $page and $total-pages &gt; $per-page">
+					<xsl:copy-of select="$item-separator" />
 					<a>
 						<xsl:attribute name="href">
-							<xsl:call-template name="list_navigation_url">
-								<xsl:with-param name="page" select="$total_pages" />
-								<xsl:with-param name="url_subquery" select="$url_subquery" />
+							<xsl:call-template name="list-navigation-url">
+								<xsl:with-param name="page" select="$total-pages" />
+								<xsl:with-param name="url-subquery" select="$url-subquery" />
 								<xsl:with-param name="type" select="$type" />
-								<xsl:with-param name="js_func" select="$js_func" />
+								<xsl:with-param name="js-func" select="$js-func" />
 							</xsl:call-template>
 						</xsl:attribute>
 						<xsl:choose>
-							<xsl:when test="$is_tiny = 1">&gt;|</xsl:when>
+							<xsl:when test="$is-tiny = 1">&gt;|</xsl:when>
 							<xsl:when test="$lang = 'en'">Last</xsl:when>
 							<xsl:otherwise>В&nbsp;конец</xsl:otherwise>
 						</xsl:choose>
@@ -299,31 +299,31 @@
 		</xsl:if>
 	</xsl:template>
 
-	<xsl:template name="list_navigation_item">
+	<xsl:template name="list-navigation-item">
 		<xsl:param name="total" />
 		<xsl:param name="page" />
 		<xsl:param name="selected" />
 		<xsl:param name="from" />
 		<xsl:param name="type" />
 		<xsl:param name="separator" />
-		<xsl:param name="url_subquery" />
+		<xsl:param name="url-subquery" />
 		<xsl:param name="step" />
-		<xsl:param name="js_func" />
+		<xsl:param name="js-func" />
 
 		<xsl:variable name="current" select="$page + $from" />
 
 		<xsl:choose>
 			<xsl:when test="$selected = $current">
-				<span class="list_navigation_selected"><xsl:value-of select="$current" /></span>
+				<span class="list-navigation-selected"><xsl:value-of select="$current" /></span>
 			</xsl:when>
 			<xsl:otherwise>
 				<a>
 					<xsl:attribute name="href">
-						<xsl:call-template name="list_navigation_url">
+						<xsl:call-template name="list-navigation-url">
 							<xsl:with-param name="page" select="$current" />
 							<xsl:with-param name="type" select="$type" />
-							<xsl:with-param name="url_subquery" select="$url_subquery" />
-							<xsl:with-param name="js_func" select="$js_func" />
+							<xsl:with-param name="url-subquery" select="$url-subquery" />
+							<xsl:with-param name="js-func" select="$js-func" />
 						</xsl:call-template>
 					</xsl:attribute>
 					<xsl:value-of select="$current" />
@@ -334,42 +334,42 @@
 		<xsl:if test="$page + $from &lt; $total and $page &lt; $step">
 			<xsl:choose>
 				<xsl:when test="$separator">
-					<span class="list_navigation_spacer"><xsl:value-of select="$separator" /></span>
+					<span class="list-navigation-spacer"><xsl:value-of select="$separator" /></span>
 				</xsl:when>
 				<xsl:otherwise>&nbsp;</xsl:otherwise>
 			</xsl:choose>
 
-			<xsl:call-template name="list_navigation_item">
+			<xsl:call-template name="list-navigation-item">
 				<xsl:with-param name="total" select="$total" />
 				<xsl:with-param name="page" select="$page + 1" />
 				<xsl:with-param name="selected" select="$selected" />
 				<xsl:with-param name="from" select="$from" />
 				<xsl:with-param name="type" select="$type" />
 				<xsl:with-param name="separator" select="$separator" />
-				<xsl:with-param name="url_subquery" select="$url_subquery" />
+				<xsl:with-param name="url-subquery" select="$url-subquery" />
 				<xsl:with-param name="step" select="$step" />
-				<xsl:with-param name="js_func" select="$js_func" />
+				<xsl:with-param name="js-func" select="$js-func" />
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template>
 
-	<xsl:template name="list_navigation_url">
+	<xsl:template name="list-navigation-url">
 		<xsl:param name="page" />
-		<xsl:param name="url_subquery" />
+		<xsl:param name="url-subquery" />
 		<xsl:param name="type" />
-		<xsl:param name="js_func" />
+		<xsl:param name="js-func" />
 
 		<xsl:choose>
-			<xsl:when test="$js_func != ''">
+			<xsl:when test="$js-func != ''">
 				<xsl:choose>
-					<xsl:when test="contains($js_func, '~')">
+					<xsl:when test="contains($js-func, '~')">
 						<xsl:text>javascript:</xsl:text>
-						<xsl:value-of select="substring-before($js_func, '~')" />
+						<xsl:value-of select="substring-before($js-func, '~')" />
 						<xsl:value-of select="$page" />
-						<xsl:value-of select="substring-after($js_func, '~')" />
+						<xsl:value-of select="substring-after($js-func, '~')" />
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="concat('javascript:', $js_func, '(', $page, ')')" />
+						<xsl:value-of select="concat('javascript:', $js-func, '(', $page, ')')" />
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
@@ -383,25 +383,25 @@
 					</xsl:when>
 				</xsl:choose>
 
-				<xsl:if test="$url_subquery != ''">
+				<xsl:if test="$url-subquery != ''">
 					<xsl:choose>
 						<xsl:when test="$type = 'query'">
 							<xsl:variable name="replaced">
-								<xsl:if test="$url_subquery != 'p'">
+								<xsl:if test="$url-subquery != 'p'">
 									<xsl:choose>
-										<xsl:when test="contains($url_subquery, 'p=')">
-											<xsl:value-of select="substring-before($url_subquery, 'p=')" />
-											<xsl:variable name="tail" select="substring-after($url_subquery, 'p=')" />
+										<xsl:when test="contains($url-subquery, 'p=')">
+											<xsl:value-of select="substring-before($url-subquery, 'p=')" />
+											<xsl:variable name="tail" select="substring-after($url-subquery, 'p=')" />
 											<xsl:if test="contains($tail, '&amp;')">
 												<xsl:value-of select="substring-after($tail, '&amp;')" />
 											</xsl:if>
 										</xsl:when>
-										<xsl:when test="contains($url_subquery, 'p&amp;')">
-											<xsl:value-of select="concat(substring-before($url_subquery, 'p&amp;'),
-												substring-after($url_subquery, 'p&amp;'))" />
+										<xsl:when test="contains($url-subquery, 'p&amp;')">
+											<xsl:value-of select="concat(substring-before($url-subquery, 'p&amp;'),
+												substring-after($url-subquery, 'p&amp;'))" />
 										</xsl:when>
 										<xsl:otherwise>
-											<xsl:value-of select="$url_subquery" />
+											<xsl:value-of select="$url-subquery" />
 										</xsl:otherwise>
 									</xsl:choose>
 								</xsl:if>
@@ -411,7 +411,7 @@
 							</xsl:if>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="concat('?', $url_subquery)" />
+							<xsl:value-of select="concat('?', $url-subquery)" />
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:if>

@@ -11,7 +11,7 @@
                 doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" />
 
     <xsl:include href="../core/templates/common.xsl" />
-    <xsl:include href="fo-common.xsl" />
+    <xsl:include href="site-common.xsl" />
 
     <xsl:template match="page|page-not-found">
         <html xml:lang="ru" lang="ru">
@@ -21,7 +21,7 @@
                 <link href="/favicon.ico" type="image/x-icon" rel="icon" /-->
 
                 <title>
-                    <xsl:call-template name="get_page_title" />
+                    <xsl:call-template name="get-page-title" />
                     <xsl:if test="url/@path != '/'">
                         <xsl:for-each select="system/navigation/main/item[@uri = '/']">
                             <xsl:text> - </xsl:text>

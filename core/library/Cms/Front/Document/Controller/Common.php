@@ -19,11 +19,10 @@ abstract class Core_Cms_Front_Document_Controller_Common extends App_Cms_Front_D
         // Site navigation
 
         $navigationXml = '';
-        $navigation = App_Cms_Front_Navigation::getList(
-            array('is_published' => 1),
-            null,
-            array('name != "robots-sitemap"')
-        );
+        $navigation = App_Cms_Front_Navigation::getList(array(
+            'is_published' => 1,
+            'name != "robots-sitemap"'
+        ));
 
         foreach ($navigation as $i) {
             $navigationXml .= App_Cms_Front_Navigation::getNavigationXml(
@@ -33,7 +32,7 @@ abstract class Core_Cms_Front_Document_Controller_Common extends App_Cms_Front_D
         }
 
         if ($navigationXml != '') {
-            $this->addSystem('<navigation>' . $navigationXml . '</navigation>');
+            $this->addSystem(Ext_Xml::node('navigation', $navigationXml));
         }
     }
 }

@@ -5,7 +5,7 @@ require('../prepend.php');
 $page = new App_Cms_Page();
 $page->SetRootNodeName('http_request');
 $page->SetRootNodeAttribute('type', 'Data');
-$page->SetTemplate(TEMPLATES . 'bo_http_requests.xsl');
+$page->SetTemplate(TEMPLATES . 'back/http-requests.xsl');
 
 $data = $_POST;
 

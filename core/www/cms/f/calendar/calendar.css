@@ -12,19 +12,19 @@ div.calendar table thead tr.month td {
 	font-size: 0.9em;
 }
 
-div.calendar table thead a.calc_arr_l  {
+div.calendar table thead a.calc-arr-l  {
 	float: left;
 }
 
-div.calendar table thead a.calc_arr_l img {
+div.calendar table thead a.calc-arr-l img {
 	margin-right: 1px;
 }
 
-div.calendar table thead a.calc_arr_r {
+div.calendar table thead a.calc-arr-r {
 	float: right;
 }
 
-div.calendar table thead a.calc_arr_r img {
+div.calendar table thead a.calc-arr-r img {
 	margin-left: 1px;
 }
 

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE xsl:stylesheet SYSTEM "entities.dtd">
+<!DOCTYPE xsl:stylesheet SYSTEM "../entities.dtd">
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:output method="html" indent="no" encoding="utf-8" />
 
+	<xsl:include href="../common.xsl" />
 	<xsl:include href="common.xsl" />
-	<xsl:include href="bo_common.xsl" />
 
 	<xsl:template match="page">
 		<html>
@@ -27,11 +27,11 @@
 				<table width="100%" height="100%">
 					<tr>
 						<td height="99%" valign="top">
-							<xsl:call-template name="page_navigation" />
+							<xsl:call-template name="page-navigation" />
 							<div id="content">
 								<div id="title"><h1>Страница не найдена</h1></div>
 								<p class="text">
-									Страница <xsl:call-template name="get_page_link" /> не&nbsp;найдена.
+									Страница <xsl:call-template name="get-page-link" /> не&nbsp;найдена.
 									Если&nbsp;вы&nbsp;уверены, что&nbsp;произошла ошибка, пожалуйста, сообщите о&nbsp;ней
 									по&nbsp;адресу <a href="mailto:support@sitedev.ru">support@sitedev.ru</a>.
 								</p>
@@ -40,7 +40,7 @@
 					</tr>
 					<tr>
 						<td height="1%" valign="bottom">
-							<xsl:call-template name="page_footer" />
+							<xsl:call-template name="page-footer" />
 						</td>
 					</tr>
 				</table>

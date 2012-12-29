@@ -1,8 +1,8 @@
-function getElementPosition(ele)
+function getElementPosition(_ele)
 {
-    this.x = ele.offsetLeft;
-    this.y = ele.offsetTop;
-    this.ele = ele;
+    this.x = _ele.offsetLeft;
+    this.y = _ele.offsetTop;
+    this.ele = _ele;
 
     while (this.ele.offsetParent != null) {
         this.ele = this.ele.offsetParent;
@@ -19,7 +19,7 @@ function addEvent(_ele, _type, _func)
         _ele.addEventListener(_type, _func, false);
 
     } if (_ele.attachEvent) {
-        _ele.attachEvent('on' + _type, _func);
+        _ele.attachEvent("on" + _type, _func);
     }
 }
 
@@ -29,7 +29,7 @@ function removeEvent(_ele, _type, _func)
         _ele.removeEventListener(_type, _func, false);
 
     } if (_ele.detachEvent) {
-        _ele.detachEvent('on' + _type, _func);
+        _ele.detachEvent("on" + _type, _func);
     }
 }
 
@@ -39,27 +39,27 @@ function cancelEvent(_e)
     evt.cancelBubble = true;
 }
 
-function getParentElement(parent, name)
+function getParentElement(_parent, _name)
 {
-    if (name.toLowerCase() == parent.nodeName.toLowerCase()) {
-        return parent;
+    if (_name.toLowerCase() == _parent.nodeName.toLowerCase()) {
+        return _parent;
 
-    } else if (parent.parentNode) {
-        return getParentElement(parent.parentNode, name);
+    } else if (_parent.parentNode) {
+        return getParentElement(_parent.parentNode, _name);
 
     } else {
         return false;
     }
 }
 
-function getClassName(ele, exeptClassName)
+function getClassName(_ele, _exeptClassName)
 {
-    var classes = ele.className.split(' ');
-    var className = '';
+    var classes = _ele.className.split(" ");
+    var className = "";
 
     for (var i = 0; i < classes.length; i++) {
-        if (exeptClassName != classes[i]) {
-            className += (className.length > 0 ? ' ' : '') + classes[i];
+        if (_exeptClassName != classes[i]) {
+            className += (className.length > 0 ? " " : "") + classes[i];
         }
     }
 
@@ -74,23 +74,26 @@ function removeElement(_ele)
 }
 
 
-/*** Loading bar
-*********************************************************/
+/**
+ * Loading bar
+ */
+
 var loadings = 0;
 
 function showLoadingBar()
 {
-    var loadingEle = document.getElementById('loading');
-    if (!loadingEle) {
-        loadingEle = document.createElement('div');
-        loadingEle.setAttribute('id', 'loading');
+    var loadingEle = document.getElementById("loading");
 
-        var bodyEle = document.getElementsByTagName('body')[0];
+    if (!loadingEle) {
+        loadingEle = document.createElement("div");
+        loadingEle.setAttribute("id", "loading");
+
+        var bodyEle = document.getElementsByTagName("body")[0];
         bodyEle.insertBefore(loadingEle, bodyEle.firstChild);
     }
 
     if (loadings == 0) {
-        loadingEle.style.display = 'block';
+        loadingEle.style.display = "block";
         waitCursor(true);
     }
 
@@ -99,22 +102,23 @@ function showLoadingBar()
 
 function hideLoadingBar()
 {
-    var loadingEle = document.getElementById('loading');
+    var loadingEle = document.getElementById("loading");
     loadings--;
 
     if (loadingEle && loadings == 0) {
-        loadingEle.style.display = 'none';
+        loadingEle.style.display = "none";
         waitCursor(false);
     }
 }
 
-function waitCursor(isOn)
+function waitCursor(_isOn)
 {
-    var bodyEle = document.getElementsByTagName('body')[0];
-    var className = getClassName(bodyEle, 'wait');
-    if (isOn) {
-        if (className != '') className += ' ';
-        className += 'wait';
+    var bodyEle = document.getElementsByTagName("body")[0];
+    var className = getClassName(bodyEle, "wait");
+
+    if (_isOn) {
+        if (className != "") className += " ";
+        className += "wait";
     }
 
     bodyEle.className = className;

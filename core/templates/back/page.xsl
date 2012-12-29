@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE xsl:stylesheet SYSTEM "entities.dtd">
+<!DOCTYPE xsl:stylesheet SYSTEM "../entities.dtd">
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:output method="html" indent="no" encoding="utf-8" />
 
+	<xsl:include href="../common.xsl" />
 	<xsl:include href="common.xsl" />
-	<xsl:include href="bo_common.xsl" />
-	<xsl:include href="bo_modules.xsl" />
-	<xsl:include href="bo_forms.xsl" />
+	<xsl:include href="modules.xsl" />
+	<xsl:include href="forms.xsl" />
 
 	<xsl:template match="page">
 		<html>
@@ -17,7 +17,7 @@
 
 				<title>
 					<xsl:if test="url/@path != '/cms/'">
-						<xsl:call-template name="get_page_title" />
+						<xsl:call-template name="get-page-title" />
 						<xsl:text> - </xsl:text>
 					</xsl:if>
 					<xsl:text>Система управления</xsl:text>
@@ -29,9 +29,7 @@
 
 				<link href="/cms/f/css/main.css" type="text/css" rel="stylesheet" />
 				<link href="/cms/f/css/modules.css" type="text/css" rel="stylesheet" />
-				<xsl:text disable-output-escaping="yes">&lt;!--[if IE]&gt;</xsl:text>
-				<link href="/cms/f/css/modules_ie.css" type="text/css" rel="stylesheet" />
-				<xsl:text disable-output-escaping="yes">&lt;![endif]--&gt;</xsl:text>
+				<xsl:comment>[if IE]>&lt;link href="/cms/f/css/modules-ie.css" type="text/css" rel="stylesheet" />&lt;![endif]</xsl:comment>
 				<link href="/cms/f/css/forms.css" type="text/css" rel="stylesheet" />
 				<link href="/cms/f/calendar/calendar.css" type="text/css" rel="stylesheet" />
 
@@ -39,7 +37,7 @@
 				<script src="/cms/f/js/jquery-ui.js" type="text/javascript" />
 				<script src="/cms/f/js/common.js" type="text/javascript" />
 				<script src="/cms/f/js/scripts.js" type="text/javascript" />
-				<script src="/cms/f/js/module_documents.js" type="text/javascript" />
+				<script src="/cms/f/js/module-documents.js" type="text/javascript" />
 				<script src="/cms/f/js/cookies.js" type="text/javascript" />
 				<script src="/cms/f/js/tree.js" type="text/javascript" />
 				<script src="/cms/f/calendar/calendar.js" type="text/javascript" />
@@ -50,13 +48,13 @@
 				<table width="100%" height="100%">
 					<tr>
 						<td height="99%" valign="top">
-							<xsl:call-template name="page_navigation" />
+							<xsl:call-template name="page-navigation" />
 							<xsl:apply-templates select="content" />
 						</td>
 					</tr>
 					<tr>
 						<td height="1%" valign="bottom">
-							<xsl:call-template name="page_footer" />
+							<xsl:call-template name="page-footer" />
 						</td>
 					</tr>
 				</table>
@@ -71,9 +69,9 @@
 					<xsl:apply-templates select="module" />
 				</xsl:when>
 				<xsl:otherwise>
-					<div id="title"><h1><xsl:call-template name="get_page_title" /></h1></div>
-					<xsl:apply-templates select="*[name() = 'update_status']" />
-					<xsl:apply-templates select="*[name() != 'update_status']" />
+					<div id="title"><h1><xsl:call-template name="get-page-title" /></h1></div>
+					<xsl:apply-templates select="*[name() = 'update-status']" />
+					<xsl:apply-templates select="*[name() != 'update-status']" />
 				</xsl:otherwise>
 			</xsl:choose>
 		</div>

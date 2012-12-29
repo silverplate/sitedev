@@ -60,7 +60,7 @@ abstract class Core_Cms_Back_Office
                    : '';
 
         $page = new App_Cms_Page();
-        $page->setTemplate(TEMPLATES . 'bo_http_requests.xsl');
+        $page->setTemplate(TEMPLATES . 'back/http-requests.xsl');
         $page->setRootNodeName('http_request');
 
         if (isset($data['type'])) {
@@ -130,9 +130,7 @@ abstract class Core_Cms_Back_Office
                 $obj->name = 'Нет';
             }
 
-            $xml = $obj->getXml(
-                'bo_list',
-                'item',
+            $xml = $obj->getBackOfficeXml(
                 self::ajaxGetBranchXml($_className, $parentId, $currentId)
             );
 
@@ -169,22 +167,15 @@ abstract class Core_Cms_Back_Office
                 $item->isChildren($_excludeId) &&
                 in_array($item->getId(), $gOpenBranches)
             ) {
-                $result .= $item->getXml(
-                    'bo_list',
-                    'item',
+                $result .= $item->getBackOfficeXml(
                     self::ajaxGetBranchXml($_className, $item->getId(), $_excludeId)
                 );
 
             } else if ($item->isChildren($_excludeId)) {
-                $result .= $item->getXml(
-                    'bo_list',
-                    'item',
-                    null,
-                    array('has_children' => 'true')
-                );
+                $result .= $item->getBackOfficeXml(null, array('has_children' => 'true'));
 
             } else {
-                $result .= $item->getXml('bo_list', 'item');
+                $result .= $item->getBackOfficeXml();
             }
         }
 

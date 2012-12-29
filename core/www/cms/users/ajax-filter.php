@@ -19,11 +19,11 @@ if ($filter['selected_id']) {
 	$page->SetRootNodeAttribute('selected_id', $filter['selected_id']);
 }
 
-$page->SetTemplate(TEMPLATES . 'bo_http_requests.xsl');
+$page->SetTemplate(TEMPLATES . 'back/http-requests.xsl');
 
 if ($result_items['items']) {
 	foreach ($result_items['items'] as $item) {
-		$page->AddContent($item->GetXml('bo_list', 'item'));
+		$page->AddContent($item->getBackOfficeXml());
 	}
 
 	$page->AddContent('<list_navigation page="' . $filter['page'] . '" per_page="' . $filter['per_page'] . '" total="' . $result_items['total'] . '" />');

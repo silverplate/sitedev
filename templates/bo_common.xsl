@@ -1,1 +1,0 @@
-../core/templates/bo_common.xsl

@@ -26,7 +26,7 @@ class Core_Model extends App_ActiveRecord
 
     public function getXml($_node = null, $_xml = null, array $_attrs = null)
     {
-        $node = Ext_String::dash(get_called_class());
+        $node = $_node ? $_node : Ext_String::dash($this->getTable());
 
         if (empty($_xml))         $xml = array();
         else if (is_array($_xml)) $xml = $_xml;

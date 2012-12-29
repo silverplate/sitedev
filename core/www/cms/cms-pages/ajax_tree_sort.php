@@ -8,7 +8,7 @@ $data = $_POST;
 if (!empty($data['branches'])) {
 	$changed = array();
 	$parent = array();
-	$objects = App_Cms_Document::getList();
+	$objects = App_Cms_Front_Document::getList();
 
 	foreach ($data['branches'] as $i) {
 		$order = $newOrder = array();
@@ -42,11 +42,14 @@ if (!empty($data['branches'])) {
 			$isRoot = $i->folder != '/'
 			       || $parent[$i->getId()] == '';
 
-			$isUnique = App_Cms_Document::checkUnique($parent[$i->getId()],
-			                                  $i->folder, $i->getId());
+			$isUnique = App_Cms_Front_Document::checkUnique(
+		        $parent[$i->getId()],
+		        $i->folder,
+		        $i->getId()
+	        );
 
-			$isNotCustomUrl = empty($gCustomUrls) || !in_array(trim($objects[$i->getId()]->uri, '/'),
-			                                                   $gCustomUrls);
+			$isNotCustomUrl = empty($gCustomUrls) ||
+			                  !in_array(trim($objects[$i->getId()]->uri, '/'), $gCustomUrls);
 
 			if ($isRoot && $isUnique && $isNotCustomUrl) {
 			    $parentId = empty($parent[$i->getId()])
@@ -63,5 +66,5 @@ if (!empty($data['branches'])) {
 		$objects[$i]->update();
 	}
 
-	App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, null, 'Сортировка');
+	App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_MODIFY, null, 'Сортировка');
 }

@@ -17,8 +17,8 @@ define('CORE_LIBRARIES', CORE_PATH . 'library/');
 
 define('MODELS', WD . 'models/');
 
-define('DATA_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Data/Controller/');
-define('DOCUMENT_CONTROLLERS', LIBRARIES . 'App/Cms/Document/Controller/');
+define('DATA_CONTROLLERS', LIBRARIES . 'App/Cms/Front/Document/Data/Controller/');
+define('DOCUMENT_CONTROLLERS', LIBRARIES . 'App/Cms/Front/Document/Controller/');
 
 
 /**
@@ -277,9 +277,9 @@ function documentNotFound()
 {
     header('HTTP/1.0 404 Not Found');
 
-    if (class_exists('App_Cms_Document')) {
+    if (class_exists('App_Cms_Front_Document')) {
         $realUrl = parse_url($_SERVER['REQUEST_URI']);
-        $document = App_Cms_Document::load(get_lang_inner_uri() . 'not-found/', 'uri');
+        $document = App_Cms_Front_Document::load(get_lang_inner_uri() . 'not-found/', 'uri');
 
         if ($document) {
             if (
@@ -294,7 +294,7 @@ function documentNotFound()
                     (defined('IS_SHOW_HIDDEN') && IS_SHOW_HIDDEN)
                 )
             ) {
-                $controller = App_Cms_Document::initController($document->getController(), $document);
+                $controller = App_Cms_Front_Document::initController($document->getController(), $document);
                 $controller->execute();
                 $controller->output();
                 exit();

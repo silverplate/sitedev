@@ -18,22 +18,22 @@ $page->SetRootNodeAttribute('type', 'bo_logs');
 $page->SetTemplate(TEMPLATES . 'bo_http_requests.xsl');
 
 if ($result_items['items']) {
-	$users = App_Cms_Bo_User::GetList();
-	$sections = App_Cms_Bo_Section::GetList();
-	$actions = App_Cms_Bo_Log::GetActions();
+	$users = App_Cms_Back_User::GetList();
+	$sections = App_Cms_Back_Section::GetList();
+	$actions = App_Cms_Back_Log::GetActions();
 
 	foreach ($result_items['items'] as $item) {
 		$xml = array();
 
-		if ($item->boUserId && isset($users[$item->boUserId])) {
-			$xml['user'] = $users[$item->boUserId]->GetTitle();
+		if ($item->backUserId && isset($users[$item->backUserId])) {
+			$xml['user'] = $users[$item->backUserId]->GetTitle();
 
 		} else if ($item->userName) {
 			$xml['user'] = $item->userName;
 		}
 
-		if ($item->boSectionId && isset($sections[$item->boSectionId])) {
-			$xml['section'] = $sections[$item->boSectionId]->GetTitle();
+		if ($item->backSectionId && isset($sections[$item->backSectionId])) {
+			$xml['section'] = $sections[$item->backSectionId]->GetTitle();
 
 		} else if ($item->sectionName) {
 			$xml['section'] = $item->sectionName;

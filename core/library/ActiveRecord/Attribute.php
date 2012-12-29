@@ -4,23 +4,13 @@ abstract class Core_ActiveRecord_Attribute
 {
     private $_name;
     private $_type;
-    private $_length;
     private $_value;
     private $_isPrimary;
-    private $_isUnique;
 
-    public function __construct($_name, $_type, $_length = null, $_isPrimary = null, $_isUnique = null, $_value = null)
+    public function __construct($_name, $_type)
     {
         $this->_name = $_name;
-        $this->_length = $_length;
-        $this->_isPrimary = (boolean) $_isPrimary;
-        $this->_isUnique = (boolean) $_isUnique;
-
         $this->setType($_type);
-
-        if ($_value) {
-            $this->setValue($_value);
-        }
     }
 
     public function setType($_type)
@@ -33,11 +23,6 @@ abstract class Core_ActiveRecord_Attribute
     public function getType()
     {
         return $this->_type;
-    }
-
-    public function getLength()
-    {
-        return $this->_length;
     }
 
     public function setValue($_value)
@@ -61,19 +46,19 @@ abstract class Core_ActiveRecord_Attribute
         }
     }
 
-    public function getSqlValue()
-    {
-        return (string) $this->_value == '' ? 'NULL' : App_Db::escape($this->_value);
-    }
-
     public function getValue()
     {
         return $this->_value;
     }
 
+    public function getSqlValue()
+    {
+        return (string) $this->_value == '' ? 'NULL' : App_Db::escape($this->_value);
+    }
+
     public function isValue()
     {
-        return !empty($this->_value);
+        return (string) $this->_value != '';
     }
 
     public function getName()
@@ -81,13 +66,13 @@ abstract class Core_ActiveRecord_Attribute
         return $this->_name;
     }
 
-    public function isPrimary()
+    public function isPrimary($_isPrimary = null)
     {
-        return $this->_isPrimary;
-    }
+        if (is_null($_isPrimary)) {
+            return $this->_isPrimary;
 
-    public function isUnique()
-    {
-        return $this->_isUnique;
+        } else {
+            $this->_isPrimary = (boolean) $_isPrimary;
+        }
     }
 }

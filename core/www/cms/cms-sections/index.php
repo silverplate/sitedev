@@ -2,23 +2,23 @@
 
 require('../prepend.php');
 
-$page = new App_Cms_Bo_Page();
+$page = new App_Cms_Back_Page();
 $page->SetTitle($g_section->GetTitle());
 
 if ($page->IsAuthorized()) {
 	if (isset($_GET['id'])) {
-		$obj = App_Cms_Bo_Section::Load($_GET['id']);
+		$obj = App_Cms_Back_Section::Load($_GET['id']);
 		if (!$obj) unset($obj);
 
 	} elseif (isset($_GET['NEW'])) {
-		$obj = new App_Cms_Bo_Section;
+		$obj = new App_Cms_Back_Section;
 	}
 
 	if (isset($obj)) {
 		$form = new App_Form();
 		$form->Load('form.xml');
 
-		foreach (App_Cms_Bo_User::GetList() as $item) {
+		foreach (App_Cms_Back_User::GetList() as $item) {
 			$form->Elements['users']->AddOption($item->GetId(), $item->GetTitle());
 		}
 
@@ -37,19 +37,19 @@ if ($page->IsAuthorized()) {
 		if ($form->UpdateStatus == FORM_UPDATED) {
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 				$obj->Delete();
-				App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
+				App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
 				goToUrl($page->Url['path'] . '?DEL');
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
-				if (App_Cms_Bo_Section::CheckUnique($form->Elements['uri']->GetValue(), $obj->GetId())) {
+				if (App_Cms_Back_Section::CheckUnique($form->Elements['uri']->GetValue(), $obj->GetId())) {
 					$obj->fillWithData($form->GetSqlValues());
 
 					if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
 						$obj->Create();
-						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
 					} else {
 						$obj->Update();
-						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
 					}
 
 					if (isset($form->Elements['users'])) {
@@ -80,7 +80,7 @@ if ($page->IsAuthorized()) {
 	}
 
 	$list_xml = '<local_navigation is_sortable="true">';
-	foreach (App_Cms_Bo_Section::GetList() as $item) {
+	foreach (App_Cms_Back_Section::GetList() as $item) {
 		$list_xml .= $item->GetXml('bo_list', 'item');
 	}
 	$list_xml .= '</local_navigation>';

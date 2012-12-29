@@ -2,23 +2,23 @@
 
 require('../prepend.php');
 
-$page = new App_Cms_Bo_Page();
+$page = new App_Cms_Back_Page();
 $page->SetTitle($g_section->GetTitle());
 
 if ($page->IsAuthorized()) {
 	if (isset($_GET['id'])) {
-		$obj = App_Cms_Document_Navigation::Load($_GET['id']);
+		$obj = App_Cms_Front_Navigation::Load($_GET['id']);
 		if (!$obj) unset($obj);
 
 	} elseif (isset($_GET['NEW'])) {
-		$obj = new App_Cms_Document_Navigation();
+		$obj = new App_Cms_Front_Navigation();
 	}
 
 	if (isset($obj)) {
 		$form = new App_Form();
 		$form->Load('form.xml');
 
-		foreach (App_Cms_Document_Navigation::GetTypes() as $id => $params) {
+		foreach (App_Cms_Front_Navigation::GetTypes() as $id => $params) {
 			$form->Elements['type']->AddOption($id, Ext_String::toLower($params['title']));
 		}
 
@@ -37,16 +37,16 @@ if ($page->IsAuthorized()) {
 
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 				$obj->Delete();
-				App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
+				App_Cms_Back_Log::logModule(App_Cms_Back_Log::ACT_DELETE, $obj->GetId(), $obj->getTitle());
 				goToUrl($page->Url['path'] . '?DEL');
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
 				if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
 					$obj->Create();
-					App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+					App_Cms_Back_Log::logModule(App_Cms_Back_Log::ACT_CREATE, $obj->GetId(), $obj->getTitle());
 				} else {
 					$obj->Update();
-					App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
+					App_Cms_Back_Log::logModule(App_Cms_Back_Log::ACT_MODIFY, $obj->GetId(), $obj->getTitle());
 				}
 
 				goToUrl($page->Url['path'] . '?id=' . $obj->GetId() . '&OK');
@@ -65,7 +65,7 @@ if ($page->IsAuthorized()) {
 	}
 
 	$list_xml = '<local_navigation>';
-	foreach (App_Cms_Document_Navigation::GetList() as $item) {
+	foreach (App_Cms_Front_Navigation::GetList() as $item) {
 		$list_xml .= $item->GetXml('bo_list', 'item');
 	}
 	$list_xml .= '</local_navigation>';
@@ -75,7 +75,7 @@ if ($page->IsAuthorized()) {
 
 		if ($obj->GetId()) {
 			$module .= ' id="' . $obj->GetId() . '">';
-			$module .= '<title><![CDATA[' . $obj->GetTitle() . ']]></title>';
+			$module .= '<title><![CDATA[' . $obj->getTitle() . ']]></title>';
 		} else {
 			$module .= ' is_new="true">';
 			$module .= '><title><![CDATA[Добавление]]></title>';

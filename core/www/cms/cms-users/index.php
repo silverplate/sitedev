@@ -2,23 +2,23 @@
 
 require('../prepend.php');
 
-$page = new App_Cms_Bo_Page();
+$page = new App_Cms_Back_Page();
 $page->SetTitle($g_section->GetTitle());
 
 if ($page->IsAuthorized()) {
 	if (isset($_GET['id'])) {
-		$obj = App_Cms_Bo_User::Load($_GET['id']);
+		$obj = App_Cms_Back_User::Load($_GET['id']);
 		if (!$obj) unset($obj);
 
 	} elseif (isset($_GET['NEW'])) {
-		$obj = new App_Cms_Bo_User;
+		$obj = new App_Cms_Back_User;
 	}
 
 	if (isset($obj)) {
 		$form = new App_Form();
 		$form->Load('form.xml');
 
-		foreach (App_Cms_Bo_Section::GetList() as $item) {
+		foreach (App_Cms_Back_Section::GetList() as $item) {
 			$form->Elements['sections']->AddOption($item->GetId(), $item->GetTitle());
 		}
 
@@ -44,11 +44,11 @@ if ($page->IsAuthorized()) {
 		if ($form->UpdateStatus == FORM_UPDATED) {
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 				$obj->Delete();
-				App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->getId(), $obj->GetTitle());
+				App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_DELETE, $obj->getId(), $obj->getTitle());
 				goToUrl($page->Url['path'] . '?DEL');
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
-				if (App_Cms_Bo_User::CheckUnique($form->Elements['login']->GetValue(), $obj->getId())) {
+				if (App_Cms_Back_User::CheckUnique($form->Elements['login']->GetValue(), $obj->getId())) {
 					$obj->fillWithData($form->GetSqlValues());
 
 					$password = $form->Elements['passwd']->GetValue();
@@ -66,10 +66,10 @@ if ($page->IsAuthorized()) {
 
 					if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
 						$obj->Create();
-						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->getId(), $obj->GetTitle());
+						App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_CREATE, $obj->getId(), $obj->getTitle());
 					} else {
 						$obj->Update();
-						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->getId(), $obj->GetTitle());
+						App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_MODIFY, $obj->getId(), $obj->getTitle());
 					}
 
 					if (isset($form->Elements['sections'])) {
@@ -104,7 +104,7 @@ if ($page->IsAuthorized()) {
 	}
 
 	$list_xml = '<local_navigation>';
-	foreach (App_Cms_Bo_User::GetList() as $item) {
+	foreach (App_Cms_Back_User::GetList() as $item) {
 		$list_xml .= $item->GetXml('bo_list', 'item');
 	}
 	$list_xml .= '</local_navigation>';
@@ -114,7 +114,7 @@ if ($page->IsAuthorized()) {
 
 		if ($obj->getId()) {
 			$module .= ' id="' . $obj->getId() . '">';
-			$module .= '<title><![CDATA[' . $obj->GetTitle() . ']]></title>';
+			$module .= '<title><![CDATA[' . $obj->getTitle() . ']]></title>';
 		} else {
 			$module .= ' is_new="true">';
 			$module .= '><title><![CDATA[Добавление]]></title>';

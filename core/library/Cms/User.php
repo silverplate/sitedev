@@ -1,255 +1,283 @@
 <?php
 
-abstract class Core_Cms_User extends App_ActiveRecord
+abstract class Core_Cms_User extends App_Model
 {
-	private static $Base;
-	private static $SiteUser;
+    const AUTH_GROUP_GUESTS = 1;
+    const AUTH_GROUP_USERS  = 2;
+    const AUTH_GROUP_ALL    = 3; // Сумма всех констант
 
-	const TABLE = 'user';
-	const AUTH_GROUP_GUESTS = 1;
-	const AUTH_GROUP_USERS = 2;
-	const AUTH_GROUP_ALL = 3; // Сумма всех констант
+    protected static $_siteUser;
 
-	public static function Get() {
-		return self::$SiteUser;
-	}
+    public function __construct()
+    {
+        parent::__construct();
 
-	public static function StartSession() {
-		if (isset($_POST['auth_submit']) || isset($_POST['auth_submit_x'])) {
-			$try = App_Cms_User::Auth($_POST['auth_login'], $_POST['auth_password']);
-			if ($try) {
-				App_Cms_Session::Get()->Login($try->GetId());
-				App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGIN);
-			} else {
-				App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGIN_ERROR);
-			}
+        $this->addPrimaryKey('string');
+        $this->addAttr('status_id', 'integer');
+        $this->addAttr('first_name', 'string');
+        $this->addAttr('last_name', 'string');
+        $this->addAttr('patronymic_name', 'string');
+        $this->addAttr('email', 'string');
+        $this->addAttr('phone_code', 'string');
+        $this->addAttr('phone', 'string');
+        $this->addAttr('passwd', 'string');
+        $this->addAttr('reminder_key', 'string');
+        $this->addAttr('reminder_date', 'datetime');
+        $this->addAttr('creation_date', 'datetime');
+    }
 
-			reload();
+    public static function getAuthGroups()
+    {
+        return array(
+            self::AUTH_GROUP_ALL => array(
+                'title' => 'Все', 'title1' => 'Всем'
+            ),
+            self::AUTH_GROUP_GUESTS => array(
+                'title' => 'Неавторизованные', 'title1' => 'Неавторизованным'
+            ),
+            self::AUTH_GROUP_USERS => array(
+                'title' => 'Авторизованные',
+                'title1' => 'Авторизованным'
+            )
+        );
+    }
 
-		} elseif (isset($_POST['auth_reminder_submit']) || isset($_POST['auth_reminder_submit_x'])) {
-			$try = isset($_POST['auth_email']) && $_POST['auth_email']
-				? App_Cms_User::getList(array('email' => $_POST['auth_email'], 'status_id' => 1))
-				: false;
+    public static function getAuthGroupTitle($_id, $_title = null)
+    {
+        $title = 'title' . ($_title ? "_$_title" : '');
+        $groups = self::getAuthGroups();
 
-			if ($try) {
-				foreach ($try as $user) {
-					App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_REMIND_PWD);
-					$user->RemindPassword();
-				}
-			} else {
-				App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_REMIND_PWD_ERROR);
-			}
+        return isset($groups[$_id]) ? $groups[$_id][$title] : false;
+    }
 
-			reload();
+    public static function getAuthGroup()
+    {
+        if (!defined('IS_USERS') || !IS_USERS) return null;
+        else if (self::get())                  return self::AUTH_GROUP_USERS;
+        else                                   return self::AUTH_GROUP_GUESTS;
+    }
 
-		} elseif (isset($_GET['r']) || (isset($_GET['e']) && App_Cms_Session::Get()->IsLoggedIn())) {
-			if (App_Cms_Session::Get()->IsLoggedIn()) {
-				App_Cms_Session::Get()->Logout();
-			}
+    public static function get()
+    {
+        return self::$_siteUser;
+    }
 
-			if (isset($_GET['r'])) {
-				$try = $_GET['r'] ? App_Cms_User::load($_GET['r'], 'reminder_key') : false;
-				if ($try && $try->ChangePassword() == 0) {
-					App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CHANGE_PWD);
-				} else {
-					App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CHANGE_PWD_ERROR);
-				}
-			} else {
-				App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGOUT);
-			}
+    public static function startSession()
+    {
+        $session = App_Cms_Session::get();
 
-			reload();
+        if (isset($_POST['auth_submit']) || isset($_POST['auth_submit_x'])) {
+            $try = self::auth($_POST['auth_login'], $_POST['auth_password']);
 
-		} elseif (isset($_GET['e']) && App_Cms_Session::Get()->IsLoggedIn()) {
-			App_Cms_Session::Get()->Logout();
-			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_LOGOUT);
-			reload();
+            if ($try) {
+                $session->login($try->getId());
+                $session->setParam(
+                    App_Cms_Session::ACT_PARAM_NEXT,
+                    App_Cms_Session::ACT_LOGIN
+                );
 
-		} else {
-			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM, App_Cms_Session::Get()->GetParam(App_Cms_Session::ACT_PARAM_NEXT) ? App_Cms_Session::Get()->GetParam(App_Cms_Session::ACT_PARAM_NEXT) : App_Cms_Session::ACT_START);
-			App_Cms_Session::Get()->SetParam(App_Cms_Session::ACT_PARAM_NEXT, App_Cms_Session::ACT_CONTINUE);
-			self::$SiteUser = App_Cms_Session::Get()->IsLoggedIn() ? App_Cms_User::Auth(App_Cms_Session::Get()->GetUserId()) : false;
-		}
-	}
+            } else {
+                $session->setParam(
+                    App_Cms_Session::ACT_PARAM_NEXT,
+                    App_Cms_Session::ACT_LOGIN_ERROR
+                );
+            }
 
-	public static function GetAuthGroups () {
-		return array(
-			self::AUTH_GROUP_ALL => array('title' => 'Все', 'title1' => 'Всем'),
-			self::AUTH_GROUP_GUESTS => array('title' => 'Неавторизованные', 'title1' => 'Неавторизованным'),
-			self::AUTH_GROUP_USERS => array('title' => 'Авторизованные', 'title1' => 'Авторизованным')
-		);
-	}
+            reload();
 
-	public static function GetAuthGroupTitle($_id, $_title = null) {
-		$title = 'title' . ($_title ? '_' . $_title : '');
-		$groups = self::GetAuthGroups();
-		return isset($groups[$_id]) ? $groups[$_id][$title] : false;
-	}
+        } else if (
+            isset($_POST['auth_reminder_submit']) ||
+            isset($_POST['auth_reminder_submit_x'])
+        ) {
+            $try = !empty($_POST['auth_email'])
+                 ? self::getList(array('email' => $_POST['auth_email'], 'status_id' => 1))
+                 : false;
 
-	public static function GetAuthGroup() {
-		return IS_USERS ? (self::Get() ? self::AUTH_GROUP_USERS : self::AUTH_GROUP_GUESTS) : null;
-	}
+            if ($try) {
+                foreach ($try as $user) {
+                    $session->setParam(
+                        App_Cms_Session::ACT_PARAM_NEXT,
+                        App_Cms_Session::ACT_REMIND_PWD
+                    );
 
-	public static function CheckUnique($_value, $_exclude = null) {
-		return self::IsUnique(get_called_class(), self::GetTbl(), self::GetPri(), 'email', $_value, $_exclude);
-	}
+                    $user->remindPassword();
+                }
 
-	public static function Auth() {
-		if (func_num_args() == 1) {
-			$try = App_Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->getAttrNames(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE ' . self::GetPri() . ' = ' . App_Db::escape(func_get_arg(0)) . ' AND status_id = 1');
+            } else {
+                $session->setParam(
+                    App_Cms_Session::ACT_PARAM_NEXT,
+                    App_Cms_Session::ACT_REMIND_PWD_ERROR
+                );
+            }
 
-		} elseif (func_num_args() == 2) {
-			$try = App_Db::Get()->GetEntry('SELECT ' . implode(',', array_diff(self::GetBase()->getAttrNames(), array('passwd'))) . ' FROM ' . self::GetTbl() . ' WHERE email = ' . App_Db::escape(func_get_arg(0)) . ' AND passwd = ' . App_Db::escape(md5(func_get_arg(1))) . ' AND status_id = 1');
-		}
+            reload();
 
-		if (isset($try) && $try) {
-			$cname = get_called_class();
-			$obj = new $cname;
-			$obj->fillWithData($try);
+        } else if (
+            isset($_GET['r']) ||
+            (isset($_GET['e']) && $session->isLoggedIn())
+        ) {
+            if ($session->isLoggedIn()) {
+                $session->logout();
+            }
 
-			return $obj;
-		}
+            if (isset($_GET['r'])) {
+                $try = $_GET['r'] ? self::load($_GET['r'], 'reminder_key') : false;
 
-		return false;
-	}
+                $session->setParam(
+                    App_Cms_Session::ACT_PARAM_NEXT,
+                    $try && $try->changePassword() == 0 ? App_Cms_Session::ACT_CHANGE_PWD : App_Cms_Session::ACT_CHANGE_PWD_ERROR
+                );
 
-	public function RemindPassword() {
-		global $g_mail;
+            } else {
+                $session->setParam(
+                    App_Cms_Session::ACT_PARAM_NEXT,
+                    App_Cms_Session::ACT_LOGOUT
+                );
+            }
 
-		if ($this->email) {
-			$this->reminderKey = App_Db::Get()->GetUnique(self::GetTbl(), 'reminder_key', 30);
-			$this->reminderDate = date('Y-m-d H:i:s');
-			$this->update();
+            reload();
 
-			return send_email($g_mail, $this->email, 'Смена пароля',
-				'Для смены пароля к сайту http://' .
-				$_SERVER['HTTP_HOST'] . ' загрузите страницу: http://' .
-				$_SERVER['HTTP_HOST'] . '?r=' . $this->reminderKey . "\r\n\n" .
-				'Если вы не просили поменять пароль, проигнорируйте это сообщение.', null, false
-			);
-		}
-	}
+        } else if (isset($_GET['e']) && $session->isLoggedIn()) {
+            $session->logout();
 
-	public function ChangePassword() {
-		global $g_mail;
+            $session->setParam(
+                App_Cms_Session::ACT_PARAM_NEXT,
+                App_Cms_Session::ACT_LOGOUT
+            );
 
-		if ($this->email) {
-			if ($this->statusId == 1 && $this->GetDate('reminder_date') && mktime() - 60 * 60 * 24 < $this->GetDate('reminder_date')) {
-				$password = $this->GeneratePassword();
+            reload();
 
-				$this->setPassword($password);
-				$this->reminderKey = '';
-				$this->reminderDate = '';
-				$this->update();
+        } else {
+            $session->setParam(
+                App_Cms_Session::ACT_PARAM,
+                $session->getParam(App_Cms_Session::ACT_PARAM_NEXT) ? $session->getParam(App_Cms_Session::ACT_PARAM_NEXT) : App_Cms_Session::ACT_START
+            );
 
-				return send_email($g_mail, $this->email, 'Доступ',
-					'Доступ к сайту http://' . $_SERVER['HTTP_HOST'] . ".\r\n\n" .
-					'Логин: ' . $this->email .
-					"\r\nПароль: " . $password, null, false
-				) ? 0 : 3;
-			} else return 2;
-		} else return 1;
-	}
+            $session->setParam(
+                App_Cms_Session::ACT_PARAM_NEXT,
+                App_Cms_Session::ACT_CONTINUE
+            );
 
-	public function GetTitle() {
-		return $this->lastName . ' ' . $this->firstName;
-	}
+            self::$_siteUser = $session->isLoggedIn()
+                             ? self::auth($session->getUserId())
+                             : false;
+        }
+    }
 
-	public static function generatePassword()
-	{
-	    return Ext_String::getRandomReadable(8);
-	}
+    public static function checkUnique($_value, $_excludeId = null)
+    {
+        return self::isUnique('email', $_value, $_excludeId);
+    }
 
-	public function SetPassword($_password) {
-		$this->passwd = md5($_password);
-	}
+    /**
+     * @return App_Cms_User
+     */
+    public static function auth()
+    {
+        if (func_num_args() == 1) {
+            $user = self::getById(func_get_arg(0));
 
-	public function UpdatePassword($_password) {
-		$this->UpdateAttribute('passwd', md5($_password));
-	}
+        } else if (func_num_args() == 2) {
+            $user = self::getBy(
+                array('email', 'passwd'),
+                array(func_get_arg(0), md5(func_get_arg(1)))
+            );
+        }
 
-	public function getXml($_type, $_node_name = null, $_append_xml = null) {
-		$node_name = ($_node_name) ? $_node_name : 'user';
-		$result = '';
+        return !empty($user) && $user->statusId == 1 ? $user : false;
+    }
 
-		switch ($_type) {
-			case 'bo_list':
-				$result .= '<' . $node_name . ' id="' . $this->getId() . '"';
-				if ($this->status_id == 1) $result .= ' is_published="true"';
+    public function remindPassword()
+    {
+        global $g_mail;
 
-				$result .= '><title><![CDATA[' . $this->GetTitle() . ']]></title>';
-				$result .= $_append_xml;
-				$result .= '</' . $node_name . '>';
-				break;
+        if ($this->email) {
+            $this->reminderDate = date('Y-m-d H:i:s');
+            $this->reminderKey = App_Db::get()->getUnique(
+                $this->getTable(),
+                'reminder_key',
+                30
+            );
 
-			case 'page_system':
-				$result .= '<' . $node_name . ' id="' . $this->getId() . '"';
-				$result .= '><title><![CDATA[' . $this->GetTitle() . ']]></title>';
-				$result .= $_append_xml;
-				$result .= '</' . $node_name . '>';
-				break;
-		}
+            $this->update();
 
-		return $result;
-	}
+            $message =
+                'Для смены пароля к сайту http://' .
+                $_SERVER['HTTP_HOST'] . ' загрузите страницу: http://' .
+                $_SERVER['HTTP_HOST'] . '?r=' . $this->reminderKey . "\r\n\n" .
+                'Если вы не просили поменять пароль, проигнорируйте это сообщение.';
 
-	public function __construct() {
-		parent::__construct(self::GetTbl());
-		foreach (self::GetBase()->_attributes as $item) {
-			$this->_attributes[$item->GetName()] = clone($item);
-		}
-	}
+            return send_email(
+                $g_mail,
+                $this->email,
+                'Смена пароля',
+                $message,
+                null,
+                false
+            );
+        }
+    }
 
-	public static function GetBase() {
-		if (!isset(self::$Base)) {
-			self::$Base = new App_ActiveRecord(self::ComputeTblName());
-			self::$Base->AddAttribute(self::ComputeTblName() . '_id', 'varchar', 30, true);
-			self::$Base->AddAttribute('status_id', 'int');
-			self::$Base->AddAttribute('first_name', 'varchar', 255);
-			self::$Base->AddAttribute('last_name', 'varchar', 255);
-			self::$Base->AddAttribute('patronymic_name', 'varchar', 255);
-			self::$Base->AddAttribute('email', 'varchar', 255);
-			self::$Base->AddAttribute('phone_code', 'varchar', 255);
-			self::$Base->AddAttribute('phone', 'varchar', 255);
-			self::$Base->AddAttribute('passwd', 'varchar', 32);
-			self::$Base->AddAttribute('reminder_key', 'varchar', 30);
-			self::$Base->AddAttribute('reminder_date', 'datetime');
-			self::$Base->AddAttribute('creation_date', 'datetime');
-		}
+    public function changePassword()
+    {
+        global $g_mail;
 
-		return self::$Base;
-	}
+        if ($this->email) {
+            $date = $this->getDate('reminder_date');
 
-	public static function GetPri($_is_table = false) {
-		return self::GetBase()->GetPrimary($_is_table);
-	}
+            if (
+                $this->statusId == 1 &&
+                $date &&
+                $date > time() - 60 * 60 * 24
+            ) {
+                $password = $this->generatePassword();
 
-	public static function GetTbl() {
-		return self::GetBase()->GetTable();
-	}
+                $this->setPassword($password);
+                $this->reminderKey = '';
+                $this->reminderDate = '';
+                $this->update();
 
-	public static function load($_value, $_attribute = null) {
-		return parent::load(get_called_class(), $_value, $_attribute);
-	}
+                $message = 'Доступ к сайту http://' . $_SERVER['HTTP_HOST'] .
+                           ".\r\n\nЛогин: {$this->email}\r\nПароль: $password";
 
-	public static function getList($_attributes = array(), $_parameters = array(), $_row_conditions = array()) {
-		return parent::getList(
-			get_called_class(),
-			self::GetTbl(),
-			self::GetBase()->getAttrNames(),
-			$_attributes,
-			$_parameters,
-			$_row_conditions
-		);
-	}
+                return send_email($g_mail, $this->email, 'Доступ', $message, null, false) ? 0 : 3;
 
-	public static function getCount($_attributes = array(), $_row_conditions = array()) {
-		return parent::getCount(get_called_class(), self::GetTbl(), $_attributes, $_row_conditions);
-	}
+            }
 
-	public static function ComputeTblName()  {
-		return DB_PREFIX . self::TABLE;
-	}
+            return 2;
+        }
+
+        return 1;
+    }
+
+    public function getTitle()
+    {
+        return trim($this->lastName . ' ' . $this->firstName);
+    }
+
+    public static function generatePassword()
+    {
+        return Ext_String::getRandomReadableAlt(8);
+    }
+
+    public function setPassword($_password)
+    {
+        $this->passwd = md5($_password);
+    }
+
+    public function updatePassword($_password)
+    {
+        $this->updateAttr('passwd', md5($_password));
+    }
+
+    public function getBackOfficeXml($_xml = array(), $_attrs = array())
+    {
+        $attrs = $_attrs;
+
+        if (!isset($attrs['is_published']) && $this->statusId == 1) {
+            $attrs['is_published'] = 1;
+        }
+
+        return parent::getBackOfficeXml($_xml, $attrs);
+    }
 }
-
-?>

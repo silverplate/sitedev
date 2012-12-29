@@ -12,17 +12,17 @@ function bo_log_filter($_filter) {
 
 	if ($_filter['is_users']) {
 		if ($_filter['users'] && is_array($_filter['users'])) {
-			array_push($row_conditions, App_Cms_Bo_User::GetPri() . ' IN (' . App_Db::escape($_filter['users']) . ')');
+			array_push($row_conditions, App_Cms_Back_User::GetPri() . ' IN (' . App_Db::escape($_filter['users']) . ')');
 		} else {
-			array_push($row_conditions, App_Cms_Bo_User::GetPri() . ' NOT IN (' . App_Db::escape(array_keys(App_Cms_Bo_User::GetList())) . ')');
+			array_push($row_conditions, App_Cms_Back_User::GetPri() . ' NOT IN (' . App_Db::escape(array_keys(App_Cms_Back_User::GetList())) . ')');
 		}
 	}
 
 	if ($_filter['is_sections']) {
 		if ($_filter['sections'] && is_array($_filter['sections'])) {
-			array_push($row_conditions, App_Cms_Bo_Section::GetPri() . ' IN (' . App_Db::escape($_filter['sections']) . ')');
+			array_push($row_conditions, App_Cms_Back_Section::GetPri() . ' IN (' . App_Db::escape($_filter['sections']) . ')');
 		} else {
-			array_push($row_conditions, App_Cms_Bo_Section::GetPri() . ' NOT IN (' . App_Db::escape(array_keys(App_Cms_Bo_Section::GetList())) . ')');
+			array_push($row_conditions, App_Cms_Back_Section::GetPri() . ' NOT IN (' . App_Db::escape(array_keys(App_Cms_Back_Section::GetList())) . ')');
 		}
 	}
 
@@ -30,13 +30,13 @@ function bo_log_filter($_filter) {
 		if ($_filter['actions'] && is_array($_filter['actions'])) {
 			array_push($row_conditions, 'action_id IN (' . App_Db::escape($_filter['actions']) . ')');
 		} else {
-			array_push($row_conditions, 'action_id NOT IN (' . App_Db::escape(array_keys(App_Cms_Bo_Log::GetActions())) . ')');
+			array_push($row_conditions, 'action_id NOT IN (' . App_Db::escape(array_keys(App_Cms_Back_Log::GetActions())) . ')');
 		}
 	}
 
 	return array(
-		'items' => App_Cms_Bo_Log::GetList($conditions, $parameters, $row_conditions),
-		'total' => App_Cms_Bo_Log::GetCount($conditions, $row_conditions)
+		'items' => App_Cms_Back_Log::GetList($conditions, $parameters, $row_conditions),
+		'total' => App_Cms_Back_Log::GetCount($conditions, $row_conditions)
 	);
 }
 

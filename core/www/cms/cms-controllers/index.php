@@ -2,16 +2,16 @@
 
 require('../prepend.php');
 
-$page = new App_Cms_Bo_Page();
+$page = new App_Cms_Back_Page();
 $page->SetTitle($g_section->GetTitle());
 
 if ($page->IsAuthorized()) {
 	if (isset($_GET['id'])) {
-		$obj = App_Cms_Controller::Load($_GET['id']);
+		$obj = App_Cms_Front_Controller::Load($_GET['id']);
 		if (!$obj) unset($obj);
 
 	} elseif (isset($_GET['NEW'])) {
-		$obj = new App_Cms_Controller();
+		$obj = new App_Cms_Front_Controller();
 	}
 
 	if (isset($obj)) {
@@ -44,7 +44,7 @@ if ($page->IsAuthorized()) {
 
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 				$obj->Delete();
-				App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
+				App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
 				goToUrl($page->Url['path'] . '?DEL');
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
@@ -58,7 +58,7 @@ if ($page->IsAuthorized()) {
 							);
 						}
 
-						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
 
 					} else {
 						$obj->Update();
@@ -68,11 +68,11 @@ if ($page->IsAuthorized()) {
 						    $form->Elements['content']->GetValue()
 						);
 
-						App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
+						App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
 					}
 
 					if ($obj->isDocumentMain) {
-						App_Db::Get()->Execute('UPDATE ' . App_Cms_Controller::GetTbl() . ' SET is_document_main = 0 WHERE is_document_main = 1 AND ' . App_Cms_Controller::GetPri() . ' != ' . App_Db::escape($obj->GetId()));
+						App_Db::Get()->Execute('UPDATE ' . App_Cms_Front_Controller::GetTbl() . ' SET is_document_main = 0 WHERE is_document_main = 1 AND ' . App_Cms_Front_Controller::GetPri() . ' != ' . App_Db::escape($obj->GetId()));
 					}
 
 					reload('?id=' . $obj->GetId() . '&OK');
@@ -98,7 +98,7 @@ if ($page->IsAuthorized()) {
 	}
 
 	$list_xml = '<local_navigation>';
-	foreach (App_Cms_Controller::GetList() as $item) {
+	foreach (App_Cms_Front_Controller::GetList() as $item) {
 		$list_xml .= $item->GetXml('bo_list', 'item');
 	}
 	$list_xml .= '</local_navigation>';

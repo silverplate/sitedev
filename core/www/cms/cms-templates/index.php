@@ -2,18 +2,18 @@
 
 require_once '../prepend.php';
 
-$page = new App_Cms_Bo_Page();
+$page = new App_Cms_Back_Page();
 $page->setTitle($g_section->getTitle());
 
 if ($page->isAuthorized()) {
     if (isset($_GET['id'])) {
-        $obj = App_Cms_Template::getById($_GET['id']);
+        $obj = App_Cms_Front_Template::getById($_GET['id']);
         if (!$obj) {
             unset($obj);
         }
 
     } else if (isset($_GET['NEW'])) {
-        $obj = new App_Cms_Template();
+        $obj = new App_Cms_Front_Template();
     }
 
     if (isset($obj)) {
@@ -41,16 +41,14 @@ if ($page->isAuthorized()) {
                 $form->Buttons['delete']->isSubmited()
             ) {
                 $obj->delete();
-                App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_DELETE, $obj->getId(), $obj->getTitle());
+                App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_DELETE, $obj->getId(), $obj->getTitle());
                 goToUrl($page->Url['path'] . '?DEL');
 
             } else if (
                 (isset($form->Buttons['insert']) && $form->Buttons['insert']->isSubmited()) ||
                 (isset($form->Buttons['update']) && $form->Buttons['update']->isSubmited())
             ) {
-                if (App_Cms_TemplateDb::isUnique('filename',
-                                         $obj->filename,
-                                         $obj->getId())) {
+                if (App_Cms_Front_Template::isUnique('filename', $obj->filename, $obj->getId())) {
                     if (
                         isset($form->Buttons['insert']) &&
                         $form->Buttons['insert']->isSubmited()
@@ -62,20 +60,20 @@ if ($page->isAuthorized()) {
                             $obj->setContent($content);
                         }
 
-                        App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+                        App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_CREATE, $obj->GetId(), $obj->getTitle());
 
                     } else {
                         $obj->update();
                         $obj->setContent($form->Elements['content']->getValue());
 
-                        App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, $obj->getId(), $obj->getTitle());
+                        App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_MODIFY, $obj->getId(), $obj->getTitle());
                     }
 
                     if ($obj->isDocumentMain) {
                         App_Db::get()->execute(
-                            'UPDATE ' . App_Cms_TemplateDb::getTbl() . ' ' .
+                            'UPDATE ' . App_Cms_Front_Template::getTbl() . ' ' .
                             'SET is_document_main = 0 ' .
-                            'WHERE is_document_main = 1 AND ' . App_Cms_TemplateDb::getPri() . ' != ' . $obj->getDbId()
+                            'WHERE is_document_main = 1 AND ' . App_Cms_Front_Template::getPri() . ' != ' . $obj->getSqlId()
                         );
                     }
 
@@ -103,7 +101,7 @@ if ($page->isAuthorized()) {
 
     $listXml = '<local_navigation>';
 
-    foreach (App_Cms_Template::getList() as $item) {
+    foreach (App_Cms_Front_Template::getList() as $item) {
         $listXml .= $item->getXml('bo-list', 'item');
     }
 

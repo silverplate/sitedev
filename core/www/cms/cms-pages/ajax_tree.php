@@ -1,4 +1,4 @@
 <?php
 
 require '../prepend.php';
-App_Cms_BackOffice::ajaxTreeOutput('App_Cms_Document');
+App_Cms_Back_Office::ajaxTreeOutput('App_Cms_Front_Document');

@@ -4,7 +4,6 @@ require_once realpath(dirname(__FILE__) . '/../../../core/library') . '/libs.php
 require_once CORE_SETS . 'project.php';
 $result = array();
 
-
 // Init for DB
 
 $boSections = array(
@@ -40,6 +39,7 @@ $foDocuments = array(
                        'сontroller' => 'common',
                        'template' => 'common',
                        'navigations' => array('main'))),
+
     array('/not-found/' => array('title' => 'Документ не найден',
                                  'folder' => 'not-found',
                                  'сontroller' => 'not-found',
@@ -68,10 +68,10 @@ $content2  = '<p>Неправильно набран адрес, или&nbsp;т�
 
 $foData = array(
     '/' => array(
-        array('title' => 'Содержание', 'tag' => 'html', App_Cms_Document_Data_ContentType::GetPri() => 'text', 'content' => $content1),
+        array('title' => 'Содержание', 'tag' => 'html', App_Cms_Front_Data_ContentType::getPri() => 'text', 'content' => $content1),
     ),
     '/not-found/' => array(
-        array('title' => 'Содержание', 'tag' => 'html', App_Cms_Document_Data_ContentType::GetPri() => 'text', 'content' => $content2)
+        array('title' => 'Содержание', 'tag' => 'html', App_Cms_Front_Data_ContentType::getPri() => 'text', 'content' => $content2)
     )
 );
 
@@ -95,7 +95,8 @@ foreach (explode(';', $sqlTables) as $query) {
 
 $boSectionObjs = array();
 foreach ($boSections as $i) {
-    $obj = new App_Cms_Bo_Section;
+    $obj = App_Cms_Back_Section::createInstance();
+
     $obj->fillWithData($i);
     $obj->isPublished = !isset($i['is_published']) || $i['is_published'];
     $obj->create();
@@ -110,7 +111,7 @@ $result['BO sections'] = count($boSectionObjs);
 
 $boUserObjs = array();
 foreach ($boUsers as $i) {
-    $obj = new App_Cms_Bo_User;
+    $obj = App_Cms_Back_User::createInstance();
     $obj->fillWithData($i);
     $obj->setPassword($i['passwd']);
 
@@ -120,11 +121,11 @@ foreach ($boUsers as $i) {
 
     $obj->create();
 
-    $boUserObjs[$obj->GetId()] = $obj;
+    $boUserObjs[$obj->getId()] = $obj;
     foreach (array_keys($boSectionObjs) as $j) {
-        $link = new App_Cms_Bo_UserToSection();
-        $link->boUserId = $obj->getId();
-        $link->boSectionId = $j;
+        $link = App_Cms_Back_User_Has_Section::createInstance();
+        $link->backUserId = $obj->getId();
+        $link->backSectionId = $j;
         $link->create();
     }
 }
@@ -136,7 +137,7 @@ $result['BO users'] = count($boUserObjs);
 
 $foControllerObjs = array();
 foreach ($foControllers as $key => $i) {
-    $obj = new App_Cms_Controller();
+    $obj = App_Cms_Front_Controller::createInstance();
     $obj->fillWithData($i);
     $obj->isPublished = true;
     $obj->create();
@@ -151,8 +152,8 @@ $result['FO controllers'] = count($foControllerObjs);
 
 $templatesObjs = array();
 foreach ($templates as $key => $i) {
-    $obj = new App_Cms_Template();
-    $obj->getDb()->fillWithData($i);
+    $obj = App_Cms_Front_Template::createInstance();
+    $obj->fillWithData($i);
     $obj->isPublished = true;
     $obj->isMultiple = !empty($i['is_multiple']);
     $obj->isDocumentMain = !empty($i['is_document_main']);
@@ -168,7 +169,7 @@ $result['FO templates'] = count($templatesObjs);
 
 $foNavigationObjs = array();
 foreach ($foNavigations as $key => $i) {
-    $obj = new App_Cms_Document_Navigation();
+    $obj = App_Cms_Front_Navigation::createInstance();
     $obj->fillWithData($i);
     $obj->isPublished = !isset($i['is_published']) || $i['is_published'];
     $obj->create();
@@ -184,16 +185,16 @@ $result['FO navigation'] = count($foNavigationObjs);
 $foDocumentObjs = array();
 foreach ($foDocuments as $level) {
     foreach ($level as $uri => $i) {
-        $obj = new App_Cms_Document();
+        $obj = App_Cms_Front_Document::createInstance();
         $obj->fillWithData($i);
         $obj->isPublished = true;
 
         if (isset($i['сontroller']) && isset($foControllerObjs[$i['сontroller']])) {
-            $obj->foControllerId = $foControllerObjs[$i['сontroller']]->getId();
+            $obj->frontControllerId = $foControllerObjs[$i['сontroller']]->getId();
         }
 
         if (isset($i['template']) && isset($templatesObjs[$i['template']])) {
-            $obj->foTemplateId = $templatesObjs[$i['template']]->getId();
+            $obj->frontTemplateId = $templatesObjs[$i['template']]->getId();
         }
 
         $parentUri = str_replace($i['folder'] . '/', '', $uri);
@@ -226,7 +227,7 @@ $result['FO documents'] = count($foDocumentObjs);
 
 $foDataContentTypeObjs = array();
 foreach ($foDataContentType as $id => $i) {
-    $obj = new App_Cms_Document_Data_ContentType();
+    $obj = App_Cms_Front_Data_ContentType::createInstance();
     $obj->fillWithData($i);
     $obj->id = $id;
     $obj->isPublished = true;
@@ -244,10 +245,10 @@ $foDataObjs = array();
 foreach ($foData as $uri => $blocks) {
     if (isset($foDocumentObjs[$uri])) {
         foreach ($blocks as $i) {
-            $obj = new App_Cms_Document_Data();
+            $obj = App_Cms_Front_Data::createInstance();
             $obj->fillWithData($i);
             $obj->authStatusId = App_Cms_User::AUTH_GROUP_ALL;
-            $obj->foDocumentId = $foDocumentObjs[$uri]->getId();
+            $obj->frontDocumentId = $foDocumentObjs[$uri]->getId();
             $obj->isPublished = true;
             $obj->isMount = true;
 
@@ -255,7 +256,7 @@ foreach ($foData as $uri => $blocks) {
                 isset($i['сontroller']) &&
                 isset($foControllerObjs[$i['сontroller']])
             ) {
-                $obj->foControllerId = $foControllerObjs[$i['сontroller']]->getId();
+                $obj->frontControllerId = $foControllerObjs[$i['сontroller']]->getId();
             }
 
             $obj->create();

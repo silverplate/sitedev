@@ -1,8 +1,6 @@
 <?php
 
-require('prepend.php');
+require_once 'prepend.php';
 
-$page = new App_Cms_Bo_Page404();
-$page->Output();
-
-?>
+$page = new App_Cms_Back_Page_404();
+$page->output();

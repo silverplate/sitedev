@@ -11,7 +11,7 @@ if (isset($data['items']) && $data['items']) {
 	}
 
 	$current_sort_order = array();
-	$objects = App_Cms_Document_Data::GetList(array(App_Cms_Document_Data::GetPri() => $data['items']));
+	$objects = App_Cms_Front_Data::GetList(array(App_Cms_Front_Data::GetPri() => $data['items']));
 	foreach ($objects as $item) {
 		array_push($current_sort_order, $item->sortOrder);
 	}
@@ -23,7 +23,7 @@ if (isset($data['items']) && $data['items']) {
 		}
 	}
 
-	App_Cms_Bo_Log::LogModule(App_Cms_Bo_Log::ACT_MODIFY, null, 'Сортировка');
+	App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_MODIFY, null, 'Сортировка');
 }
 
 ?>

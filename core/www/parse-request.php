@@ -3,8 +3,8 @@
 require_once 'prepend.php';
 
 $gCache = '' == SITE_LANG
-        ? new App_Cms_ProjectCache()
-        : new App_Cms_ProjectCache(null, SITE_LANG);
+        ? new App_Cms_Cache_Project()
+        : new App_Cms_Cache_Project(null, SITE_LANG);
 
 if ($gCache->isAvailable() && $gCache->isCache()) {
     echo $gCache;
@@ -12,7 +12,7 @@ if ($gCache->isAvailable() && $gCache->isCache()) {
 } else {
     $realUrl = parse_url($_SERVER['REQUEST_URI']);
     $url = parse_url(getCustomUrl($_SERVER['REQUEST_URI']));
-    $document = App_Cms_Document::load($url['path'], 'uri');
+    $document = App_Cms_Front_Document::load($url['path'], 'uri');
 
     if (
         $document &&
@@ -28,7 +28,7 @@ if ($gCache->isAvailable() && $gCache->isCache()) {
             ($document->isPublished == 1 || IS_SHOW_HIDDEN) &&
             (!$document->authStatusId || is_null(App_Cms_User::getAuthGroup()) || $document->authStatusId & App_Cms_User::getAuthGroup())
         ) {
-            $controller = App_Cms_Document::initController($document->getController(), $document);
+            $controller = App_Cms_Front_Document::initController($document->getController(), $document);
             $controller->execute();
             $controller->output();
 

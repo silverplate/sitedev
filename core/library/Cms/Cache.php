@@ -63,7 +63,7 @@ abstract class Core_Cms_Cache
 		return $request['query'];
 	}
 
-	public function SetSection(Core_Cms_CacheSection &$_obj) {
+	public function SetSection(Core_Cms_Cache_Section &$_obj) {
 		$this->Sections[$_obj->GetUri()] = $_obj;
 	}
 

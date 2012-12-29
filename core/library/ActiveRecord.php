@@ -8,31 +8,76 @@ abstract class Core_ActiveRecord
     protected $_table;
 
     /**
-     * @var array[Core_ActiveRecord_Attribute]
+     * @var array[App_ActiveRecord_Attribute]
      */
     protected $_attributes;
+
+    /**
+     * @var array[App_ActiveRecord]
+     */
+    protected $_foreignInstances = array();
 
     /**
      * @var array[array]
      */
     protected $_links = array();
 
-    public function __construct($_table)
+    /**
+     * @param string $_table
+     */
+    public function __construct($_table = null)
     {
-        $this->_table = $_table;
+        $this->_table = is_null($_table) ? self::computeTable() : $_table;
     }
 
+    /**
+     * @return App_ActiveRecord
+     */
+    public static function createInstance()
+    {
+        $class = get_called_class();
+        return new $class;
+    }
+
+	/**
+	 * @return string
+	 */
+	public static function computeTable()
+	{
+	    $name = str_replace(array('Core_', 'App_', 'Cms_'), '', get_called_class());
+	    return DB_PREFIX . Ext_String::underline($name);
+	}
+
+    /**
+     * @return string
+     */
     public function getTable()
     {
         return $this->_table;
     }
 
+    /**
+     * @return string
+     */
+    public static function getTbl()
+    {
+        return self::createInstance()->getTable();
+    }
+
+    /**
+     * @param string $_name
+     * @return boolean
+     */
     public function hasAttribute($_name)
     {
         return key_exists($_name, $this->_attributes) ||
                key_exists(Ext_String::underline($_name), $this->_attributes);
     }
 
+    /**
+     * @param string $_name
+     * @return boolean
+     */
     public function __isset($_name)
     {
         return property_exists($this, $_name) || $this->hasAttribute($_name);
@@ -75,6 +120,10 @@ abstract class Core_ActiveRecord
         return false;
     }
 
+    /**
+     * @param string $_name
+     * @return string|number
+     */
     public function __get($_name)
     {
         return property_exists($this, $_name)
@@ -82,6 +131,10 @@ abstract class Core_ActiveRecord
              : $this->getAttrValue($_name);
     }
 
+    /**
+     * @param string $_name
+     * @param string|number $_value
+     */
     public function __set($_name, $_value)
     {
         if (property_exists($this, $_name)) {
@@ -95,7 +148,7 @@ abstract class Core_ActiveRecord
     /**
      * @param string $_name
      * @throws Exception
-     * @return Core_ActiveRecord_Attribute
+     * @return App_ActiveRecord_Attribute
      */
     public function getAttr($_name)
     {
@@ -107,16 +160,27 @@ abstract class Core_ActiveRecord
         throw new Exception("There is no a such property `$_name`.");
     }
 
+    /**
+     * @param string $_name
+     * @return string|number
+     */
     public function getAttrValue($_name)
     {
         return $this->getAttr($_name)->getValue();
     }
 
+    /**
+     * @param string $_name
+     * @param string|number $_value
+     */
     public function setAttrValue($_name, $_value)
     {
         $this->getAttr($_name)->setValue($_value);
     }
 
+    /**
+     * @return array
+     */
     public function toArray()
     {
         $attrs = array();
@@ -128,14 +192,21 @@ abstract class Core_ActiveRecord
         return $attrs;
     }
 
-    public function getAttrNames($_table = false)
+    /**
+     * @param string $_prepend
+     * @return array
+     */
+    public function getAttrNames($_prepend = false)
     {
-        if ($_table) {
+        if ($_prepend) {
             $names = array();
-            $p = '`' . ($_table === true ? $this->getTable() : $_table) . '`.';
+
+            if ($_prepend === true)       $prepend = '`' . $this->getTable() . '`.';
+            else if (!is_null($_prepend)) $prepend = "`$_prepend`.";
+            else                          $prepend = '';
 
              foreach (array_keys($this->_attributes) as $name) {
-                 $names[$name] = $p . $name;
+                 $names[$name] = $prepend . $name;
              }
 
              return $names;
@@ -145,207 +216,300 @@ abstract class Core_ActiveRecord
         }
     }
 
-    public function addAttribute($_name,
-                                 $_type,
-                                 $_length = null,
-                                 $_isPrimary = false,
-                                 $_isUnique = false) {
+    /**
+     * @param string $_name
+     * @param string $_type
+     * @return App_ActiveRecord_Attribute
+     */
+    public function addAttr($_name, $_type)
+    {
         $this->_attributes[$_name] = new App_ActiveRecord_Attribute(
-            $_name, $_type, $_length, $_isPrimary, $_isUnique
+            $_name,
+            $_type
         );
+
+        return $this->_attributes[$_name];
     }
 
-    public function addForeignKey(App_ActiveRecord $_obj, $_isPrimary = false)
+    /**
+     * @param string $_name
+     * @param string $_type
+     * @throws Exception
+     * @return App_ActiveRecord_Attribute
+     */
+    public function addPrimaryKey()
     {
-        $key = $_obj->getPrimaryKey();
-        $this->addAttribute($key->getName(),
-                            $key->getType(),
-                            $key->getLength(),
-                            $_isPrimary);
+        if (func_num_args() == 1) {
+            $attr = $this->addAttr(
+                $this->computePrimaryKeyName(),
+                func_get_arg(0)
+            );
+
+        } else if (func_num_args() == 2) {
+            $attr = $this->addAttr(func_get_arg(0), func_get_arg(1));
+
+        } else {
+            throw new Exception('Wrong number of arguments.');
+        }
+
+        $attr->isPrimary(true);
+        return $attr;
     }
 
-    public function addPrimaryKey($_name, $_type, $_length = null)
+    /**
+     * @param App_ActiveRecord $_instance
+     * @return App_ActiveRecord_Attribute
+     */
+    public function addForeign(App_ActiveRecord $_instance)
     {
-        return $this->addAttribute($_name, $_type, $_length, true);
+        $key = $_instance->getPrimaryKey();
+        $this->_foreignInstances[$key->getName()] = $_instance;
+
+        return $this->addAttr($key->getName(), $key->getType());
     }
 
+    /**
+     * @return array[App_ActiveRecord]
+     */
+    public function getForeignInstances()
+    {
+        return $this->_foreignInstances;
+    }
+
+    /**
+     * @throws Exception
+     * @return App_ActiveRecord_Attribute|array[App_ActiveRecord_Attribute]
+     */
     public function getPrimaryKey()
     {
         $keys = array();
 
+        if (!$this->_attributes) {
+            throw new Exception();
+        }
+
         foreach ($this->_attributes as $item) {
             if ($item->isPrimary()) {
-                $keys[] = $item;
+                $keys[$item->getName()] = $item;
             }
         }
 
-        if (count($keys) == 0) {
-            return false;
+        if (count($keys) == 0)      throw new Exception('Primary key must be set');
+        else if (count($keys) == 1) return current($keys);
+        else                        return $keys;
+    }
 
-        } elseif (count($keys) == 1) {
-            return $keys[0];
+    /**
+     * @param string $_prepend
+     * @return string|array
+     */
+    public function getPrimaryKeyName($_prepend = null)
+    {
+        if ($_prepend === true)       $prepend = $this->getTable() . '.';
+        else if (!is_null($_prepend)) $prepend = "$_prepend.";
+        else                          $prepend = '';
+
+        $primary = $this->getPrimaryKey();
+
+        if (is_array($primary)) {
+            foreach ($primary as $name => $attr) {
+                $primary[$name] = $prepend . $attr->getName();
+            }
+
+            return $primary;
 
         } else {
-            return $keys;
+            return $prepend . $primary->getName();
         }
     }
 
-    public function getPrimary($_is_table = false)
+    /**
+     * @param string $_prepend
+     * @return string|array
+     */
+    public static function getPri($_prepend = null)
     {
-        $keys = $this->getPrimaryKey();
+        return self::createInstance()->getPrimaryKeyName($_prepend);
+    }
 
-        if ($keys) {
-            $table = $_is_table ? $this->getTable() . '.' : '';
+    /**
+     * @param string $_prepend
+     * @return string
+     */
+    public static function getFirstForeignPri($_prepend = null)
+    {
+        $keys = array_values(self::getPri($_prepend));
+        return $keys[0];
+    }
 
-            if (is_array($keys)) {
-                $names = array();
+    /**
+     * @return string
+     */
+    public static function getFirstForeignTbl()
+    {
+        $instances = array_values(self::createInstance()->getForeignInstances());
+        return $instances[0]->getTable();
+    }
 
-                foreach ($keys as $key) {
-                    $names[] = $table . $key->getName();
-                }
+    /**
+     * @param string $_prepend
+     * @return string
+     */
+    public static function getSecondForeignPri($_prepend = null)
+    {
+        $keys = array_values(self::getPri($_prepend));
+        return $keys[1];
+    }
 
-                if ($names) return $names;
+    /**
+     * @return string
+     */
+    public static function getSecondForeignTbl()
+    {
+        $instances = array_values(self::createInstance()->getForeignInstances());
+        return $instances[1]->getTable();
+    }
 
-            } else {
-                return $table . $keys->getName();
+	/**
+	 * @return string
+	 */
+	public function computePrimaryKeyName()
+	{
+	    return $this->getTable() . '_id';
+	}
+
+    /**
+     * @param string|array $_value
+     * @return string
+     */
+    public function getPrimaryKeyWhere($_value = null)
+    {
+        $where = array();
+        $primary = $this->getPrimaryKey();
+
+        if (is_array($primary)) {
+            foreach ($primary as $name => $attr) {
+                $value = is_null($_value)
+                       ? $attr->getSqlValue()
+                       : App_Db::escape($_value[$name]);
+
+                $where[] = $attr->getName() . " = $value";
             }
+
+        } else {
+            $value = is_null($_value)
+                   ? $primary->getSqlValue()
+                   : App_Db::escape($_value);
+
+            $where[] = $primary->getName() . " = $value";
+        }
+
+        return implode(' AND ', $where);
+    }
+
+    /**
+     * @todo Замерить что работает быстрее $this->getId() или $this->id?
+     * @param boolean $_isSql
+     * @return string|array[string]
+     */
+    public function getId($_isSql = null)
+    {
+        $primary = $this->getPrimaryKey();
+
+        if (is_array($primary)) {
+            $ids = array();
+
+            foreach ($primary as $attr) {
+                $ids[$attr->getName()] = $_isSql
+                                       ? $attr->getSqlValue()
+                                       : $attr->getValue();
+            }
+
+            return $ids;
+
+        } else {
+            return $_isSql ? $primary->getSqlValue() : $primary->getValue();
+        }
+    }
+
+    /**
+     * @return string|number
+     */
+    public function getSqlId()
+    {
+        return $this->getId(true);
+    }
+
+    /**
+     * @param string|integer $_id
+     * @return App_ActiveRecord|false
+     */
+    public static function getById($_id)
+    {
+        return self::load($_id);
+    }
+
+    /**
+     * @param string $_attr
+     * @param string|integer $_value
+     * @return App_ActiveRecord|false
+     */
+    public static function getBy($_attr, $_value)
+    {
+        return self::load($_value, $_attr);
+    }
+
+    /**
+     * @param string|integer $_value
+     * @param string $_attr
+     * @return App_ActiveRecord|false
+     */
+    public static function load($_value, $_attr = null)
+    {
+        $obj = self::createInstance();
+        $data = $obj->fetch($_value, $_attr);
+
+        if ($data !== false) {
+            $obj->fillWithData($data);
+            return $obj;
         }
 
         return false;
     }
 
-    public function getPrimaryKeyStatment($_value = null)
-    {
-        $key = $this->getPrimaryKey();
-        $conditions = array();
-
-        if ($key) {
-            if (is_array($key)) {
-                for ($i = 0; $i < count($key); $i++) {
-                    if ($_value && is_array($_value)) {
-                        if (isset($_value[$key[$i]->getName()])) {
-                            $value = App_Db::escape($_value[$key[$i]->getName()]);
-
-                        } else if (isset($_value[$i])) {
-                            $value = App_Db::escape($_value[$i]);
-
-                        } else {
-                            $value = $key[$i]->getSqlValue();
-                        }
-
-                    } else {
-                        $value = $key[$i]->getSqlValue();
-                    }
-
-                    $conditions[] = $key[$i]->getName() . ' = ' . $value;
-                }
-
-            } else {
-                $value = is_null($_value) ? $key->getSqlValue() : App_Db::escape($_value);
-                $conditions[] = $key->getName() . ' = ' . $value;
-            }
-        }
-
-        return ($conditions) ? implode(' AND ', $conditions) : false;
-    }
-
-    public function getDbId()
-    {
-        return App_Db::escape($this->getId());
-    }
-
-    public function getId()
-    {
-        $key = $this->getPrimaryKey();
-        $value = false;
-
-        if (is_array($key)) {
-            $value = array();
-
-            foreach ($key as $item) {
-                $value[] = array($item->getName() => $item->getValue());
-            }
-
-        } else {
-            $value = $key->getValue(false);
-        }
-
-        return $value;
-    }
-
-    public function setId($_value)
-    {
-        $key = $this->getPrimaryKey();
-
-        if (is_array($key)) {
-            if ($_value && is_array($_value)) {
-                for ($i = 0; $i < count($key); $i++) {
-                    if (isset($_value[$key[$i]->getName()])) {
-                        $key[$i]->setValue($_value[$key[$i]->getName()]);
-
-                    } else if (isset($_value[$i])) {
-                        $key[$i]->setValue($_value[$i]);
-                    }
-                }
-            }
-
-        } else if ($_value) {
-            $key->setValue($_value);
-        }
-    }
-
-    public function getTitle()
-    {
-        if (isset($this->title) && $this->title) {
-            return $this->title;
-
-        } else if (isset($this->name) && $this->name) {
-            return $this->name;
-
-        } else {
-            return 'ID ' . $this->getId();
-        }
-    }
-
-    public function getDate($_name)
-    {
-        $value = $this->$_name;
-        return ($value && $value != '0000-00-00' && $value != '0000-00-00 00:00:00') ? strtotime($value) : false;
-    }
-
-    public function setDate($_name, $_date)
-    {
-        $format = isset($this->_attributes[$_name]) && $this->_attributes[$_name]->getType() == 'datetime' ? 'Y-m-d H:i:s' : 'Y-m-d';
-        $this->$_name = date($format, $_date);
-    }
-
-    public static function load($_className, $_value, $_attribute = null)
-    {
-        $obj = new $_className;
-        return $obj->fetch($_value, $_attribute) ? $obj : false;
-    }
-
+    /**
+     * @param string|integer|array $_value
+     * @param string|array $_attr
+     * @return array|false
+     */
     public function fetch($_value, $_attr = null)
     {
-        $condition = $_attr
-                   ? $_attr . ' = ' . App_Db::escape($_value)
-                   : $this->getPrimaryKeyStatment($_value);
+        if (is_array($_attr)) {
+            $tmp = array();
 
-        $data = App_Db::get()->getEntry(
-            'SELECT * FROM ' . $this->getTable() .
-            ' WHERE ' . $condition
-        );
+            foreach ($_attr as $i => $attr) {
+                $tmp[] = "$attr = " . App_Db::escape(
+                             isset($_value[$attr]) ? $_value[$attr] : $_value[$i]
+                         );
+            }
 
-        if ($data) {
-            $this->fillWithData($data);
+            $where = implode(' AND ', $tmp);
 
-            return true;
+        } else if ($_attr) {
+            $where = "$_attr = " . App_Db::escape($_value);
 
         } else {
-            return false;
+            $where = $this->getPrimaryKeyWhere($_value);
         }
+
+        return App_Db::get()->getEntry("
+            SELECT * FROM {$this->_table} WHERE $where LIMIT 1
+        ");
     }
 
+    /**
+     * @param array $_data
+     */
     public function fillWithData(array $_data)
     {
         foreach ($this->_attributes as $item) {
@@ -355,20 +519,36 @@ abstract class Core_ActiveRecord
         }
     }
 
+    /**
+     * @return boolean
+     */
+    public function save()
+    {
+        return $this->id ? $this->update() : $this->create();
+    }
+
+    /**
+     * @return boolean
+     */
     public function create()
     {
-        $t = $this->getTable();
-        $attributes = array();
+        $values = array();
 
         foreach ($this->_attributes as $item) {
             if (!$item->isValue()) {
                 if ($item->isPrimary()) {
                     if ($item->getType() == 'string') {
-                        $item->setValue(App_Db::get()->getUnique($t, $item->getName(), $item->getLength()));
+                        $item->setValue(App_Db::get()->getUnique(
+                            $this->getTable(),
+                            $item->getName()
+                        ));
                     }
 
                 } else if ($item->getName() == 'sort_order') {
-                    $item->setValue(App_Db::get()->getNextNumber($t, $item->getName()));
+                    $item->setValue(App_Db::get()->getNextNumber(
+                        $this->getTable(),
+                        $item->getName()
+                    ));
 
                 } else if (
                     $item->getName() == 'creation_date' ||
@@ -380,241 +560,275 @@ abstract class Core_ActiveRecord
                 }
             }
 
-            $attributes[$item->getName()] = $item->getSqlValue();
+            $values[$item->getName()] = $item->getSqlValue();
         }
 
         $result = App_Db::get()->execute(
-            'INSERT INTO ' . $t .
-            App_Db::get()->getQueryFields($attributes, 'insert', true)
+            'INSERT INTO ' . $this->getTable() .
+            App_Db::get()->getQueryFields($values, 'insert', true)
         );
 
-        if ($result && App_Db::get()->getLastInsertedId()) {
-            $this->id = App_Db::get()->getLastInsertedId();
+        if ($result) {
+            $lastId = App_Db::get()->getLastInsertedId();
+            if ($lastId) $this->id = $lastId;
+
+            return true;
         }
 
-        return $result;
+        return false;
     }
 
-    public function update(array $_fields = null)
+    /**
+     * @return boolean
+     */
+    public function update()
     {
-        $fields = empty($_fields)
-                ? App_Db::get()->getQueryFields($this->toArray(), 'update')
-                : App_Db::get()->getQueryFields($_fields, 'update');
+        $attrs = array();
 
-        return App_Db::get()->execute(
+        foreach ($this->_attributes as $attr) {
+            if (!$attr->isPrimary()) {
+                $attrs[$attr->getName()] = $attr->getSqlValue();
+            }
+        }
+
+        return (boolean) App_Db::get()->execute(
             'UPDATE ' . $this->getTable() .
-            $fields .
-            'WHERE ' . $this->getPrimaryKeyStatment()
+            App_Db::get()->getQueryFields($attrs, 'update', true) .
+            'WHERE ' . $this->getPrimaryKeyWhere() .
+            'LIMIT 1'
         );
     }
 
-    public function updateAttribute($_name, $_value = null)
+    /**
+     * @param string $_name
+     * @param string|number $_value
+     * @return boolean
+     */
+    public function updateAttr($_name, $_value = null)
     {
-        if ($this->_attributes[$_name]) {
-            $primary_key_condition = $this->getPrimaryKeyStatment();
-            if (!is_null($_value)) $this->$_name = $_value;
-
-            return App_Db::get()->execute(
-                'UPDATE ' . $this->getTable() .
-                App_Db::get()->getQueryFields(array($this->_attributes[$_name]->getName() => $this->_attributes[$_name]->getSqlValue()), 'update', true) .
-                'WHERE ' . $primary_key_condition
-            );
-
-        } else {
-            return false;
+        if (!is_null($_value)) {
+            $this->$_name = $_value;
         }
+
+        $attrs = array($_name => $this->getAttr($_name)->getSqlValue());
+
+        return (boolean) App_Db::get()->execute(
+            'UPDATE ' . $this->getTable() .
+            App_Db::get()->getQueryFields($attrs, 'update', true) .
+            'WHERE ' . $this->getPrimaryKeyWhere() .
+            'LIMIT 1'
+        );
     }
 
+    /**
+     * @return boolean
+     */
     public function delete()
     {
-        foreach (array_keys($this->_links) as $item) {
-            $this->updateLinks($item);
-        }
-
-        if ($this->getImages()) {
-            foreach (array_keys($this->getImages()) as $item) {
-                if ($this->getIllu($item)) {
-                    $this->getIllu($item)->delete();
-                }
-            }
-
-            if (Ext_File::isDirEmpty($this->getImagePath())) {
-                rmdir($this->getImagePath());
+        if (isset($this->_links)) {
+            foreach (array_keys($this->_links) as $item) {
+                $this->updateLinks($item);
             }
         }
 
-        return App_Db::get()->execute('DELETE FROM ' . $this->getTable() . ' WHERE ' . $this->getPrimaryKeyStatment());
+        if (method_exists($this, 'getFiles')) {
+            foreach ($this->getFiles() as $item) {
+                $item->delete();
+            }
+        }
+
+        return (boolean) App_Db::get()->execute(
+            "DELETE FROM {$this->_table} WHERE " .
+            $this->getPrimaryKeyWhere() .
+            'LIMIT 1'
+        );
     }
 
-    public static function tableInit($_table, $_id = null, $_is_log = false)
+    /**
+     * @return boolean
+     */
+    public static function truncate()
     {
-        $class_name = get_called_class();
-        $obj = new $class_name($_table);
-
-        if ($_is_log) {
-            $log_file = LIBRARIES . Ext_File::computeName(__FILE__) . '.txt';
-            Ext_File::write($log_file, $_table . PHP_EOL . PHP_EOL);
-            Ext_File::write($log_file, 'self::$Base = new App_ActiveRecord(self::TABLE);' . PHP_EOL);
-        }
-
-        $attributes = App_Db::get()->getList('SHOW COLUMNS FROM ' . $_table);
-        foreach ($attributes as $item) {
-            $length = null;
-
-            if ($item['Type'] == 'tinyint(1)') {
-                $type = 'boolean';
-
-            } elseif (preg_match('/^([a-zA-Z]+)\((.+)\)$/', $item['Type'], $match)) {
-                $type = $match[1];
-                $length = $match[2];
-
-            } else {
-                $type = $item['Type'];
-            }
-
-            if ($_is_log) {
-                Ext_File::write($log_file, 'self::$_base->addAttribute(\'' . $item['Field'] . '\', \'' . $type . '\', ' . (($length) ? $length : 'null') . ', ' . ((strpos($item['Key'], 'PRI') !== false) ? 'true' : 'false') . ', ' . ((strpos($item['Key'], 'UNI') !== false) ? 'true' : 'false') . ');' . "\r", 'append');
-            }
-
-            $obj->addAttribute($item['Field'], $type, $length, (strpos($item['Key'], 'PRI') !== false), (strpos($item['Key'], 'UNI') !== false), null);
-        }
-
-        if ($_is_log) {
-            Ext_File::write($log_file, "\r", 'append');
-        }
-
-        if ($_id) {
-            $obj->retrieve($_id);
-        }
-
-        return $obj;
+        return (boolean) App_Db::get()->execute('TRUNCATE ' . self::getTbl());
     }
 
-    public static function getSortAttribute($_tables, $_attributes)
+    /**
+     * @param array $_where
+     * @return boolean
+     */
+    public static function deleteWhere($_where)
     {
-        $try_attributes = array('sort_order', 'title', 'name');
+        return (boolean) App_Db::get()->execute(
+            'DELETE FROM ' . self::getTbl() .
+            ' WHERE ' . implode(' AND ', App_Db::get()->getWhere($_where))
+        );
+    }
 
-        foreach ($try_attributes as $attribute) {
-            if (in_array($attribute, $_attributes)) {
-                return $attribute;
+//     Метод давно не использовался, поэтому его актуальность под вопросом.
+//
+//     public static function tableInit($_table, $_id = null, $_isLog = false)
+//     {
+//         $className = get_called_class();
+//         $obj = new $className($_table);
 
-            } elseif (is_array($_tables)) {
-                foreach ($_tables as $table) {
-                    if (in_array($table . '.' . $attribute, $_attributes)) {
-                        return $table . '.' . $attribute;
-                    }
-                }
+//         if ($_isLog) {
+//             $logFile = LIBRARIES . Ext_File::computeName($className) . '.txt';
+//             Ext_File::write($logFile, $_table . PHP_EOL . PHP_EOL);
+//             Ext_File::write(
+//                 $logFile,
+//                 'self::$Base = new App_ActiveRecord(self::TABLE);' . PHP_EOL
+//             );
+//         }
 
-            } elseif ($_tables && in_array($_tables . '.' . $attribute, $_attributes)) {
-                return $_tables . '.' . $attribute;
+//         $attributes = App_Db::get()->getList("SHOW COLUMNS FROM $_table");
+
+//         foreach ($attributes as $item) {
+//             if ($item['Type'] == 'tinyint(1)') {
+//                 $type = 'boolean';
+
+//             } else if (preg_match(
+//                 '/^([a-zA-Z]+)\((.+)\)$/',
+//                 $item['Type'],
+//                 $match
+//             )) {
+//                 $type = $match[1];
+
+//             } else {
+//                 $type = $item['Type'];
+//             }
+
+//             $method = (strpos($item['Key'], 'PRI') !== false)
+//                     ? 'addPrimaryKey'
+//                     : 'addAttr';
+
+//             if ($_isLog) {
+//                 Ext_File::write(
+//                     $logFile,
+//                     "self::\$_base->$method('{$item['Field']}', '$type');" .
+//                     PHP_EOL
+//                 );
+//             }
+
+//             $obj->$method($item['Field'], $type);
+//         }
+
+//         if ($_id) {
+//             $obj->retrieve($_id);
+//         }
+
+//         return $obj;
+//     }
+
+    /**
+     * @return string|false
+     */
+    public function getSortAttrName()
+    {
+        foreach (array('sort_order', 'title', 'name') as $name) {
+            if ($this->hasAttribute($name)) {
+                return $name;
             }
         }
 
         return false;
     }
 
-    public static function massDelete($_table, $_conditions = null)
+    /**
+     * @param array $_where
+     * @param array $_params
+     * @return array[App_ActiveRecord]
+     */
+    public static function getList($_where = array(), $_params = array())
     {
-        if ($_conditions) {
-            App_Db::get()->execute(
-                'DELETE FROM ' . $_table .
-                ' WHERE ' . implode(' AND ', App_Db::get()->getWhere($_conditions))
-            );
+        $where = array();
+        $row = array();
 
-        } else {
-            App_Db::get()->execute('TRUNCATE ' . $_table);
+        foreach ($_where as $key => $value) {
+            if (Ext_Number::isInteger($key)) $row[] = $value;
+            else                             $where[$key] = $value;
         }
+
+        if ($where) {
+            $row = array_merge(App_Db::get()->getWhere($where), $row);
+        }
+
+        $instance = self::createInstance();
+        $list = array();
+
+        $items = App_Db::get()->getList(App_Db::get()->getSelect(
+            $instance->getTable(),
+            null,
+            $row,
+            empty($_params['order']) ? $instance->getSortAttrName() : $_params['order'],
+            null,
+            empty($_params['limit']) ? null : (int) $_params['limit'],
+            empty($_params['offset']) ? null : (int) $_params['offset']
+        ));
+
+        foreach ($items as $item) {
+            $obj = self::createInstance();
+            $obj->fillWithData($item);
+            $list[(string) $obj->getId()] = $obj;
+        }
+
+        return $list;
     }
 
-    public static function getList($_class, $_tables, $_attributes, $_conditions = array(), $_parameters = array(), $_row = array())
+    /**
+     * @param array $_where
+     * @return integer
+     */
+    public static function getCount($_where = array())
     {
-        $result = array();
-        $tables = (is_array($_tables)) ? implode(', ', $_tables) : $_tables;
+        $where = array();
+        $row = array();
 
-        $sortOrder = isset($_parameters['sort_order'])
-                   ? $_parameters['sort_order']
-                   : self::getSortAttribute($_tables, $_attributes);
-
-        if ($sortOrder) {
-            $sortOrder = ' ORDER BY ' . $sortOrder;
-        }
-
-        $limit = '';
-        if (isset($_parameters['count'])) {
-            $limit .= ' LIMIT ' . (int) $_parameters['count'];
-        }
-
-        if (isset($_parameters['offset'])) {
-            $limit .= ' OFFSET ' . (int) $_parameters['offset'];
-        }
-
-        if ($_row && is_array($_row)) $conditions = $_row;
-        else if ($_row)               $conditions = array($_row);
-        else                          $conditions = array();
-
-        if ($_conditions) {
-            $conditions = array_merge($conditions, App_Db::get()->getWhere($_conditions));
-        }
-
-        $condition = $conditions ? ' WHERE ' . implode(' AND ', $conditions) : '';
-        $list = App_Db::get()->getList('SELECT ' . implode(', ', $_attributes) .
-                                       ' FROM ' . $tables .
-                                       $condition .
-                                       $sortOrder .
-                                       $limit, 'few');
-
-        if ($list) {
-            foreach ($list as $item) {
-                $obj = new $_class;
-                $obj->fillWithData($item);
-
-                if (is_array($obj->getId())) {
-                    $result[] = $obj;
-
-                } else {
-                    $result[$obj->getId()] = $obj;
-                }
+        foreach ($_where as $key => $value) {
+            if (Ext_Number::isInteger($key)) {
+                $row[] = $value;
+            } else {
+                $where[$key] = $value;
             }
         }
 
-        return $result;
-    }
-
-    public static function isUnique($_class, $_table, $_pk, $_attribute, $_value, $_exclude = null)
-    {
-        return !(self::getList(
-            $_class,
-            $_table,
-            array($_pk),
-            array($_attribute => $_value),
-            array('count' => 1),
-            is_null($_exclude) ? null : array($_pk . ' != ' . App_Db::escape($_exclude))
-        ));
-    }
-
-    public static function getCount($_class, $_tables, $_conditions = array(), $_row_conditions = array())
-    {
-        $class_obj = new $_class;
-        $tables = (is_array($_tables)) ? implode(', ', $_tables) : $_tables;
-
-        if ($_row_conditions && is_array($_row_conditions)) {
-            $conditions = $_row_conditions;
-        } elseif ($_row_conditions) {
-            $conditions = array($_row_conditions);
-        } else {
-            $conditions = array();
+        if ($where) {
+            $row = array_merge(App_Db::get()->getWhere($where), $row);
         }
 
-        if ($_conditions) {
-            $conditions = array_merge($conditions, self::getQueryCondition($_conditions));
-        }
+        $condition = $row ? ' WHERE ' . implode(' AND ', $row) : '';
+        $result = App_Db::get()->getEntry("
+            SELECT COUNT(1) AS `cnt` FROM {self::getTbl()} $condition
+        ");
 
-        $condition = ($conditions) ? ' WHERE ' . implode(' AND ', $conditions) : '';
-        $result = App_Db::get()->getEntry('SELECT COUNT(' . $class_obj->getPrimary(true) . ') AS count FROM ' . $tables . $condition);
-
-        return ($result) ? (int) $result['count'] : 0;
+        return $result ? (int) $result['cnt'] : 0;
     }
 
+    /**
+     * @param string $_attr
+     * @param string $_value
+     * @param string|array $_excludeId
+     * @return boolean
+     */
+    public static function isUnique($_attr, $_value, $_excludeId = null)
+    {
+        $where = array($_attr => $_value);
+
+        if ($_excludeId) {
+            $where = array_merge(
+                $where,
+                App_Db::get()->getWhereNot(array(
+                    $this->getPrimaryKeyName() => $_excludeId
+                ))
+            );
+        }
+
+        return count(self::getList($where, array('limit' => 1))) == 0;
+    }
+
+    /**
+     * @param string $_name
+     * @param array $_value
+     */
     public function updateLinks($_name, $_value = null)
     {
         if ($this->getLinks($_name)) {
@@ -625,183 +839,93 @@ abstract class Core_ActiveRecord
             $this->setLinks($_name);
         }
 
-        if (!is_null($_value)) {
+        if (!empty($_value)) {
             $this->setLinks($_name, $_value);
 
-            if ($this->getLinks($_name)) {
-                foreach ($this->getLinks($_name) as $item) {
-                    $item->create();
-                }
+            foreach ($this->getLinks($_name) as $item) {
+                $item->create();
             }
         }
     }
 
-    public function getXml($_type = null, $_node_name = null, $_append_xml = null, $_append_attributes = null)
+    public function getLinks($_name, $_isPublished = null)
     {
-        $node_name = ($_node_name) ? $_node_name : 'item';
-        $result = '';
+        if (!isset($this->_links[$_name])) {
+            if (isset($this->_linkParams[$_name])) {
+                $class = $this->_linkParams[$_name];
+                $where = array($this->getPrimaryKeyWhere());
 
-        switch ($_type) {
-            case 'list':
-                $result .= '<' . $node_name . ' id="' . $this->getId() . '"';
-
-                if ($_append_attributes) {
-                    foreach ($_append_attributes as $name => $value) {
-                        $result .= ' ' . $name . '="' . $value . '"';
-                    }
+                if (!is_null($_isPublished)) {
+                    $where['is_published'] = (boolean) $_isPublished ? 1 : 0;
                 }
 
-                $result .= '>';
+                $this->_links[$_name] = $class::getList($where);
 
-                if ($_append_xml) {
-                    $result .= '<title><![CDATA[' . $this->getTitle() . ']]></title>';
+            } else {
+                $this->_links[$_name] = array();
+            }
+        }
 
-                    if (is_array($_append_xml)) {
-                        foreach ($_append_xml as $key => $value) {
-                            $result .= preg_match('/^[a-z_]+$/', $key)
-                                ? "<{$key}><![CDATA[{$value}]]></{$key}>"
-                                : '<item key="' . $key . '"><![CDATA[' . $value . ']]></item>';
-                        }
-                    } else {
-                        $result .= $_append_xml;
-                    }
+        return $this->_links[$_name];
+    }
 
-                } else {
-                    $result .= '<![CDATA[' . $this->getTitle() . ']]>';
-                }
+    public function getLinkIds($_name, $_isPublished = null)
+    {
+        $result = array();
 
-                $result .= '</' . $node_name . '>';
-                break;
+        if (isset($this->_linkParams[$_name])) {
+            $class = $this->_linkParams[$_name];
 
-            case 'simple':
-            default:
-                $result .= '<' . $node_name . ' id="' . $this->getId() . '"';
+            $keys = array(
+                $class::getFirstForeignPri(),
+                $class::getSecondForeignPri()
+            );
 
-                if ($_append_attributes) {
-                    foreach ($_append_attributes as $name => $value) {
-                        $result .= ' ' . $name . '="' . $value . '"';
-                    }
-                }
+            $key = $this->getPrimaryKeyName() == $keys[0]
+                 ? $keys[1]
+                 : $keys[0];
 
-                $result .= '>';
-
-                if ($this->getTitle() != '_без названия') {
-                    $result .= '<title><![CDATA[' . $this->getTitle() . ']]></title>';
-                }
-
-                if ($_append_xml) {
-                    if (is_array($_append_xml)) {
-                        foreach ($_append_xml as $key => $value) {
-                            $result .= preg_match('/^[a-z_]+$/', $key)
-                                ? "<{$key}><![CDATA[{$value}]]></{$key}>"
-                                : '<item key="' . $key . '"><![CDATA[' . $value . ']]></item>';
-                        }
-                    } else {
-                        $result .= $_append_xml;
-                    }
-                }
-
-                $result .= '</' . $node_name . '>';
-                break;
+            foreach ($this->getLinks($_name, $_isPublished) as $item) {
+                $result[] = $item->$key;
+            }
         }
 
         return $result;
     }
 
-    public function getFiles()
+    public function setLinks($_name, $_values = null)
     {
-        if (property_exists($this, '_files')) {
-            if (is_null($this->_files)) {
-                $this->_files = array();
+        $this->_links[$_name] = array();
 
-                if (
-                    method_exists($this, 'getFilePath') &&
-                    $this->getFilePath() &&
-                    is_dir($this->getFilePath())
-                ) {
-                    $handle = opendir($this->getFilePath());
+        if (!empty($_values) && isset($this->_linkParams[$_name])) {
+            $values = is_array($_values) ? $_values : array($_values);
+            $class = $this->_linkParams[$_name];
 
-                    while (false !== $item = readdir($handle)) {
-                        $filePath = $this->getFilePath() . '/' . $item;
+            $keys = array(
+                $class::getFirstForeignPri(),
+                $class::getSecondForeignPri()
+            );
 
-                        if ($item{0} != '.' && is_file($filePath)) {
-                            $file = App_File::factory($filePath);
+            $pri = $this->getPrimaryKeyName();
+            $key = $pri == $keys[0] ? $keys[1] : $keys[0];
 
-                            $this->_files[
-                                Ext_String::toLower($file->getFileName())
-                            ] = $file;
-                        }
+            foreach ($values as $id => $item) {
+                $obj = new $class;
+                $obj->$pri = $this->id;
+
+                if (is_array($item)) {
+                    $obj->$key = $id;
+
+                    foreach ($item as $attribute => $value) {
+                        $obj->$attribute = $value;
                     }
 
-                    closedir($handle);
+                } else {
+                    $obj->$key = $item;
                 }
+
+                $this->_links[$_name][] = $obj;
             }
-
-            return $this->_files;
-        }
-
-        return array();
-    }
-
-    public function getImages()
-    {
-        if (property_exists($this, '_images')) {
-            if (is_null($this->_images)) {
-                $this->_images = array();
-
-                foreach ($this->getFiles() as $key => $file) {
-                    if ($file->isImage()) {
-                        $this->_images[$key] = $file;
-                    }
-                }
-            }
-
-            return $this->_images;
-        }
-
-        return array();
-    }
-
-    public function getIllu($filename)
-    {
-        $files = $this->getImages();
-        return 0 < count($files) && isset($files[$filename])
-            ? $files[$filename]
-            : false;
-    }
-
-    public function getIlluByName($name)
-    {
-        foreach ($this->getImages() as $file) {
-            if ($name == $file->getName() || $name == $file->getFileName()) {
-                return $file;
-            }
-        }
-        return false;
-    }
-
-    public function getFile($filename)
-    {
-        $files = $this->getFiles();
-        return 0 < count($files) && isset($files[$filename])
-            ? $files[$filename]
-            : false;
-    }
-
-    public function getFileByName($name)
-    {
-        foreach ($this->getFiles() as $file) {
-            if ($name == $file->getName() || $name == $file->getFileName()) {
-                return $file;
-            }
-        }
-        return false;
-    }
-
-    public function cleanFileCache()
-    {
-        foreach ($this->getFiles() as $file) {
-            Ext_File_Cache::delete($file->getPath());
         }
     }
 }

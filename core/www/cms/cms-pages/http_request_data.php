@@ -4,7 +4,7 @@ require('../prepend.php');
 
 $page = new App_Cms_Page();
 $page->SetRootNodeName('http_request');
-$page->SetRootNodeAttribute('type', 'document_data');
+$page->SetRootNodeAttribute('type', 'Data');
 $page->SetTemplate(TEMPLATES . 'bo_http_requests.xsl');
 
 $data = $_POST;
@@ -20,9 +20,9 @@ $page->Output();
 
 function get_branch_xml($_parent_id) {
 	$result = '';
-	$document = App_Cms_Document::Load($_parent_id);
+	$document = App_Cms_Front_Document::Load($_parent_id);
 
-	foreach (App_Cms_Document_Data::GetList(array(App_Cms_Document::GetPri() => $_parent_id)) as $item) {
+	foreach (App_Cms_Front_Data::GetList(array(App_Cms_Front_Document::GetPri() => $_parent_id)) as $item) {
 		$additional_xml = '';
 
 		switch ($item->GetTypeId()) {

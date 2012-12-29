@@ -60,13 +60,15 @@ td#logo
 	white-space: nowrap;
 }
 
-#user_info
+#user-info
 {
 	float: right;
-	margin: 0 0 5px 20px;
+	margin: 0 0 20px 20px;
 	font-size: 0.7em;
-	border: 1px solid #ccc;
+/*
+    border: 1px solid #ccc;
 	padding: 1em 0.7em;
+*/
 }
 
 div.workmate-warning

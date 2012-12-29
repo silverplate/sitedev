@@ -768,7 +768,7 @@ abstract class Core_ActiveRecord
         foreach ($items as $item) {
             $obj = self::createInstance();
             $obj->fillWithData($item);
-            $list[(string) $obj->getId()] = $obj;
+            $list[is_array($obj->getId()) ? implode('-', $obj->getId()) : $obj->getId()] = $obj;
         }
 
         return $list;

@@ -17,7 +17,6 @@ abstract class Core_Cms_Back_Page extends App_Cms_Page
         }
 
         $this->addSystem($this->_getUserNavigationXml());
-        $this->addContent($this->_getUserSectionsXml());
     }
 
     public function isAuthorized()
@@ -44,30 +43,10 @@ abstract class Core_Cms_Back_Page extends App_Cms_Page
 
         if (!empty($g_user)) {
             foreach ($g_user->getSections() as $item) {
-                $xml .= $item->getXml();
+                $xml .= $item->getNavigationXml();
             }
 
             $xml = Ext_Xml::notEmptyNode('navigation', $xml);
-        }
-
-        return $xml;
-    }
-
-    protected function _getUserSectionsXml()
-    {
-        global $g_user;
-
-        $xml = '';
-
-        if (!empty($g_user)) {
-            foreach ($g_user->getSections() as $key => $section) {
-                $xml .= $section->getXml(
-                    null,
-                    Ext_Xml::notEmptyCdata('description', $section->description)
-                );
-            }
-
-            $xml = Ext_Xml::notEmptyNode('cms-sections', $xml);
         }
 
         return $xml;

@@ -57,6 +57,19 @@ abstract class Core_Cms_Page
         }
     }
 
+    public function getUrlXml()
+    {
+        $url = $this->_url;
+        unset($url['request_uri']);
+
+        return Ext_Xml::cdata('url', $this->_url['request_uri'], $url);
+    }
+
+    public function getUrl($_name = null)
+    {
+        return $_name ? $this->_url[$_name] : $this->_url;
+    }
+
     public function addSystem($_source)
     {
         if ($_source) {
@@ -125,14 +138,6 @@ abstract class Core_Cms_Page
             $xml,
             $this->_rootAttrs
         );
-    }
-
-    public function getUrlXml()
-    {
-        $url = $this->_url;
-        unset($url['request_uri']);
-
-        return Ext_Xml::cdata('url', $this->_url['request_uri'], $url);
     }
 
     public function getHtml()

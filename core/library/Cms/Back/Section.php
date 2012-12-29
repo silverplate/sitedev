@@ -51,6 +51,9 @@ abstract class Core_Cms_Back_Section extends App_Model
         $attrs = $_attrs;
         $attrs['uri'] = $this->getUri();
 
-        return parent::getXml(null, $_xml, $attrs);
+        $xml = $_xml;
+        Ext_Xml::append($xml, Ext_Xml::notEmptyCdata('description', $this->description));
+
+        return parent::getXml(null, $xml, $attrs);
     }
 }

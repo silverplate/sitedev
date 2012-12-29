@@ -6,7 +6,7 @@ extends App_Cms_Front_Document_Controller_Common
     public function execute()
     {
         parent::execute();
-        $this->setRootNodeName('page-not-found');
+        $this->setRootName('page-not-found');
     }
 
     public function output()

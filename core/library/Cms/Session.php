@@ -49,7 +49,7 @@ abstract class Core_Cms_Session
     protected function _init()
     {
         $http_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
-        $session = App_Db::Get()->GetEntry('
+        $session = App_Db::get()->getEntry('
             SELECT
                 is_logged_in,
                 user_id
@@ -69,7 +69,7 @@ abstract class Core_Cms_Session
         ');
 
         if ($session) {
-            foreach (App_Db::Get()->GetList('SELECT name, value FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId())) as $item) {
+            foreach (App_Db::get()->getList('SELECT name, value FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId())) as $item) {
                 $this->_params[$item['name']] = unserialize($item['value']);
             }
 
@@ -79,7 +79,7 @@ abstract class Core_Cms_Session
             self::_destroy();
             self::clean();
 
-            App_Db::Get()->Execute('INSERT INTO ' . self::PREFIX . 'session' . App_Db::Get()->GetQueryFields(array(
+            App_Db::get()->execute('INSERT INTO ' . self::PREFIX . 'session' . App_Db::get()->getQueryFields(array(
                 self::PREFIX . 'session_id' => App_Db::escape(self::getId()),
                 'is_ip_match' => 0,
                 'is_logged_in' => 0,
@@ -133,7 +133,7 @@ abstract class Core_Cms_Session
     public static function getId()
     {
         if (!isset($_COOKIE[self::get()->getCookieName()]) || !$_COOKIE[self::get()->getCookieName()]) {
-            self::_setId(App_Db::Get()->GetUnique(self::PREFIX . 'session', self::PREFIX . 'session_id', 30));
+            self::_setId(App_Db::get()->getUnique(self::PREFIX . 'session', self::PREFIX . 'session_id', 30));
         }
 
         return $_COOKIE[self::get()->getCookieName()];
@@ -142,7 +142,7 @@ abstract class Core_Cms_Session
     private static function _setId($_id, $_expires = null)
     {
         $_COOKIE[self::get()->getCookieName()] = $_id;
-        setcookie(self::get()->getCookieName(), $_id, $_expires, self::get()->GetCookiePath());
+        setcookie(self::get()->getCookieName(), $_id, $_expires, self::get()->getCookiePath());
     }
 
     public function isLoggedIn()
@@ -165,7 +165,7 @@ abstract class Core_Cms_Session
         $this->_userId = $_userId;
         self::_setId(self::getId(), $_validDate ? $_validDate : null);
 
-        App_Db::Get()->Execute('UPDATE ' . self::PREFIX . 'session' . App_Db::Get()->GetQueryFields(array(
+        App_Db::get()->execute('UPDATE ' . self::PREFIX . 'session' . App_Db::get()->getQueryFields(array(
             'is_ip_match' => ($_isIpMatch) ? 1 : 0,
             'is_logged_in' => 1,
             'user_id' => App_Db::escape($_userId),
@@ -180,7 +180,7 @@ abstract class Core_Cms_Session
         $this->_isLoggedIn = false;
         $this->_userId = '';
 
-        App_Db::Get()->Execute('UPDATE ' . self::PREFIX . 'session' . App_Db::Get()->GetQueryFields(array(
+        App_Db::get()->execute('UPDATE ' . self::PREFIX . 'session' . App_Db::get()->getQueryFields(array(
             'is_logged_in' => 0,
             'user_id' => '\'\'',
             'valid_date' => 'NULL'
@@ -189,7 +189,7 @@ abstract class Core_Cms_Session
 
     private function impress()
     {
-        App_Db::Get()->Execute('UPDATE ' . self::PREFIX . 'session' . App_Db::Get()->GetQueryFields(array('last_impression_date' => 'NOW()'), 'update', true) . 'WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId()));
+        App_Db::get()->execute('UPDATE ' . self::PREFIX . 'session' . App_Db::get()->getQueryFields(array('last_impression_date' => 'NOW()'), 'update', true) . 'WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId()));
     }
 
     private function _initParam($_name, $_value)
@@ -199,7 +199,7 @@ abstract class Core_Cms_Session
 
     public function deleteParam($_name)
     {
-        App_Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId()) . ' AND name = ' . App_Db::escape($_name));
+        App_Db::get()->execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId()) . ' AND name = ' . App_Db::escape($_name));
         unset($this->_params[$_name]);
     }
 
@@ -207,7 +207,7 @@ abstract class Core_Cms_Session
     {
         self::deleteParam($_name);
 
-        App_Db::Get()->Execute('INSERT INTO ' . self::PREFIX . 'session_param' . App_Db::Get()->GetQueryFields(array(
+        App_Db::get()->execute('INSERT INTO ' . self::PREFIX . 'session_param' . App_Db::get()->getQueryFields(array(
             self::PREFIX . 'session_id' => self::getId(),
             'name' => $_name,
             'value' => serialize($_value)
@@ -219,7 +219,7 @@ abstract class Core_Cms_Session
     public function getParam($_name)
     {
         if (!isset($this->_params[$_name])) {
-            $param = App_Db::Get()->GetEntry('SELECT value FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId()) . ' AND name = ' . App_Db::escape($_name));
+            $param = App_Db::get()->getEntry('SELECT value FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId()) . ' AND name = ' . App_Db::escape($_name));
             $this->_params[$_name] = $param ? unserialize($param['value']) : null;
         }
 
@@ -228,13 +228,13 @@ abstract class Core_Cms_Session
 
     private function _destroy()
     {
-        App_Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId()));
-        App_Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId()));
+        App_Db::get()->execute('DELETE FROM ' . self::PREFIX . 'session WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId()));
+        App_Db::get()->execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id = ' . App_Db::escape(self::getId()));
     }
 
     public static function clean($_userId = null)
     {
-        App_Db::Get()->Execute('
+        App_Db::get()->execute('
             DELETE FROM
                 ' . self::PREFIX . 'session
             WHERE
@@ -245,43 +245,38 @@ abstract class Core_Cms_Session
                 (timeout > 0 AND (ISNULL(last_impression_date) OR DATE_ADD(last_impression_date, INTERVAL timeout MINUTE) < NOW()))
         ');
 
-        App_Db::Get()->Execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id NOT IN (SELECT ' . self::PREFIX . 'session_id FROM ' . self::PREFIX . 'session)');
+        App_Db::get()->execute('DELETE FROM ' . self::PREFIX . 'session_param WHERE ' . self::PREFIX . 'session_id NOT IN (SELECT ' . self::PREFIX . 'session_id FROM ' . self::PREFIX . 'session)');
     }
 
     public function getXml($_node = null, $_xml = null)
     {
-        $node_name = ($_node) ? $_node : 'session';
-        $result = '<' . $node_name . ' id="' . self::getId() . '"';
+        $attrs = array('id' => self::getId());
 
-        foreach (array(self::ACT_PARAM) as $item) {
-            if ($this->getParam($item)) {
-                $result .= ' ' . $item . '="' . $this->getParam($item) . '"';
-            }
+        if ($this->getParam(self::ACT_PARAM)) {
+            $attrs[self::ACT_PARAM] = $this->getParam(self::ACT_PARAM);
         }
 
-        return $result . '>' . $_xml . '</' . $node_name . '>';
+        return Ext_Xml::node($_node ? $_node : 'session', $_xml, $attrs);
     }
 
     public function getWorkmateXml()
     {
-        $result = '';
+        $xml = '';
 
-        $workmates = $this->getWorkmates();
-        if ($workmates) {
-            $result .= '<workmates>';
-            foreach ($workmates as $item) {
-                $result .= '<user><![CDATA[' . (isset($item['title']) ? $item['title'] : $item['login']) . ']]></user>';
-            }
-            $result .= '</workmates>';
+        foreach ($this->getWorkmates() as $item) {
+            Ext_Xml::append($xml, Ext_Xml::cdata(
+                'back-user',
+                empty($item['title']) ? $item['login'] : $item['title']
+            ));
         }
 
-        return $result;
+        return Ext_Xml::notEmptyNode('workmates', $xml);
     }
 
     public function getWorkmates()
     {
         if ($this->isLoggedIn()) {
-            $workmates = App_Db::Get()->GetList('
+            return App_Db::get()->getList('
                 SELECT
                     u.title,
                     u.login
@@ -296,6 +291,6 @@ abstract class Core_Cms_Session
             ');
         }
 
-        return isset($workmates) && $workmates ? $workmates : false;
+        return array();
     }
 }

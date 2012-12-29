@@ -51,7 +51,7 @@ abstract class Core_Cms_Back_User extends App_Model
     public function getSections($_isPublished = true)
     {
         return App_Cms_Back_Section::getList(array(
-            'is_published' => 1,
+            'is_published' => $_isPublished,
             App_Cms_Back_Section::getPri() => $this->getLinkIds('sections', $_isPublished)
         ));
     }

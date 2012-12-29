@@ -1,24 +1,13 @@
 <?php
 
-require('prepend.php');
+require 'prepend.php';
 
 $page = new App_Cms_Back_Page();
-$page->SetTitle('Система управления');
+$page->setTitle('Система управления');
 
-if ($page->IsAllowed()) {
-    /**
-     * @todo Почему закомментировано?
-     */
-// 	$sections_xml = '';
-
-// 	foreach ($g_user->GetSections() as $item) {
-// 		$append_xml = $item->description
-// 			? '<description><![CDATA[' . $item->description . ']]></description>'
-// 			: '';
-// 		$sections_xml .= $item->GetXml('bo_navigation', 'item', $append_xml);
-// 	}
-
-// 	$page->AddContent('<cms_sections>' . $sections_xml . '</cms_sections>');
+if ($page->isAllowed()) {
+    $page->setTemplate(TEMPLATES . 'back/home.xsl');
+    $page->addContent('<sections-on-home-page />');
 }
 
-$page->Output();
+$page->output();

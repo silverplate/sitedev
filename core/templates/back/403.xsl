@@ -10,9 +10,6 @@
 	<xsl:template match="page">
 		<html>
 			<head>
-				<!--link href="/favicon.ico" type="image/x-icon" rel="shortcut icon" />
-				<link href="/favicon.ico" type="image/x-icon" rel="icon" /-->
-
 				<title>
 					<xsl:if test="url/@path != '/cms/'">
 						<xsl:call-template name="get-page-title" />
@@ -29,7 +26,7 @@
 				<link href="/cms/f/css/forms.css" type="text/css" rel="stylesheet" />
 				<link href="/cms/f/css/403.css" type="text/css" rel="stylesheet" />
 
-				<script src="/cms/f/js/403.js" type="text/javascript" language="JavaScript"></script>
+				<script src="/cms/f/js/403.js" type="text/javascript" />
 			</head>
 			<body>
 				<xsl:attribute name="onload">
@@ -44,7 +41,7 @@
 				<table width="100%" height="100%">
 					<tr>
 						<td height="99%" valign="top">
-							<xsl:call-template name="page-navigation" />
+							<xsl:apply-templates select="system" mode="navigation" />
 
 							<form action="{/node()/url}" method="post">
 								<table class="auth-form">

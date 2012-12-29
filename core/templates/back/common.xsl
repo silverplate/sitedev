@@ -2,172 +2,6 @@
 <!DOCTYPE xsl:stylesheet SYSTEM "../entities.dtd">
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-	<xsl:template name="page-navigation">
-		<table width="100%">
-			<tr>
-				<td id="logo"><a href="/"><xsl:value-of select="/node()/system/title/text()" disable-output-escaping="yes" /></a></td>
-
-				<td id="navigation">
-					<xsl:apply-templates select="/node()/system/user" />
-					<!--xsl:call-template name="navigation-item">
-						<xsl:with-param name="uri">/cms/</xsl:with-param>
-						<xsl:with-param name="title">Система управления</xsl:with-param>
-						</xsl:call-template-->
-
-					<xsl:for-each select="/node()/content/cms-sections/item">
-                        <xsl:call-template name="navigation-item">
-                            <xsl:with-param name="uri" select="@uri" />
-                            <xsl:with-param name="title" select="title/text()" />
-                        </xsl:call-template>
-					</xsl:for-each>
-				</td>
-			</tr>
-		</table>
-	</xsl:template>
-
-	<xsl:template match="user">
-		<div id="user_info">
-			<xsl:value-of select="title" /><br />
-			<xsl:apply-templates select="/node()/system/session/workmates[user]" />
-			<a href="./?e">Выйти</a>
-		</div>
-	</xsl:template>
-
-	<xsl:template match="workmates[user]">
-		<div class="workmate-warning">
-			<xsl:choose>
-				<xsl:when test="count(user) = 1">
-					<xsl:text>Вместе с&nbsp;вами работает</xsl:text><br />
-					<xsl:text>пользователь </xsl:text>
-					<xsl:value-of select="user/text()" />
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:text>Вместе с&nbsp;вами работают</xsl:text><br />
-					<xsl:text>другие пользователи (</xsl:text>
-					<xsl:for-each select="user">
-						<xsl:value-of select="text()" />
-						<xsl:if test="position() != last()">, </xsl:if>
-					</xsl:for-each>
-					<xsl:text>)</xsl:text>
-				</xsl:otherwise>
-			</xsl:choose>
-			<xsl:text>.</xsl:text>
-			<!--xsl:text>. Убедитесь, что&nbsp;вы&nbsp;не&nbsp;радактируете один и&nbsp;тот&nbsp;же материал.</xsl:text-->
-		</div>
-	</xsl:template>
-
-	<xsl:template name="navigation-item">
-		<xsl:param name="uri" />
-		<xsl:param name="title" />
-
-		<div>
-			<xsl:attribute name="class">
-				<xsl:text>nav-item</xsl:text>
-				<xsl:if test="starts-with(/node()/url/text(), $uri) and ($uri != '/cms/' or /node()/url/text() = '/cms/')"> selected</xsl:if>
-			</xsl:attribute>
-			<xsl:choose>
-				<xsl:when test="$uri = /node()/url/text()">
-					<xsl:value-of select="$title" disable-output-escaping="yes" />
-				</xsl:when>
-				<xsl:otherwise>
-					<a href="{$uri}"><xsl:value-of select="$title" disable-output-escaping="yes" /></a>
-				</xsl:otherwise>
-			</xsl:choose>
-		</div>
-	</xsl:template>
-
-<!--
-	<xsl:template match="group" mode="navigation-group">
-		<div id="group_{@id}" style="display:none">
-			<xsl:if test="item[@selected]">
-				<xsl:attribute name="style">display: block</xsl:attribute>
-			</xsl:if>
-			<div class="group-item">
-				<a href="" onclick="$('navigation_groups').show(); $('group_{@id}').hide(); return false;">&laquo; Назад</a>
-			</div>
-			<xsl:for-each select="item">
-				<xsl:call-template name="navigation-item">
-					<xsl:with-param name="uri" select="@uri" />
-					<xsl:with-param name="title" select="title/text()" />
-				</xsl:call-template>
-			</xsl:for-each>
-		</div>
-	</xsl:template>
- -->
-
-	<xsl:template name="page-footer">
-		<div id="footer">
-			<a href="mailto:support@sitedev.ru">@ Система управления сайтом</a>
-			<xsl:text>, 2007</xsl:text>
-			<xsl:for-each select="/node()/system/title">
-				<xsl:text> &middot; </xsl:text>
-				<xsl:value-of select="text()" disable-output-escaping="yes" />
-			</xsl:for-each>
-
-			<xsl:text> &middot; &copy; </xsl:text>
-
-			<xsl:call-template name="get-date-period">
-                <xsl:with-param name="start-year">2007</xsl:with-param>
-            </xsl:call-template>
-		</div>
-	</xsl:template>
-
-	<xsl:template match="cms-sections">
-		<table class="cms-sections">
-			<xsl:choose>
-				<xsl:when test="group">
-					<xsl:apply-templates select="group" mode="cms-section" />
-					<xsl:if test="item">
-						<tr class="last">
-							<td colspan="2" class="last">
-								<h3>&mdash;</h3>
-							</td>
-						</tr>
-						<xsl:apply-templates select="item[position() mod 2 = 1]" mode="cms-section-list" />
-					</xsl:if>
-				</xsl:when>
-				<xsl:when test="item">
-					<xsl:apply-templates select="item[position() mod 2 = 1]" mode="cms-section-list" />
-				</xsl:when>
-			</xsl:choose>
-		</table>
-	</xsl:template>
-
-	<xsl:template match="group" mode="cms-section">
-		<xsl:if test="item">
-			<tr class="last">
-				<td colspan="2" class="last">
-					<h3>
-						<xsl:if test="position() = 1">
-							<xsl:attribute name="class">first</xsl:attribute>
-						</xsl:if>
-						<xsl:value-of disable-output-escaping="yes" select="title" />
-					</h3>
-				</td>
-			</tr>
-			<xsl:apply-templates select="item[position() mod 2 = 1]" mode="cms-section-list" />
-		</xsl:if>
-	</xsl:template>
-
-	<xsl:template match="item" mode="cms-section-list">
-		<tr>
-			<xsl:if test="position() = last()">
-				<xsl:attribute name="class">last</xsl:attribute>
-			</xsl:if>
-			<xsl:apply-templates select="self::node()|following-sibling::node()[1]" mode="cms-section" />
-		</tr>
-	</xsl:template>
-
-	<xsl:template match="item" mode="cms-section">
-		<td>
-			<xsl:if test="position() = last() and position() != 1">
-				<xsl:attribute name="class">last</xsl:attribute>
-			</xsl:if>
-			<a href="{@uri}" class="title"><xsl:value-of select="title/text()" disable-output-escaping="yes" /></a>
-			<div class="description"><xsl:value-of select="description/text()" disable-output-escaping="yes" /></div>
-		</td>
-	</xsl:template>
-
 	<xsl:template name="module-add-element-link">
 		<xsl:param name="label">Добавить</xsl:param>
 		<xsl:param name="uri">./?NEW</xsl:param>
@@ -423,4 +257,98 @@
 
 		<a href="http://{$url}"><xsl:value-of select="$url" /></a>
 	</xsl:template>
+
+
+    <!--
+    Navigation
+    -->
+
+    <xsl:template match="system" mode="navigation">
+        <table width="100%">
+            <tr>
+                <td id="logo">
+                    <a href="/">
+                        <xsl:value-of select="title" disable-output-escaping="yes" />
+                    </a>
+                </td>
+
+                <td id="navigation">
+                    <xsl:apply-templates select="back-user" mode="navigation" />
+                    <xsl:apply-templates select="navigation/back-section" mode="navigation" />
+                </td>
+            </tr>
+        </table>
+    </xsl:template>
+
+    <xsl:template match="navigation/back-section" mode="navigation">
+        <div class="nav-item">
+            <a href="{@uri}">
+                <xsl:value-of select="title" disable-output-escaping="yes" />
+            </a>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="navigation/back-section[
+        starts-with(/node()/url, @uri) and
+        (@uri != '/cms/' or /node()/url != '/cms/')
+    ]" mode="navigation">
+        <div class="nav-item selected">
+            <a href="{@uri}">
+                <xsl:value-of select="title" disable-output-escaping="yes" />
+            </a>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="navigation/back-section[@uri = /node()/url]" mode="navigation">
+        <div class="nav-item selected">
+            <xsl:value-of select="title" disable-output-escaping="yes" />
+        </div>
+    </xsl:template>
+
+    <xsl:template match="back-user" mode="navigation">
+        <div id="user-info">
+            <!-- <xsl:value-of select="title" /><br /> -->
+            <xsl:apply-templates select="../session/workmates[back-user]" />
+
+            <a href="./?e">Выйти</a>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="workmates">
+        <div class="workmate-warning">
+            <xsl:choose>
+                <xsl:when test="count(back-user) = 1">
+                    <xsl:text>Вместе с&nbsp;вами работает</xsl:text><br />
+                    <xsl:text>пользователь </xsl:text>
+                    <xsl:value-of select="back-user" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:text>Вместе с&nbsp;вами работают</xsl:text><br />
+                    <xsl:text>другие пользователи (</xsl:text>
+
+                    <xsl:for-each select="back-user">
+                        <xsl:value-of select="text()" />
+                        <xsl:if test="position() != last()">, </xsl:if>
+                    </xsl:for-each>
+
+                    <xsl:text>)</xsl:text>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:text>.</xsl:text>
+        </div>
+    </xsl:template>
+
+
+    <!--
+    Footer
+    -->
+    <xsl:template name="page-footer">
+        <div id="footer">
+            <a href="http://sitedev.ru">Система управления сайтом</a>
+
+            <xsl:text> с 2007 &bull; </xsl:text>
+
+            <a href="mailto:support@sitedev.ru">support@sitedev.ru</a>
+        </div>
+    </xsl:template>
 </xsl:stylesheet>

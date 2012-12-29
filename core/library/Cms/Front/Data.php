@@ -137,16 +137,63 @@ abstract class Core_Cms_Front_Data extends App_Model
         return $this->getController() ? $this->getController()->getFilename() : false;
     }
 
-    public static function initController($_controller, &$_documentData, &$_document)
+    /**
+     * @param App_Cms_Front_Controller $_controller
+     * @param App_Cms_Front_Data $_data
+     * @param App_Cms_Front_Document $_document
+     * @return App_Cms_Front_Data_Controller
+     */
+    public static function initController($_controller, $_data, $_document)
     {
         require_once $_controller->getFilename();
 
         $class = $_controller->getClassName();
+        return new $class($_data, $_document);
+    }
 
-        if (class_exists($class)) {
-            return new $class($_documentData, $_document);
+    /**
+     * @param App_Model $_parent
+     * @return array|false
+     */
+    public function proceedContent(App_Model $_parent)
+    {
+        switch ($this->getTypeId()) {
+            case 'image': return $this->proceedImage();
+            case 'xml':   return $this->proceedXml($_parent);
         }
 
         return false;
+    }
+
+    /**
+     * @return array
+     */
+    public function proceedImage()
+    {
+        if (strpos($this->content, '://') !== true) {
+            $path = DOCUMENT_ROOT . ltrim($this->content, '/');
+
+            if (is_file($path)) {
+                $file = App_Image::factory($path);
+
+                if ($file) {
+                    return array('type' => 'xml', 'content' => $file->getXml());
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param App_Model $_parent
+     * @return array
+     */
+    public function proceedXml(App_Model $_parent)
+    {
+        return array('content' => Core_Cms_Ext_Xml::applyFiles(
+            $this->content,
+            $_parent->getFiles()
+        ));
     }
 }

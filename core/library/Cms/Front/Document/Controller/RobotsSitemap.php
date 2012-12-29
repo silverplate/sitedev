@@ -11,33 +11,34 @@ abstract class Core_Cms_Front_Document_Controller_RobotsSitemap extends App_Cms_
     public function execute()
     {
         parent::execute();
-        $this->setTemplate(TEMPLATES . 'robots_sitemap.xsl');
 
+        $this->setTemplate(TEMPLATES . 'robots-sitemap.xsl');
         $type = App_Cms_Front_Navigation::load('robots-sitemap', 'name');
+
         if ($type && $type->isPublished) {
             $documents = App_Cms_Front_Navigation::getDocuments($type->name);
             $controllers = array();
-            $controllerKey = App_Cms_Front_Controller::getPri();
             $sitemap = array();
             $sitemapXml = '';
 
-            foreach ($documents as $document) {
-                $sitemap[] = self::getSitemapItemFromDocument($document);
+            foreach ($documents as $doc) {
+                $sitemap[] = self::_getSitemapItemFromDocument($doc);
 
-                if ($document->$controllerKey) {
-                    if (!isset($controllers[$document->$controllerKey])) {
-                        $controllers[$document->$controllerKey] = $document->getController();
+                if ($doc->frontControllerId) {
+                    if (!isset($controllers[$doc->frontControllerId])) {
+                        $controllers[$doc->frontControllerId] = $doc->getController();
                     }
 
-                    $controller = $controllers[$document->$controllerKey];
+                    $controller = $controllers[$doc->frontControllerId];
                     if ($controller) {
                         $class = $controller->getClassName();
                         require_once $controller->getFilename();
 
                         if (method_exists($class, 'getRobotsSitemapItems')) {
-                            $list = call_user_func_array(array($class, 'getRobotsSitemapItems'), array());
+                            $list = $class->getRobotsSitemapItems();
+
                             foreach ($list as $item) {
-                                $sitemap[] = self::getSitemapItem($item['uri'], '0.8');
+                                $sitemap[] = self::_getSitemapItem($item['uri'], '0.8');
                             }
                         }
                     }
@@ -45,20 +46,26 @@ abstract class Core_Cms_Front_Document_Controller_RobotsSitemap extends App_Cms_
             }
 
             foreach ($sitemap as $item) {
-                $sitemapXml .= '<url>';
+                $xml = '';
 
                 foreach ($item as $name => $value) {
-                    $sitemapXml .= Ext_Xml::cdata($name, $value);
+                    $xml .= Ext_Xml::cdata($name, $value);
                 }
 
-                $sitemapXml .= '</url>';
+                Ext_Xml::append(
+                    $sitemapXml,
+                    Ext_Xml::notEmptyNode('url', $xml)
+                );
             }
 
             $this->addContent($sitemapXml);
         }
     }
 
-    private static function getSitemapItem($_uri, $_priority = 1, $_freq = 'always', $_date = null)
+    protected static function _getSitemapItem($_uri,
+                                              $_priority = 1,
+                                              $_freq = 'always',
+                                              $_date = null)
     {
         $date = empty($_date) ? date('c') : date('c', $_date);
 
@@ -68,8 +75,8 @@ abstract class Core_Cms_Front_Document_Controller_RobotsSitemap extends App_Cms_
                      'priority' => $_priority);
     }
 
-    private static function getSitemapItemFromDocument($_document)
+    protected static function _getSitemapItemFromDocument($_document)
     {
-        return self::getSitemapItem($_document->getUri());
+        return self::_getSitemapItem($_document->getUri());
     }
 }

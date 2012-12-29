@@ -2,94 +2,107 @@
 
 abstract class Core_Cms_Back_Page extends App_Cms_Page
 {
-	private $UpdateStatus = array();
+    protected $_updateStatus = array();
 
-	public function __construct($_is_authorize = true) {
-		parent::__construct();
+    public function __construct($_isAuthorize = true)
+    {
+        parent::__construct();
 
-		if ($_is_authorize) {
-			if ($this->IsAllowed()) $this->SetTemplate(TEMPLATES . 'back/page.xsl');
-			else if ($this->IsAuthorized()) $this->SetTemplate(TEMPLATES . 'back/404.xsl');
-			else $this->SetTemplate(TEMPLATES . 'back/403.xsl');
-		}
+        if ($_isAuthorize) {
+            if ($this->isAllowed())         $template = 'page.xsl';
+            else if ($this->isAuthorized()) $template = '404.xsl';
+            else                            $template = '403.xsl';
 
-		$this->AddSystem($this->_getUserNavigationXml());
-		$this->AddContent($this->_getUserSectionsXml());
-	}
+            $this->setTemplate(TEMPLATES . "back/$template");
+        }
 
-	public function IsAuthorized() {
-		global $g_user;
-		return isset($g_user) && $g_user;
-	}
+        $this->addSystem($this->_getUserNavigationXml());
+        $this->addContent($this->_getUserSectionsXml());
+    }
 
-	public function IsAllowed() {
-		global $g_user, $g_section, $g_section_start_url;
-		return $this->IsAuthorized() && (isset($g_section) && $g_section && $g_user->IsSection($g_section->GetId()) || $this->Url['path'] == $g_section_start_url);
-	}
+    public function isAuthorized()
+    {
+        global $g_user;
+        return !empty($g_user);
+    }
 
-	protected function _getUserNavigationXml()
-	{
-		global $g_user;
+    public function isAllowed()
+    {
+        global $g_user, $g_section, $g_section_start_url;
 
-		$xml = '';
+        return $this->isAuthorized() && (
+            (!empty($g_section) && $g_user->isSection($g_section->getId())) ||
+            $this->_url['path'] == $g_section_start_url
+        );
+    }
 
-		if (!empty($g_user)) {
-			foreach ($g_user->getSections() as $item) {
-				$xml .= $item->getXml();
-			}
+    protected function _getUserNavigationXml()
+    {
+        global $g_user;
 
-			$xml = Ext_Xml::notEmptyNode('navigation', $xml);
-		}
+        $xml = '';
 
-		return $xml;
-	}
+        if (!empty($g_user)) {
+            foreach ($g_user->getSections() as $item) {
+                $xml .= $item->getXml();
+            }
 
-	protected function _getUserSectionsXml()
-	{
-		global $g_user;
+            $xml = Ext_Xml::notEmptyNode('navigation', $xml);
+        }
 
-		$xml = '';
+        return $xml;
+    }
 
-		if (!empty($g_user)) {
-    		foreach ($g_user->getSections() as $key => $section) {
-    			$xml .= $section->getXml(
-    		        null,
-    		        Ext_Xml::notEmptyCdata('description', $section->description)
-    	        );
-    		}
+    protected function _getUserSectionsXml()
+    {
+        global $g_user;
 
-    		$xml = Ext_Xml::notEmptyNode('cms-sections', $xml);
-		}
+        $xml = '';
 
-		return $xml;
-	}
+        if (!empty($g_user)) {
+            foreach ($g_user->getSections() as $key => $section) {
+                $xml .= $section->getXml(
+                    null,
+                    Ext_Xml::notEmptyCdata('description', $section->description)
+                );
+            }
 
-	public function SetUpdateStatus($_type, $_message = null) {
-		$this->UpdateStatus = array('type' => $_type, 'message' => $_message);
-	}
+            $xml = Ext_Xml::notEmptyNode('cms-sections', $xml);
+        }
 
-	public function GetXml() {
-		global $g_user;
+        return $xml;
+    }
 
-		if (defined('SITE_TITLE')) {
-			$this->AddSystem('<title><![CDATA[' . SITE_TITLE . ']]></title>');
-		}
+    public function setUpdateStatus($_type, $_message = null)
+    {
+        $this->_updateStatus = array('type' => $_type, 'message' => $_message);
+    }
 
-		if ($g_user) $this->AddSystem($g_user->getXml());
-		$this->AddSystem(App_Cms_Session::Get()->getXml(null, App_Cms_Session::Get()->GetWorkmateXml()));
+    public function getXml()
+    {
+        global $g_user;
 
-		if ($this->UpdateStatus) {
-			$update_status = '<update_status type="' . $this->UpdateStatus['type'] . '">';
+        if (defined('SITE_TITLE') && SITE_TITLE) {
+            $this->addSystem(Ext_Xml::cdata('title', SITE_TITLE));
+        }
 
-			if ($this->UpdateStatus['message']) {
-				$update_status .= '<![CDATA[' . $this->UpdateStatus['message'] . ']]>';
-			}
+        if (!empty($g_user)) {
+            $this->addSystem($g_user->getXml());
+        }
 
-			$this->AddContent($update_status . '</update_status>');
-		}
+        $this->addSystem(App_Cms_Session::get()->getXml(
+            null,
+            App_Cms_Session::get()->getWorkmateXml()
+        ));
 
-		return parent::GetXml();
-	}
+        if ($this->_updateStatus) {
+            $this->addContent(Ext_Xml::notEmptyCdata(
+                'update-status',
+                $this->_updateStatus['message'],
+                array('type' => $this->_updateStatus['type'])
+            ));
+        }
+
+        return parent::getXml();
+    }
 }
-
-?>

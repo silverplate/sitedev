@@ -39,7 +39,7 @@ extends App_Cms_Front_Data_Controller
         }
 
         $rowConds = array();
-        $conds = array('parent_id' => $this->_dataDocument->getId(),
+        $conds = array('parent_id' => $this->_parentDocument->getId(),
                        'is_published' => 1);
 
         foreach ($except as $attr => $value) {

@@ -24,7 +24,6 @@ $boUsers = array(
 $foControllers = array(
     'common' => array('title' => 'Страница сайта', 'type_id' => 1, 'filename' => 'Common.php', 'is_document_main' => 1, 'is_multiple' => 1),
     'not-found' => array('title' => 'Документ не найден', 'type_id' => 1, 'filename' => 'NotFound.php', 'is_document_main' => 0, 'is_multiple' => 0),
-    'apply-images' => array('title' => 'Подставить изображения', 'type_id' => 2, 'filename' => 'ApplyImages.php', 'is_document_main' => 0, 'is_multiple' => 1),
     'subpage-navigation' => array('title' => 'Вложенная навигация', 'type_id' => 2, 'filename' => 'SubpageNavigation.php', 'is_document_main' => 0, 'is_multiple' => 1)
 );
 

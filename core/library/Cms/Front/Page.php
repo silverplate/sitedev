@@ -2,45 +2,56 @@
 
 abstract class Core_Cms_Front_Page extends App_Cms_Page
 {
-	protected $IsShowHidden;
+    protected $_isHidden;
 
-	public function __construct() {
-		parent::__construct();
-		$this->IsShowHidden = defined('IS_SHOW_HIDDEN') && IS_SHOW_HIDDEN;
-		if ($this->IsShowHidden) $this->AddSystemAttribute('is_show_hidden');
-	}
+    public function __construct()
+    {
+        parent::__construct();
 
-	public function GetXml() {
-		if (SITE_TITLE) $this->AddSystem('<title><![CDATA[' . SITE_TITLE . ']]></title>');
-		if (IS_USERS && App_Cms_User::Get()) $this->AddSystem(App_Cms_User::Get()->GetXml('page_system'));
-		$this->AddSystem(App_Cms_Session::Get()->getXml());
+        $this->_isHidden = defined('IS_HIDDEN') && IS_HIDDEN;
 
-		return parent::GetXml();
-	}
+        if ($this->_isHidden) {
+            $this->addSystemAttr('is-hidden');
+        }
+    }
 
-	public function output($_is_404 = false)
-	{
-		global $gCache;
+    public function getXml()
+    {
+        if (defined('SITE_TITLE') && SITE_TITLE) {
+            $this->addSystem(Ext_Xml::cdata('title', SITE_TITLE));
+        }
 
-		if (isset($_GET['xml']) && defined('IS_ADMIN_MODE') && IS_ADMIN_MODE) {
-			// header('Content-type: text/xml; charset=' . ini_get('default_charset'));
-			header('Content-type: text/xml; charset=utf-8');
+        if (defined('IS_USERS') && IS_USERS && App_Cms_User::get()) {
+            $this->addSystem(App_Cms_User::get()->getXml());
+        }
 
-			echo Core_Cms_Ext_Xml::getDocumentForXml(
-		        $this->getXml(),
-		        $this->getRootNodeName()
-	        );
+        $this->addSystem(App_Cms_Session::get()->getXml());
 
-		} else if ($this->Template) {
-			$content = $this->GetHtml();
-			echo $content;
+        return parent::getXml();
+    }
 
-			if ($gCache && $gCache->isAvailable() && !$_is_404) {
-				$gCache->set($content);
-			}
+    public function output($_createCache = true)
+    {
+        global $gCache;
 
-		} else {
-			documentNotFound();
-		}
-	}
+        if (isset($_GET['xml']) && defined('IS_ADMIN_MODE') && IS_ADMIN_MODE) {
+            header('Content-type: text/xml; charset=utf-8');
+
+            echo Core_Cms_Ext_Xml::getDocumentForXml(
+                $this->getXml(),
+                $this->getRootName()
+            );
+
+        } else if ($this->_template) {
+            $content = $this->getHtml();
+            echo $content;
+
+            if ($gCache && $gCache->isAvailable() && $_createCache) {
+                $gCache->set($content);
+            }
+
+        } else {
+            documentNotFound();
+        }
+    }
 }

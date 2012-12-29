@@ -2,157 +2,147 @@
 
 abstract class Core_Cms_Page
 {
-	protected $Title;
-	protected $System = array();
-	protected $SystemAttributes = array();
-	protected $Content = array();
-	protected $Template;
-	protected $RootNodeName;
-	protected $RootNodeAttributes = array();
-	public $Url = array();
+    protected $_title;
+    protected $_template;
+    protected $_url = array();
+    protected $_content = array();
+    protected $_system = array();
+    protected $_systemAttrs = array();
+    protected $_rootName;
+    protected $_rootAttrs = array();
 
-	public function __construct() {
-		$this->ComputeUrl();
-	}
+    public function __construct()
+    {
+        $this->_computeUrl();
+    }
 
-	public function SetTitle($_value) {
-		$this->Title = $_value;
-	}
+    public function setTitle($_value)
+    {
+        $this->_title = $_value;
+    }
 
-	public function GetTitle() {
-		return $this->Title;
-	}
+    public function getTitle()
+    {
+        return $this->_title;
+    }
 
-	public function SetTemplate($_template_file) {
-		if (is_file($_template_file)) {
-			$this->Template = $_template_file;
-			return true;
-		} else {
-			return false;
-		}
-	}
+    public function setTemplate($_file)
+    {
+        $this->_template = $_file;
+    }
 
-	public function SetRootNodeName($_node_name) {
-		$this->RootNodeName = $_node_name;
-	}
+    public function setRootName($_name)
+    {
+        $this->_rootName = $_name;
+    }
 
-	public function GetRootNodeName() {
-		return ($this->RootNodeName) ? $this->RootNodeName : 'page';
-	}
+    public function getRootName()
+    {
+        return $this->_rootName ? $this->_rootName : 'page';
+    }
 
-	public function SetRootNodeAttribute($_name, $_value) {
-		$this->RootNodeAttributes[$_name] = $_value;
-	}
+    public function setRootAttr($_name, $_value)
+    {
+        $this->_rootAttrs[$_name] = $_value;
+    }
 
-	protected function ComputeUrl() {
-		$this->Url = parse_url($_SERVER['REQUEST_URI']);
-		$this->Url['request_uri'] = $_SERVER['REQUEST_URI'];
-		$this->Url['host'] = $_SERVER['HTTP_HOST'];
-		if (!isset($this->Url['query'])) {
-			$this->Url['query'] = '';
-		}
+    protected function _computeUrl()
+    {
+        $this->_url = parse_url($_SERVER['REQUEST_URI']);
+        $this->_url['request_uri'] = $_SERVER['REQUEST_URI'];
+        $this->_url['host'] = $_SERVER['HTTP_HOST'];
 
-		$replace = array('index.html', 'index.php');
-		$this->Url['base_path'] = str_replace($replace, '', $this->Url['path']);
-		$this->Url['base_url'] = str_replace($replace, '', $this->Url['request_uri']);
-	}
+        if (!isset($this->_url['query'])) {
+            $this->_url['query'] = '';
+        }
+    }
 
-	public function AddSystem($_source) {
-		if ($_source) {
-			$this->System[] = $_source;
-		}
-	}
+    public function addSystem($_source)
+    {
+        if ($_source) {
+            $this->_system[] = $_source;
+        }
+    }
 
-	public function AddSystemAttribute($_name, $_value = 'true') {
-		$this->SystemAttributes[$_name] = $_value;
-	}
+    public function addSystemAttr($_name, $_value = 'true')
+    {
+        $this->_systemAttrs[$_name] = $_value;
+    }
 
-	public function AddContent($_source) {
-		if ($_source) {
-			$this->Content[] = $_source;
-		}
-	}
+    public function addContent($_source)
+    {
+        if ($_source) {
+            $this->_content[] = $_source;
+        }
+    }
 
     public function getContent()
     {
-        return $this->Content;
+        return $this->_content;
     }
 
     public function setContent(array $_content)
     {
-        $this->Content = $_content;
+        $this->_content = $_content;
     }
 
-	public function Output() {
-		if (isset($_GET['xml']) || !$this->Template) {
-			header('Content-type: text/xml; charset=utf-8');
+    public function output()
+    {
+        if (isset($_GET['xml']) || !$this->_template) {
+            header('Content-type: text/xml; charset=utf-8');
 
-			echo Core_Cms_Ext_Xml::getDocumentForXml(
-		        $this->getXml(),
-		        $this->getRootNodeName()
-			);
+            echo Core_Cms_Ext_Xml::getDocumentForXml(
+                $this->getXml(),
+                $this->getRootName()
+            );
 
-		} else {
-			echo $this->getHtml();
-		}
-	}
+        } else {
+            echo $this->getHtml();
+        }
+    }
 
-	public function GetXml() {
-		$result = '<' .  $this->GetRootNodeName();
+    public function getXml()
+    {
+        $xml = '';
 
-		foreach ($this->RootNodeAttributes as $name => $value) {
-			$result .= " {$name}=\"{$value}\"";
-		}
+        Ext_Xml::append($xml, Ext_Xml::notEmptyNode(
+            'content',
+            $this->_content
+        ));
 
-		$result .= '>';
+        Ext_Xml::append($xml, Ext_Xml::notEmptyCdata('title', $this->getTitle()));
+        Ext_Xml::append($xml, $this->getUrlXml());
+        Ext_Xml::append($xml, Ext_Date::getXml(time()));
 
-		if ($this->Content) {
-			$result .= '<content>' . implode($this->Content) . '</content>';
-		}
+        Ext_Xml::append($xml, Ext_Xml::notEmptyNode(
+            'system',
+            $this->_system,
+            $this->_systemAttrs
+        ));
 
-		if ($this->System) {
-			$result .= '<system';
-			foreach ($this->SystemAttributes as $name => $value) {
-				$result .= " {$name}=\"{$value}\"";
-			}
-			$result .= '>' . implode($this->System) . '</system>';
-		}
+        return Ext_Xml::node(
+            $this->getRootName(),
+            $xml,
+            $this->_rootAttrs
+        );
+    }
 
-		if ($this->Title) {
-			$result .= '<title><![CDATA[' . $this->Title . ']]></title>';
-		}
+    public function getUrlXml()
+    {
+        $url = $this->_url;
+        unset($url['request_uri']);
 
-		$result .= $this->getUrlXml();
-		$result .= Ext_Date::getXml(time());
-		$result .= '</' .  $this->GetRootNodeName() . '>';
+        return Ext_Xml::cdata('url', $this->_url['request_uri'], $url);
+    }
 
-		return $result;
-	}
+    public function getHtml()
+    {
+        $proc = new XSLTProcessor();
+        $proc->importStylesheet(Ext_Dom::load($this->_template));
 
-	public function getUrlXml() {
-		$result = '<url';
-		foreach (array_diff_key($this->Url, array('request_uri' => '')) as $name => $value) {
-			if ($value != '') {
-				$result .= ' ' . $name . '="' . str_replace('&', '&amp;', $value) . '"';
-			}
-		}
-		return $result . '><![CDATA[' . $this->Url['request_uri'] . ']]></url>';
-	}
-
-	public function GetHtml() {
-		if ($this->Template) {
-			$obj = new XSLTProcessor;
-			$obj->importStylesheet(Ext_Dom::load($this->Template));
-
-			return $obj->transformToXml(Ext_Dom::get(Ext_Xml::getDocumentForXml(
-			    $this->getXml(),
-		        $this->getRootNodeName()
-	        )));
-
-		} else {
-			throw new Exception ('Шаблон не указан.');
-		}
-	}
+        return $proc->transformToXml(Ext_Dom::get(Ext_Xml::getDocumentForXml(
+            $this->getXml(),
+            $this->getRootName()
+        )));
+    }
 }
-
-?>

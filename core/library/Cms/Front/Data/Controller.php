@@ -2,47 +2,75 @@
 
 abstract class Core_Cms_Front_Data_Controller
 {
-	private $DocumentData;
-	protected $Document;
-	private $Content;
-	private $Type;
-	protected $_dataDocument;
+    /**
+     * @var App_Cms_Front_Data
+     */
+    protected $_data;
 
-	public function __construct(&$_data, &$_document = null) {
-		$this->DocumentData = $_data;
-		$this->Document = $_document;
+    /**
+     * @var App_Cms_Front_Document
+     */
+    protected $_document;
 
-        $dataDocumentId = $_data->frontDocumentId;
-        $this->_dataDocument = $_document && $_document->getId() == $dataDocumentId
-                             ? $_document
-                             : App_Cms_Front_Document::load($dataDocumentId);
+    /**
+     * @var App_Cms_Front_Document
+     */
+    protected $_parentDocument;
 
-		$this->SetContent($this->DocumentData->content);
-		$this->SetType($this->DocumentData->GetTypeId());
-	}
+    protected $_content;
+    protected $_type;
 
-	public function GetContent() {
-		return $this->Content;
-	}
+    /**
+     * @param App_Cms_Front_Data $_data
+     * @param App_Cms_Front_Document $_document
+     */
+    public function __construct($_data, $_document)
+    {
+        $this->_data = $_data;
+        $this->_document = $_document;
 
-	public function SetContent($_value) {
-		$this->Content = $_value;
-	}
+        $this->_parentDocument = $this->_document->id != $this->_data->frontDocumentId
+                               ? App_Cms_Front_Document::getById($this->_data->frontDocumentId)
+                               : $this->_document;
 
-	public function GetType() {
-		return $this->Type;
-	}
+        $proceedResult = $this->_data->proceedContent($this->_parentDocument);
 
-	public function SetType($_type) {
-		return $this->Type = $_type;
-	}
+        $this->setType(
+            $proceedResult && !empty($proceedResult['type'])
+          ? $proceedResult['type']
+          : $this->_data->getTypeId()
+        );
 
-	public function getXml()
-	{
-	    $tag = $this->DocumentData->tag;
+        $this->setContent(
+            $proceedResult && key_exists('content', $proceedResult)
+          ? $proceedResult['content']
+          : $this->_data->content
+        );
+    }
 
-	    return $this->getType() == 'xml'
-	         ? Ext_Xml::node($tag, Ext_Xml::decodeCdata($this->getContent()))
-	         : Ext_Xml::cdata($tag, $this->getContent());
-	}
+    public function getContent()
+    {
+        return $this->_content;
+    }
+
+    public function setContent($_value)
+    {
+        $this->_content = $_value;
+    }
+
+    public function getType()
+    {
+        return $this->_type;
+    }
+
+    public function setType($_type)
+    {
+        return $this->_type = $_type;
+    }
+
+    public function getXml()
+    {
+        $method = $this->_data->getTypeId() == 'xml' ? 'node' : 'cdata';
+        return Ext_Xml::$method($this->_data->tag, $this->getContent());
+    }
 }

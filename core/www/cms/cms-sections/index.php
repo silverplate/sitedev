@@ -37,7 +37,7 @@ if ($page->IsAuthorized()) {
         if ($form->UpdateStatus == FORM_UPDATED) {
             if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
                 $obj->Delete();
-                App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_DELETE, $obj->GetId(), $obj->GetTitle());
+                App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_DELETE, $obj->GetId(), $obj->getTitle());
                 goToUrl($page->Url['path'] . '?DEL');
 
             } elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
@@ -46,10 +46,10 @@ if ($page->IsAuthorized()) {
 
                     if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
                         $obj->Create();
-                        App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_CREATE, $obj->GetId(), $obj->GetTitle());
+                        App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_CREATE, $obj->GetId(), $obj->getTitle());
                     } else {
                         $obj->Update();
-                        App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_MODIFY, $obj->GetId(), $obj->GetTitle());
+                        App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_MODIFY, $obj->GetId(), $obj->getTitle());
                     }
 
                     if (isset($form->Elements['users'])) {
@@ -90,7 +90,7 @@ if ($page->IsAuthorized()) {
 
         if ($obj->GetId()) {
             $module .= ' id="' . $obj->GetId() . '">';
-            $module .= '<title><![CDATA[' . $obj->GetTitle() . ']]></title>';
+            $module .= '<title><![CDATA[' . $obj->getTitle() . ']]></title>';
         } else {
             $module .= ' is_new="true">';
             $module .= '><title><![CDATA[Добавление]]></title>';

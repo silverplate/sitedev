@@ -282,19 +282,20 @@ function documentNotFound()
         $document = App_Cms_Front_Document::load(get_lang_inner_uri() . 'not-found/', 'uri');
 
         if ($document) {
-            if (
-                $document->link &&
-                $document->link != $realUrl['path']
-            ) {
+            if ($document->link && $document->link != $realUrl['path']) {
                 goToUrl($document->link);
 
             } else if (
                 $document->getController() && (
                     $document->is_published == 1 ||
-                    (defined('IS_SHOW_HIDDEN') && IS_SHOW_HIDDEN)
+                    (defined('IS_HIDDEN') && IS_HIDDEN)
                 )
             ) {
-                $controller = App_Cms_Front_Document::initController($document->getController(), $document);
+                $controller = App_Cms_Front_Document::initController(
+                    $document->getController(),
+                    $document
+                );
+
                 $controller->execute();
                 $controller->output();
                 exit();
@@ -303,8 +304,8 @@ function documentNotFound()
     }
 
     echo '<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1>';
-    echo '<p>The requested URL ' . $_SERVER['REQUEST_URI'] . ' was not found on this server.</p><hr />';
-    echo '<i>' . $_SERVER['SERVER_SOFTWARE'] . ' at ' . $_SERVER['SERVER_NAME'] . ' Port ' . $_SERVER['SERVER_PORT'] . '</i>';
+    echo "<p>The requested URL {$_SERVER['REQUEST_URI']} was not found on this server.</p><hr />";
+    echo "<i>{$_SERVER['SERVER_SOFTWARE']} at {$_SERVER['SERVER_NAME']} Port {$_SERVER['SERVER_PORT']}</i>";
     echo '</body></html>';
     exit();
 }

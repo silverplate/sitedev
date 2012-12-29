@@ -1,38 +1,28 @@
 <?php
 
-abstract class Core_Cms_Front_Document_Controller_Common extends App_Cms_Front_Document_Controller
+abstract class Core_Cms_Front_Document_Controller_Common
+extends App_Cms_Front_Document_Controller
 {
     public function execute()
     {
         parent::execute();
 
-        // Шаблон
+        $this->setTemplate($this->_document->getTemplate()->getFile()->getPath());
+        $this->_computeNavigationXml();
+    }
 
-        $template = $this->Document->getTemplate();
-        if ($template->getFile()) {
-            $this->setTemplate($template->getFile()->getPath());
-
-        } else {
-            $this->setTemplate(TEMPLATES . 'fo.xsl');
-        }
-
-        // Site navigation
-
-        $navigationXml = '';
+    protected function _computeNavigationXml()
+    {
+        $xml = '';
         $navigation = App_Cms_Front_Navigation::getList(array(
             'is_published' => 1,
             'name != "robots-sitemap"'
         ));
 
         foreach ($navigation as $i) {
-            $navigationXml .= App_Cms_Front_Navigation::getNavigationXml(
-                $i->name,
-                $i->type
-            );
+            $xml .= App_Cms_Front_Navigation::getNavigationXml($i->name, $i->type);
         }
 
-        if ($navigationXml != '') {
-            $this->addSystem(Ext_Xml::node('navigation', $navigationXml));
-        }
+        $this->addSystem(Ext_Xml::notEmptyNode('navigation', $xml));
     }
 }

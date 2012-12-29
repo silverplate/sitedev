@@ -4,8 +4,10 @@ require_once realpath(dirname(__FILE__) . '/../../core/library') . '/libs.php';
 require_once CORE_SETS . 'project.php';
 
 
-/*** Language
-*********************************************************/
+/**
+ * Language
+ */
+
 $site_lang_type = '';
 $site_lang = null;
 
@@ -53,8 +55,10 @@ define(
 unset($site_lang, $host, $lang, $params, $lang_path, $local_lang_path);
 
 
-/*** Administration
-*********************************************************/
+/**
+ * Administration
+ */
+
 $g_admin = array('params' => array('mode' => 'is_admin_mode', 'hidden' => 'is_hidden'));
 define('IS_KEY', isset($_GET['key']) && $_GET['key'] == SITE_KEY);
 define('IS_ADMIN_MODE', get_admin_param('mode'));
@@ -68,7 +72,7 @@ if (IS_KEY) {
 	$g_admin['is_delete_cache'] = isset($_GET['delete_cache']);
 }
 
-define('IS_SHOW_HIDDEN', IS_ADMIN_MODE && get_admin_param('hidden'));
+define('IS_HIDDEN', IS_ADMIN_MODE && get_admin_param('hidden'));
 
 
 function get_admin_param($_name) {
@@ -88,8 +92,10 @@ function set_admin_param($_name, $_is_on) {
 }
 
 
-/*** Authorization
-*********************************************************/
-if (IS_USERS) App_Cms_User::StartSession();
+/**
+ * Authorization
+ */
 
-?>
+if (defined('IS_USERS') && IS_USERS) {
+    App_Cms_User::StartSession();
+}

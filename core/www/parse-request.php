@@ -25,7 +25,7 @@ if ($gCache->isAvailable() && $gCache->isCache()) {
         if (
             $document &&
             $document->getController() &&
-            ($document->isPublished == 1 || IS_SHOW_HIDDEN) &&
+            ($document->isPublished == 1 || IS_HIDDEN) &&
             (!$document->authStatusId || is_null(App_Cms_User::getAuthGroup()) || $document->authStatusId & App_Cms_User::getAuthGroup())
         ) {
             $controller = App_Cms_Front_Document::initController($document->getController(), $document);

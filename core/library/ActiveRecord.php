@@ -740,27 +740,13 @@ abstract class Core_ActiveRecord
      */
     public static function getList($_where = null, $_params = array())
     {
-        $where = array();
-        $row = array();
-
-        if ($_where) {
-            foreach ($_where as $key => $value) {
-                if (Ext_Number::isInteger($key)) $row[] = $value;
-                else                             $where[$key] = $value;
-            }
-        }
-
-        if ($where) {
-            $row = array_merge(App_Db::get()->getWhere($where), $row);
-        }
-
         $instance = self::createInstance();
         $list = array();
 
         $items = App_Db::get()->getList(App_Db::get()->getSelect(
             $instance->getTable(),
             null,
-            $row,
+            $_where,
             empty($_params['order']) ? $instance->getSortAttrName() : $_params['order'],
             null,
             empty($_params['limit']) ? null : (int) $_params['limit'],
@@ -782,25 +768,11 @@ abstract class Core_ActiveRecord
      */
     public static function getCount($_where = array())
     {
-        $where = array();
-        $row = array();
-
-        foreach ($_where as $key => $value) {
-            if (Ext_Number::isInteger($key)) {
-                $row[] = $value;
-            } else {
-                $where[$key] = $value;
-            }
-        }
-
-        if ($where) {
-            $row = array_merge(App_Db::get()->getWhere($where), $row);
-        }
-
-        $condition = $row ? ' WHERE ' . implode(' AND ', $row) : '';
-        $result = App_Db::get()->getEntry("
-            SELECT COUNT(1) AS `cnt` FROM {self::getTbl()} $condition
-        ");
+        $result = App_Db::get()->getEntry(App_Db::get()->getSelect(
+            self::getTbl(),
+            'COUNT(1) AS `cnt`',
+            $_where
+        ));
 
         return $result ? (int) $result['cnt'] : 0;
     }
@@ -818,9 +790,7 @@ abstract class Core_ActiveRecord
         if ($_excludeId) {
             $where = array_merge(
                 $where,
-                App_Db::get()->getWhereNot(array(
-                    $this->getPrimaryKeyName() => $_excludeId
-                ))
+                App_Db::get()->getWhereNot(array(self::getPri() => $_excludeId))
             );
         }
 

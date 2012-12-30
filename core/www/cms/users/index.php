@@ -41,7 +41,7 @@ if ($page->IsAuthorized()) {
             if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
                 $obj->Delete();
                 App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_DELETE, $obj->GetId(), $obj->getTitle());
-                goToUrl($page->Url['path'] . '?DEL');
+                goToUrl($page->getUrl('path') . '?DEL');
 
             } else if ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
                 if (App_Cms_User::CheckUnique($form->Elements['email']->GetValue(), $obj->GetId())) {
@@ -64,7 +64,7 @@ if ($page->IsAuthorized()) {
                         App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_MODIFY, $obj->GetId(), $obj->getTitle());
                     }
 
-                    goToUrl($page->Url['path'] . '?id=' . $obj->GetId() . '&OK');
+                    goToUrl($page->getUrl('path') . '?id=' . $obj->GetId() . '&OK');
 
                 } else {
                     $form->UpdateStatus = FORM_ERROR;
@@ -87,31 +87,31 @@ if ($page->IsAuthorized()) {
     }
 
     $filter = obj_get_filter();
-    $list_xml = '<local_navigation type="filter"';
+    $list_xml = '<local-navigation type="filter"';
 
     $options = array('open', 'name', 'email');
     foreach ($options as $item) {
-        if (isset($filter['is_' . $item]) && $filter['is_' . $item]) $list_xml .= ' is_' . $item . '="true"';
+        if (isset($filter['is_' . $item]) && $filter['is_' . $item]) $list_xml .= ' is-' . $item . '="true"';
     }
 
     $list_xml .= '>';
 
     foreach (array('name', 'email') as $item) {
         if (isset($filter[$item]) && $filter[$item]) {
-            $list_xml .= '<filter_' . $item . '><![CDATA[' . $filter[$item] . ']]></filter_' . $item . '>';
+            $list_xml .= '<filter-' . $item . '><![CDATA[' . $filter[$item] . ']]></filter-' . $item . '>';
         }
     }
 
-    $list_xml .= '</local_navigation>';
+    $list_xml .= '</local-navigation>';
 
     if (isset($obj)) {
-        $module = '<module type="simple" is_able_to_add="true"';
+        $module = '<module type="simple" is-able-to-add="true"';
 
         if ($obj->GetId()) {
             $module .= ' id="' . $obj->GetId() . '">';
             $module .= '<title><![CDATA[' . $obj->getTitle() . ']]></title>';
         } else {
-            $module .= ' is_new="true">';
+            $module .= ' is-new="true">';
             $module .= '><title><![CDATA[Добавление]]></title>';
         }
 

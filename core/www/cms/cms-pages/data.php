@@ -84,17 +84,17 @@ if (is_null($document_id) || !App_Cms_Front_Document::Load($document_id)) {
         if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
             $obj->Delete();
             App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_DELETE, $obj->getId(), 'Блоки данных. Документ ' . $obj->frontDocumentId);
-            goToUrl($page->Url['path'] . '?parent_id=' . $obj->frontDocumentId . '&DEL');
+            goToUrl($page->getUrl('path') . '?parent_id=' . $obj->frontDocumentId . '&DEL');
 
         } else if (isset($form->Buttons['create']) && $form->Buttons['create']->IsSubmited()) {
             $obj->Create();
             App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_CREATE, $obj->getId(), 'Блоки данных. Документ ' . $obj->frontDocumentId);
-            goToUrl($page->Url['path'] . '?id=' . $obj->getId() . '&parent_id=' . $obj->frontDocumentId . '&OK');
+            goToUrl($page->getUrl('path') . '?id=' . $obj->getId() . '&parent_id=' . $obj->frontDocumentId . '&OK');
 
         } else if (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited()) {
             $obj->Update();
             App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_MODIFY, $obj->getId(), 'Блоки данных. Документ ' . $obj->frontDocumentId);
-            goToUrl($page->Url['path'] . '?id=' . $obj->getId() . '&parent_id=' . $obj->frontDocumentId . '&OK');
+            goToUrl($page->getUrl('path') . '?id=' . $obj->getId() . '&parent_id=' . $obj->frontDocumentId . '&OK');
         }
     }
 

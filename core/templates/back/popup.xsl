@@ -26,7 +26,7 @@
 
 				<link href="/cms/f/css/main.css" type="text/css" rel="stylesheet" />
 				<link href="/cms/f/css/modules.css" type="text/css" rel="stylesheet" />
-				<xsl:comment>&lt;!--[if IE]>&lt;link href="/cms/f/css/modules-ie.css" type="text/css" rel="stylesheet" />&lt;![endif]--></xsl:comment>
+				<xsl:comment>[if IE]>&lt;link href="/cms/f/css/modules-ie.css" type="text/css" rel="stylesheet" />&lt;![endif]</xsl:comment>
 				<link href="/cms/f/css/forms.css" type="text/css" rel="stylesheet" />
 
 				<script src="/cms/f/js/module-documents.js" type="text/javascript" language="JavaScript" />

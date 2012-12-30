@@ -42,7 +42,7 @@ if ($page->isAuthorized()) {
             ) {
                 $obj->delete();
                 App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_DELETE, $obj->getId(), $obj->getTitle());
-                goToUrl($page->Url['path'] . '?DEL');
+                goToUrl($page->getUrl('path') . '?DEL');
 
             } else if (
                 (isset($form->Buttons['insert']) && $form->Buttons['insert']->isSubmited()) ||
@@ -99,23 +99,23 @@ if ($page->isAuthorized()) {
         $page->setUpdateStatus('success', 'Шаблон удален');
     }
 
-    $listXml = '<local_navigation>';
+    $listXml = '<local-navigation>';
 
     foreach (App_Cms_Front_Template::getList() as $item) {
-        $listXml .= $item->getXml('bo-list', 'item');
+        $listXml .= $item->getBackOfficeXml();
     }
 
-    $listXml .= '</local_navigation>';
+    $listXml .= '</local-navigation>';
 
     if (isset($obj)) {
-        $module = '<module type="simple" is_able_to_add="true"';
+        $module = '<module type="simple" is-able-to-add="true"';
 
         if ($obj->getId()) {
             $module .= ' id="' . $obj->getId() . '">';
             $module .= '<title><![CDATA[' . $obj->getTitle() . ']]></title>';
 
         } else {
-            $module .= ' is_new="true">';
+            $module .= ' is-new="true">';
             $module .= '><title>Добавление</title>';
         }
 
@@ -127,7 +127,7 @@ if ($page->isAuthorized()) {
 
     } else {
         $about = $g_section->description ? '<p class="first">' . $g_section->description . '</p>' : '';
-        $page->addContent('<module type="simple" is_able_to_add="true">' . $listXml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
+        $page->addContent('<module type="simple" is-able-to-add="true">' . $listXml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
     }
 }
 

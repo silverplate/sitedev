@@ -38,7 +38,7 @@ if ($page->IsAuthorized()) {
 			if (isset($form->Buttons['delete']) && $form->Buttons['delete']->IsSubmited()) {
 				$obj->Delete();
 				App_Cms_Back_Log::logModule(App_Cms_Back_Log::ACT_DELETE, $obj->GetId(), $obj->getTitle());
-				goToUrl($page->Url['path'] . '?DEL');
+				goToUrl($page->getUrl('path') . '?DEL');
 
 			} elseif ((isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) || (isset($form->Buttons['update']) && $form->Buttons['update']->IsSubmited())) {
 				if (isset($form->Buttons['insert']) && $form->Buttons['insert']->IsSubmited()) {
@@ -49,7 +49,7 @@ if ($page->IsAuthorized()) {
 					App_Cms_Back_Log::logModule(App_Cms_Back_Log::ACT_MODIFY, $obj->GetId(), $obj->getTitle());
 				}
 
-				goToUrl($page->Url['path'] . '?id=' . $obj->GetId() . '&OK');
+				goToUrl($page->getUrl('path') . '?id=' . $obj->GetId() . '&OK');
 			}
 
 		} elseif ($form->UpdateStatus == FORM_ERROR) {
@@ -64,20 +64,20 @@ if ($page->IsAuthorized()) {
 		$page->SetUpdateStatus('success', 'Тип удален');
 	}
 
-	$list_xml = '<local_navigation>';
+	$list_xml = '<local-navigation>';
 	foreach (App_Cms_Front_Navigation::GetList() as $item) {
 		$list_xml .= $item->getBackOfficeXml();
 	}
-	$list_xml .= '</local_navigation>';
+	$list_xml .= '</local-navigation>';
 
 	if (isset($obj)) {
-		$module = '<module type="simple" is_able_to_add="true"';
+		$module = '<module type="simple" is-able-to-add="true"';
 
 		if ($obj->GetId()) {
 			$module .= ' id="' . $obj->GetId() . '">';
 			$module .= '<title><![CDATA[' . $obj->getTitle() . ']]></title>';
 		} else {
-			$module .= ' is_new="true">';
+			$module .= ' is-new="true">';
 			$module .= '><title><![CDATA[Добавление]]></title>';
 		}
 
@@ -89,7 +89,7 @@ if ($page->IsAuthorized()) {
 
 	} else {
 		$about = $g_section->description ? '<p class="first">' . $g_section->description . '</p>' : '';
-		$page->AddContent('<module type="simple" is_able_to_add="true">' . $list_xml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
+		$page->AddContent('<module type="simple" is-able-to-add="true">' . $list_xml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
 	}
 }
 

@@ -2,16 +2,16 @@ function dateFilterFromDate(_stringDateFrom, _stringDateTill)
 {
 	if (_stringDateFrom) {
 		var fromDate = _stringDateFrom.split("-");
-		calendarSet("filter_from", fromDate[0], fromDate[1] - 1, fromDate[2]);
+		calendarSet("filter-from", fromDate[0], fromDate[1] - 1, fromDate[2]);
 	}
 
 	if (_stringDateTill) {
 		var tillDate = _stringDateTill.split("-");
-		calendarSet("filter_till", tillDate[0], tillDate[1] - 1, tillDate[2]);
+		calendarSet("filter-till", tillDate[0], tillDate[1] - 1, tillDate[2]);
 
 	} else {
 		var now = new Date();
-		calendarSet("filter_till", now.getFullYear(), now.getMonth(), now.getDate());
+		calendarSet("filter-till", now.getFullYear(), now.getMonth(), now.getDate());
 	}
 }
 
@@ -23,50 +23,51 @@ function dateFilterGetDate(_name)
 function hideFilter()
 {
 	changeElementVisibility("filter", false);
-	changeElementVisibility("filter_link", true);
-	setCookie("filter_is_open", "");
+	changeElementVisibility("filter-link", true);
+	setCookie("filter-is-open", "");
 }
 
 function showFilter()
 {
 	changeElementVisibility("filter", true);
-	changeElementVisibility("filter_link", false);
-	setCookie("filter_is_open", 1);
+	changeElementVisibility("filter-link", false);
+	setCookie("filter-is-open", 1);
 }
 
 function filterUpdate(_eleName, _isFormSubmit, _isSortable, _isDate)
 {
 	var formEle = document.getElementById("filter");
 	var ele = document.getElementById(_eleName);
+	var from, till;
 
 	if (_isDate) {
-		var from = dateFilterGetDate("filter_from");
-		var till = dateFilterGetDate("filter_till");
+		from = dateFilterGetDate("filter_from");
+		till = dateFilterGetDate("filter_till");
 	}
 
 	if (formEle && ele && (!_isDate || (from && till))) {
 		showLoadingBar();
 
 		if (_isDate) {
-			setCookie("filter_from", from.toGMTString());
-			setCookie("filter_till", till.toGMTString());
+			setCookie("filter-from", from.toGMTString());
+			setCookie("filter-till", till.toGMTString());
 		}
 
 		if (_isFormSubmit) {
-			setCookie("filter_page", "");
+			setCookie("filter-page", "");
 		}
 
 		var inputs = new Array("title", "name", "email");
 
 		for (var i = 0; i < inputs.length; i++) {
-			var input = document.getElementById("filter_" + inputs[i]);
-			setCookie("filter_" + inputs[i], input ? input.value : "");
+			var input = document.getElementById("filter-" + inputs[i]);
+			setCookie("filter-" + inputs[i], input ? input.value : "");
 		}
 
 		var inputs = new Array("users", "sections", "actions", "type", "group");
 
 		for (var i = 0; i < inputs.length; i++) {
-			var checkEle = document.getElementById("is_filter_" + inputs[i]);
+			var checkEle = document.getElementById("is-filter-" + inputs[i]);
 			if (checkEle) {
 				var value = "";
 				if (checkEle.checked) {
@@ -82,8 +83,8 @@ function filterUpdate(_eleName, _isFormSubmit, _isSortable, _isDate)
 					}
 				}
 
-				setCookie("is_filter_" + inputs[i], checkEle.checked ? 1 : "");
-				setCookie("filter_" + inputs[i], value);
+				setCookie("is-filter-" + inputs[i], checkEle.checked ? 1 : "");
+				setCookie("filter-" + inputs[i], value);
 			}
 		}
 
@@ -108,10 +109,10 @@ function filterUpdateNav(_page, _isSortable)
 	showLoadingBar();
 
 	var formEle = document.getElementById("filter");
-	var ele = document.getElementById("filter_content");
+	var ele = document.getElementById("filter-content");
 	var selectedEle = formEle.elements["filter_selected_id"];
 
-	setCookie("filter_page", _page);
+	setCookie("filter-page", _page);
 
     var postBody = $(formEle).serialize() + "&page=" + _page;
 

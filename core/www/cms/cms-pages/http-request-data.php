@@ -1,86 +1,98 @@
 <?php
 
-require('../prepend.php');
+require '../prepend.php';
 
 $page = new App_Cms_Page();
-$page->SetRootNodeName('http_request');
-$page->SetRootNodeAttribute('type', 'Data');
-$page->SetTemplate(TEMPLATES . 'back/http-requests.xsl');
+$page->setRootName('http-request');
+$page->setRootAttr('type', 'Data');
+$page->setTemplate(TEMPLATES . 'back/http-requests.xsl');
 
 $data = $_POST;
 
-if (isset($data['id']) && $data['id']) {
-	$page->SetRootNodeAttribute('parent_id', $data['id']);
-	$page->AddContent(get_branch_xml($data['id']));
+if (!empty($data['id'])) {
+	$page->setRootAttr('parent_id', $data['id']);
+	$page->addContent(getBranchXml($data['id']));
 }
 
 header('Content-type: text/html; charset=utf-8');
-$page->Output();
+$page->output();
 
 
-function get_branch_xml($_parent_id) {
+function getBranchXml($_parentId)
+{
 	$result = '';
-	$document = App_Cms_Front_Document::Load($_parent_id);
+	$document = App_Cms_Front_Document::load($_parentId);
 
-	foreach (App_Cms_Front_Data::GetList(array(App_Cms_Front_Document::GetPri() => $_parent_id)) as $item) {
-		$additional_xml = '';
+	foreach (App_Cms_Front_Data::getList(array(App_Cms_Front_Document::getPri() => $_parentId)) as $item) {
+		$additionalXml = '';
 
-		switch ($item->GetTypeId()) {
+		switch ($item->getTypeId()) {
 			case 'image':
-				if ($document && is_dir($document->GetFilePath())) {
-					if ($document->GetImages()) {
-						$additional_xml .= '<self>';
-						foreach ($document->GetImages() as $image) {
-							$additional_xml .= $image->GetXml();
+				if ($document && is_dir($document->getFilePath())) {
+					if ($document->getImages()) {
+						$additionalXml .= '<self>';
+
+						foreach ($document->getImages() as $image) {
+							$additionalXml .= $image->getXml();
 						}
-						$additional_xml .= '</self>';
+
+						$additionalXml .= '</self>';
 					}
 				}
 
-				if (!isset($other_images)) {
-					$other_images = data_get_images(DOCUMENT_ROOT . 'f/', $document->GetFilePath());
+				if (!isset($otherImages)) {
+					$otherImages = getDataImages(
+				        DOCUMENT_ROOT . 'f/',
+				        $document->getFilePath()
+			        );
 				}
 
-				if ($other_images) {
-					$additional_xml .= '<others>';
-					foreach ($other_images as $image) {
-						$additional_xml .= $image->GetXml();
+				if ($otherImages) {
+					$additionalXml .= '<others>';
+
+					foreach ($otherImages as $image) {
+						$additionalXml .= $image->GetXml();
 					}
-					$additional_xml .= '</others>';
+
+					$additionalXml .= '</others>';
 				}
 
 				break;
 		}
 
-		$result .= $item->GetXml($additional_xml);
+		$result .= $item->getXml($additionalXml);
 	}
 
 	return $result;
 }
 
-function data_get_images($_dir, $_exclude_path) {
+function getDataImages($_dir, $_excludePath)
+{
 	$result = array();
 	$dir = rtrim($_dir, '/') . '/';
-	$exclude_path = rtrim($_exclude_path, '/') . '/';
+	$excludePath = rtrim($_excludePath, '/') . '/';
 
 	if (is_dir($dir)) {
-		$dir_handle = opendir($dir);
-		$item = readdir($dir_handle);
+		$dirHandle = opendir($dir);
+		$item = readdir($dirHandle);
 
 		while ($item) {
 			if ($item != '.' && $item != '..') {
 				if (is_dir($dir . $item)) {
-					$result = array_merge($result, data_get_images($dir . $item, $exclude_path));
+					$result = array_merge(
+				        $result,
+				        getDataImages($dir . $item, $excludePath)
+			        );
 
-				} else if ($dir != $exclude_path && Ext_Image::IsImage($item)) {
+				} else if ($dir != $excludePath && Ext_Image::IsImage($item)) {
 				    $result[] = App_Image::factory($dir . $item);
 				}
 			}
 
-			$item = readdir($dir_handle);
+			$item = readdir($dirHandle);
 		}
 
-		closedir($dir_handle);
+		closedir($dirHandle);
 	}
 
 	return $result;

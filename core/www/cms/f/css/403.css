@@ -8,7 +8,7 @@ table.auth-form
     margin: 50px 50px 30px 50px;
 }
 
-#auth_reminder
+#auth-reminder
 {
     width: 300px;
     margin: 0 50px 50px 50px;
@@ -16,7 +16,7 @@ table.auth-form
 }
 
 table.auth-form label,
-#auth_reminder label
+#auth-reminder label
 {
     display: block;
     font-size: 0.84em;
@@ -40,26 +40,26 @@ table.auth-form td.auth-password input
     width: 100%;
 }
 
-#auth_reminder td.auth-email input
+#auth-reminder td.auth-email input
 {
     width: 300px;
 }
 
-#auth_reminder td.auth-email
+#auth-reminder td.auth-email
 {
     padding-bottom: 1em;
 }
 
-table.auth-form #auth_submit,
-#auth_reminder #auth_reminder_submit
+table.auth-form #auth-submit,
+#auth-reminder #auth-reminder-submit
 {
     float: right;
 }
 
 table.auth-form td.error,
 table.auth-form td.success,
-#auth_reminder td.error,
-#auth_reminder td.success
+#auth-reminder td.error,
+#auth-reminder td.success
 {
     padding-top: 1em;
     font-size: 0.84em;
@@ -67,18 +67,18 @@ table.auth-form td.success,
 }
 
 table.auth-form td.success,
-#auth_reminder td.success
+#auth-reminder td.success
 {
     color: green;
 }
 
-div#auth_forgot
+div#auth-forgot
 {
     margin: 0 50px 50px 50px;
     font-size: 0.7em;
 }
 
-div#auth_forgot span
+div#auth-forgot span
 {
     cursor: pointer;
     border-bottom: 1px black dashed;

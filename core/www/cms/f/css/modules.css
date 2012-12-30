@@ -110,7 +110,7 @@ div.success
  * Local navigation
  */
 
-ul#filter_content
+ul#filter-content
 {
 	font-size: 0.84em;
 	list-style-type: none;
@@ -118,19 +118,19 @@ ul#filter_content
 	margin: 0;
 }
 
-ul#filter_content li
+ul#filter-content li
 {
 	font-size: 0.84em;
 	margin-bottom: 5px;
 	line-height: 1.3em;
 }
 
-ul#filter_content.sortable li
+ul#filter-content.sortable li
 {
 	cursor: move;
 }
 
-ul#filter_content.sortable li a
+ul#filter-content.sortable li a
 {
 	cursor: pointer;
 }
@@ -145,7 +145,7 @@ span.sort-only
  * Data blocks
  */
 
-#document_data_blocks
+#document-data-blocks
 {
 	font-size: 0.84em;
 }
@@ -220,7 +220,7 @@ table.date-filter-periods a
 	display: block;
 }
 
-div#filter_link
+div#filter-link
 {
 	background-color: #36c;
 	padding: 5px 10px;
@@ -228,7 +228,7 @@ div#filter_link
 	margin-bottom: 20px;
 }
 
-div#filter_link a
+div#filter-link a
 {
 	font-size: 0.7em;
 	text-decoration: none;
@@ -305,7 +305,7 @@ div.filter-input label.filter-name
 	border-bottom: 1px dashed black;
 }
 
-#filter_content
+#filter-content
 {
 	font-size: 0.84em;
 }
@@ -315,7 +315,7 @@ div.filter-input label.filter-name
  * List navigation
  */
 
-#list_navigation
+#list-navigation
 {
 	float:left;
 	border: 1px solid #ddd;

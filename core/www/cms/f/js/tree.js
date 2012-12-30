@@ -17,7 +17,7 @@ function treeLoad(_updateEleId, _moduleName, _fieldName, _parentId, _type)
 	}
 
 	if (_type != "list") {
-		var currentObjectEle = document.getElementById("current_object_id");
+		var currentObjectEle = document.getElementById("current-object-id");
 		if (currentObjectEle && currentObjectEle.value) {
 		    postBody += "&current_object_id=" + currentObjectEle.value;
 		}
@@ -37,7 +37,7 @@ function treeLoad(_updateEleId, _moduleName, _fieldName, _parentId, _type)
             $("#" + _updateEleId).html(_response);
 
             if (_type == "list") {
-                $("#tree_list").sortable({
+                $("#tree-list").sortable({
                     delay: 500,
 /*
                     opacity: 0.3,
@@ -53,7 +53,7 @@ function treeLoad(_updateEleId, _moduleName, _fieldName, _parentId, _type)
                     }
                 });
 
-                $( "#tree_list" ).disableSelection();
+                $( "#tree-list" ).disableSelection();
             }
 
             hideLoadingBar();
@@ -64,7 +64,7 @@ function treeLoad(_updateEleId, _moduleName, _fieldName, _parentId, _type)
 function updateTree(_ele, _fieldName)
 {
 	treeBranches = new Array();
-	getTreeBranchIds("tree_list", _ele, _fieldName);
+	getTreeBranchIds("tree-list", _ele, _fieldName);
 
 	if (treeBranches.length > 0) {
 		showLoadingBar();
@@ -84,7 +84,7 @@ function updateTree(_ele, _fieldName)
 
 function getTreeBranchIds(_parentEleId, _ele, _fieldName)
 {
-	var parentId = _parentEleId == "tree_list" ? "" : _parentEleId;
+	var parentId = _parentEleId == "tree-list" ? "" : _parentEleId;
 	var child;
 	var idEle;
 	var subItems;
@@ -93,11 +93,11 @@ function getTreeBranchIds(_parentEleId, _ele, _fieldName)
 		child = _ele.childNodes[i];
 
 		if (child.nodeName == "DIV" && child.className == "sort-item") {
-			idEle = document.getElementById(child.getAttribute("id") + "_id");
+			idEle = document.getElementById(child.getAttribute("id") + "-id");
 
 			if (idEle) {
 				addTreeBranchId(parentId, idEle.getAttribute("value"));
-				subItems = document.getElementById(_fieldName + "_" + idEle.getAttribute("value"));
+				subItems = document.getElementById(_fieldName + "-" + idEle.getAttribute("value"));
 
 				if (subItems) {
 					getTreeBranchIds(idEle.getAttribute("value"), subItems, _fieldName);
@@ -125,7 +125,7 @@ function addTreeBranchId(_branchId, _id)
 
 function treeCollapse(_obj, _moduleName, _fieldName, _parentId, _type)
 {
-	var updateEleId = _fieldName + "_" + _parentId;
+	var updateEleId = _fieldName + "-" + _parentId;
 	var ele = document.getElementById(updateEleId);
 
 	if (ele.innerHTML == "") {
@@ -138,7 +138,7 @@ function treeCollapse(_obj, _moduleName, _fieldName, _parentId, _type)
 
 	treeImageRoll(_obj.getElementsByTagName("img")[0], ele);
 
-	var cookieName = "back_tree_" + _moduleName + "_" + _fieldName;
+	var cookieName = "back-tree-" + _moduleName + "-" + _fieldName;
 	if (ele.style.display == "block") saveIntoCookieList(cookieName, _parentId, null);
 	else removeFromCookieList(cookieName, parentId, null);
 }
@@ -150,8 +150,8 @@ function treeImageRoll(_img, _ele)
 
 function treeSwitcher(_name)
 {
-	var eleOpenBtn = document.getElementById(_name + "_tree_open_btn");
-	var eleContainer = document.getElementById(_name + "_tree_container");
+	var eleOpenBtn = document.getElementById(_name + "-tree-open-btn");
+	var eleContainer = document.getElementById(_name + "-tree-container");
 	eleOpenBtn.style.display = eleOpenBtn.style.display == "none" ? "block" : "none";
 	eleContainer.style.display = eleOpenBtn.style.display == "none" ? "block" : "none";
 }

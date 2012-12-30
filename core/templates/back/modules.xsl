@@ -54,14 +54,14 @@
 				<td class="navigation">
 					<xsl:choose>
 						<xsl:when test="@type = 'tree'">
-							<div id="tree_list" class="tree" />
+							<div id="tree-list" class="tree" />
 							<xsl:variable name="module-name" select="@name" />
 							<xsl:variable name="field-name">navigation</xsl:variable>
 
 							<script type="text/javascript" language="JavaScript">
 								<xsl:value-of select="concat('var formTreeValues_', $field-name, ' = new Array(')" />
 								<xsl:if test="@id"><xsl:value-of select="concat('&quot;', @id, '&quot;')" /></xsl:if>
-								<xsl:value-of select="concat('); treeLoad(&quot;tree_list&quot;, &quot;', $module-name, '&quot;, &quot;', $field-name, '&quot;, &quot;&quot;, &quot;list&quot;);')" />
+								<xsl:value-of select="concat('); treeLoad(&quot;tree-list&quot;, &quot;', $module-name, '&quot;, &quot;', $field-name, '&quot;, &quot;&quot;, &quot;list&quot;);')" />
 							</script>
 						</xsl:when>
 						<xsl:otherwise>
@@ -76,8 +76,8 @@
                             <xsl:otherwise>false</xsl:otherwise>
 						</xsl:choose></xsl:variable>
 
-						<div id="filter_content" />
-						<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('filterUpdate(&quot;filter_content&quot;, false, false, ', $is-date, ');')" /></script>
+						<div id="filter-content" />
+						<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('filterUpdate(&quot;filter-content&quot;, false, false, ', $is-date, ');')" /></script>
 					</xsl:for-each>
 
 					<xsl:apply-templates select="content" mode="module" />
@@ -101,12 +101,12 @@
 		>Добавить</a>
 		<br clear="all" />
 
-		<input type="hidden" id="wysiwyg_file_path" value="{ancestor::node()[name() = 'module']/@file-path}" />
-		<div id="document_data_blocks" />
+		<input type="hidden" id="wysiwyg-file-path" value="{ancestor::node()[name() = 'module']/@file-path}" />
+		<div id="document-data-blocks" />
 
 		<script type="text/javascript" language="JavaScript">
 			function documentUpdateDataBlocks() {
-				documentDataUpdateBranch('document_data_blocks', '<xsl:value-of select="ancestor::node()[name() = 'module']/@id" />');
+				documentDataUpdateBranch('document-data-blocks', '<xsl:value-of select="ancestor::node()[name() = 'module']/@id" />');
 			}
 			documentUpdateDataBlocks();
 		</script>

@@ -11,7 +11,7 @@ abstract class Core_Cms_Back_Office
     {
         if (!empty($_POST['items'])) {
             $tmp = new $_class;
-            $key = $tmp->getDb()->getPrimary();
+            $key = $_class->getPrimaryKeyName();
 
             $newSortOrder = array();
             for ($i = 0; $i < count($_POST['items']); $i++) {
@@ -19,10 +19,7 @@ abstract class Core_Cms_Back_Office
             }
 
             $currentSortOrder = array();
-            $objects = call_user_func_array(
-                array($_class, 'getList'),
-                array(array($key => $_POST['items']))
-            );
+            $objects = $_class::getList(array($key => $_POST['items']));
 
             foreach ($objects as $item) {
                 $currentSortOrder[] = $item->sortOrder;
@@ -32,10 +29,7 @@ abstract class Core_Cms_Back_Office
                 $newItemSortOrder = $currentSortOrder[$newSortOrder[$item->getId()]];
 
                 if ($newItemSortOrder) {
-                    $item->getDb()->updateAttribute(
-                        'sort_order',
-                        $newItemSortOrder
-                    );
+                    $item->updateAttr('sort_order', $newItemSortOrder);
                 }
             }
 
@@ -61,41 +55,35 @@ abstract class Core_Cms_Back_Office
 
         $page = new App_Cms_Page();
         $page->setTemplate(TEMPLATES . 'back/http-requests.xsl');
-        $page->setRootNodeName('http_request');
+        $page->setRootName('http-request');
 
         if (isset($data['type'])) {
-            $page->setRootNodeAttribute('type', 'tree_' . $data['type']);
+            $page->setRootAttr('type', 'tree_' . $data['type']);
         }
 
         if (isset($data['module_name'])) {
-            $page->setRootNodeAttribute('module_name', $data['module_name']);
+            $page->setRootAttr('module-name', $data['module_name']);
         }
 
         if (isset($data['field_name'])) {
-            $page->setRootNodeAttribute('field_name', $data['field_name']);
+            $page->setRootAttr('field-name', $data['field_name']);
         }
 
         if ($parentId) {
-            $page->setRootNodeAttribute('parent_id', $parentId);
+            $page->setRootAttr('parent-id', $parentId);
         }
 
         if ($currentId) {
-            $page->setRootNodeAttribute('current_object_id', $currentId);
+            $page->setRootAttr('current-object-id', $currentId);
         }
 
         foreach ($selectedIds as $i) {
             $page->addContent(Ext_Xml::cdata('selected', $i));
         }
 
-        if ($selectedIds) {
-            $gOpenBranches = call_user_func_array(
-                $_className . '::GetMultiAncestors',
-                array($selectedIds)
-            );
-
-        } else {
-            $gOpenBranches = array();
-        }
+        $gOpenBranches = $selectedIds
+                       ? $_className::getMultiAncestors($selectedIds)
+                       : array();
 
         $cookieBranchName = 'bo-tree';
 
@@ -149,18 +137,13 @@ abstract class Core_Cms_Back_Office
         global $gOpenBranches;
 
         $result = '';
-        $conditions = array('parent_id' => empty($_parentId) ? null : $_parentId);
-        $rowConditions = array();
+        $where = array('parent_id' => empty($_parentId) ? null : $_parentId);
 
         if ($_excludeId) {
-            $rowConditions[] = call_user_func($_className . '::GetPri') . ' != ' .
-                               App_Db::escape($_excludeId);
+            $where[] = $_className::getPri() . ' != ' . App_Db::escape($_excludeId);
         }
 
-        $list = call_user_func_array(
-            $_className . '::getList',
-            array($conditions, array(), $rowConditions)
-        );
+        $list = $_className::getList($where);
 
         foreach ($list as $item) {
             if (
@@ -172,7 +155,7 @@ abstract class Core_Cms_Back_Office
                 );
 
             } else if ($item->isChildren($_excludeId)) {
-                $result .= $item->getBackOfficeXml(null, array('has_children' => 'true'));
+                $result .= $item->getBackOfficeXml(null, array('has-children' => 'true'));
 
             } else {
                 $result .= $item->getBackOfficeXml();

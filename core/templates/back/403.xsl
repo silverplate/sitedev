@@ -32,8 +32,8 @@
 				<xsl:attribute name="onload">
 					<xsl:text>document.getElementById('</xsl:text>
 					<xsl:choose>
-						<xsl:when test="/node()/system/session[@action = 7]">auth_email</xsl:when>
-						<xsl:otherwise>auth_login</xsl:otherwise>
+						<xsl:when test="/node()/system/session[@action = 7]">auth-email</xsl:when>
+						<xsl:otherwise>auth-login</xsl:otherwise>
 					</xsl:choose>
 					<xsl:text>').focus();</xsl:text>
 				</xsl:attribute>
@@ -47,47 +47,47 @@
 								<table class="auth-form">
 									<tr>
 										<td class="auth-login">
-											<label for="auth_login">Логин</label>
-											<input type="text" name="auth_login" id="auth_login" maxlength="30" tabindex="1" />
+											<label for="auth-login">Логин</label>
+											<input type="text" name="auth_login" id="auth-login" maxlength="30" tabindex="1" />
 										</td>
 										<td class="auth-password">
-											<label for="auth_password">Пароль</label>
-											<input type="password" name="auth_password" id="auth_password" maxlength="255" tabindex="2" />
+											<label for="auth-password">Пароль</label>
+											<input type="password" name="auth_password" id="auth-password" maxlength="255" tabindex="2" />
 										</td>
 									</tr>
 									<tr>
 										<td colspan="3">
 											<table class="chooser-item">
 												<tr>
-													<td><input type="checkbox" name="auth_is_remember_me" id="auth_is_remember_me" value="1" tabindex="3" /></td>
-													<td class="chooser-label"><label for="auth_is_remember_me">Авторизовывайте меня сразу</label></td>
+													<td><input type="checkbox" name="auth_is_remember_me" id="auth-is-remember-me" value="1" tabindex="3" /></td>
+													<td class="chooser-label"><label for="auth-is-remember-me">Авторизовывайте меня сразу</label></td>
 												</tr>
 											</table>
-											<input type="submit" name="auth_submit" id="auth_submit" value="Войти" tabindex="5" />
+											<input type="submit" name="auth_submit" id="auth-submit" value="Войти" tabindex="5" />
 										</td>
 									</tr>
 									<xsl:apply-templates select="/node()/system/session[@action = 3 or @action = 8 or @action = 9]" />
 								</table>
 
-								<div id="auth_forgot">
+								<div id="auth-forgot">
 									<xsl:if test="/node()/system/session[@action = 6 or @action = 7]">
 										<xsl:attribute name="style">display: none;</xsl:attribute>
 									</xsl:if>
 									<span onclick="passwordReminder(true);">Я не помню пароль</span>
 								</div>
 
-								<table id="auth_reminder">
+								<table id="auth-reminder">
 									<xsl:if test="/node()/system/session[@action = 6 or @action = 7]">
 										<xsl:attribute name="style">display: block;</xsl:attribute>
 									</xsl:if>
 									<tr>
 										<td class="auth-email">
-											<label for="auth_email">Сделайте мне новый пароль. Мой адрес</label>
-											<input type="text" name="auth_email" id="auth_email" maxlength="255" />
+											<label for="auth-email">Сделайте мне новый пароль. Мой адрес</label>
+											<input type="text" name="auth_email" id="auth-email" maxlength="255" />
 										</td>
 									</tr>
 									<tr>
-										<td><input type="submit" name="auth_reminder_submit" id="auth_reminder_submit" value="Пришлите пароль" /></td>
+										<td><input type="submit" name="auth_reminder_submit" id="auth-reminder-submit" value="Пришлите пароль" /></td>
 									</tr>
 									<xsl:apply-templates select="/node()/system/session[@action = 6 or @action = 7]" />
 								</table>

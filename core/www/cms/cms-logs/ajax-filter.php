@@ -1,28 +1,27 @@
 <?php
 
-require_once('../prepend.php');
-require_once('filter_lib.php');
+require_once '../prepend.php';
+require_once 'filter-lib.php';
 
 $filter = bo_log_get_filter(true);
-$result_items = bo_log_filter($filter);
+$resultItems = bo_log_filter($filter);
 
-if (!$result_items['items'] && $result_items['total'] > 0 && $filter['page'] != 1) {
+if (!$resultItems['items'] && $resultItems['total'] > 0 && $filter['page'] != 1) {
 	$filter['page'] = 1;
-	$result_items = bo_log_filter($filter);
+	$resultItems = bo_log_filter($filter);
 }
 
 $page = new App_Cms_Page();
-$page->SetRootNodeName('http_request');
-$page->SetRootNodeAttribute('type', 'back-logs');
+$page->setRootName('http-request');
+$page->setRootAttr('type', 'back-logs');
+$page->setTemplate(TEMPLATES . 'back/http-requests.xsl');
 
-$page->SetTemplate(TEMPLATES . 'back/http-requests.xsl');
+if ($resultItems['items']) {
+	$users = App_Cms_Back_User::getList();
+	$sections = App_Cms_Back_Section::getList();
+	$actions = App_Cms_Back_Log::getActions();
 
-if ($result_items['items']) {
-	$users = App_Cms_Back_User::GetList();
-	$sections = App_Cms_Back_Section::GetList();
-	$actions = App_Cms_Back_Log::GetActions();
-
-	foreach ($result_items['items'] as $item) {
+	foreach ($resultItems['items'] as $item) {
 		$xml = array();
 
 		if ($item->backUserId && isset($users[$item->backUserId])) {
@@ -33,7 +32,7 @@ if ($result_items['items']) {
 		}
 
 		if ($item->backSectionId && isset($sections[$item->backSectionId])) {
-			$xml['section'] = $sections[$item->backSectionId]->GetTitle();
+			$xml['section'] = $sections[$item->backSectionId]->getTitle();
 
 		} else if ($item->sectionName) {
 			$xml['section'] = $item->sectionName;
@@ -43,18 +42,21 @@ if ($result_items['items']) {
 			$xml['action'] = $actions[$item->actionId];
 		}
 
-		$append_xml = '';
+		$appendXml = '';
+
 		foreach ($xml as $name => $value) {
-			$append_xml .= "<{$name}><![CDATA[{$value}]]></{$name}>";
+		    $appendXml .= Ext_Xml::cdata($name, $value);
 		}
 
-		$page->AddContent($item->getBackOfficeXml($append_xml));
+		$page->addContent($item->getBackOfficeXml($appendXml));
 	}
 
-	$page->AddContent('<list_navigation page="' . $filter['page'] . '" per_page="' . $filter['per_page'] . '" total="' . $result_items['total'] . '" />');
+	$page->addContent(Ext_Xml::node('list-navigation', null, array(
+        'page' => $filter['page'],
+        'per-page' => $filter['per_page'],
+        'total' => $resultItems['total']
+    )));
 }
 
 header('Content-type: text/html; charset=utf-8');
-$page->Output();
-
-?>
+$page->output();

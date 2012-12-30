@@ -63,7 +63,7 @@
 			</tr>
 		</table>
 
-		<div id="{$field-name}_{@id}" class="tree-subitems"><xsl:if test="item">
+		<div id="{$field-name}-{@id}" class="tree-subitems"><xsl:if test="item">
 			<xsl:attribute name="style">display: block;</xsl:attribute>
 			<xsl:apply-templates select="item" mode="form-tree" />
 		</xsl:if></div>
@@ -73,8 +73,8 @@
 		<xsl:variable name="module-name" select="/node()/@module-name" />
 		<xsl:variable name="field-name" select="/node()/@field-name" />
 
-		<div id="sort_item_{@id}" class="sort-item">
-			<input type="hidden" id="sort_item_{@id}_id" value="{@id}" />
+		<div id="sort-item-{@id}" class="sort-item">
+			<input type="hidden" id="sort-item-{@id}-id" value="{@id}" />
 
 			<table class="tree">
 				<tr>
@@ -101,7 +101,7 @@
 				</tr>
 			</table>
 
-			<div id="{$field-name}_{@id}" class="tree-subitems"><xsl:if test="item">
+			<div id="{$field-name}-{@id}" class="tree-subitems"><xsl:if test="item">
 				<xsl:attribute name="style">display: block;</xsl:attribute>
 				<xsl:apply-templates select="item" mode="list-tree" />
 			</xsl:if></div>
@@ -113,7 +113,7 @@
 	</xsl:template>
 
 	<xsl:template match="document-data">
-		<div class="document-data" id="document_data_ele_{@id}">
+		<div class="document-data" id="document-data-ele-{@id}">
 			<input type="hidden" value="{@id}" />
 			<xsl:apply-templates select="self::node()" mode="document-data" />
 			<br clear="all" />
@@ -177,8 +177,8 @@
 							<xsl:text>clear: both; padding-bottom: 1em;</xsl:text>
 							<xsl:if test="additional/self"> padding-top: 1em;</xsl:if>
 						</xsl:attribute>
-						<a class="function" onclick="changeElementVisibility('other_images_{@id}');">Все изображения</a>
-						<div id="other_images_{@id}">
+						<a class="function" onclick="changeElementVisibility('other-images-{@id}');">Все изображения</a>
+						<div id="other-images-{@id}">
 							<xsl:attribute name="style">
 								<xsl:text>margin-top: 1em; display: </xsl:text>
 								<xsl:choose>
@@ -282,7 +282,7 @@
 
 								<xsl:choose>
 									<xsl:when test="$is-subsection = 'true'">
-										<a onclick="changeElementVisibility('back_log_section_{generate-id()}');" class="section">
+										<a onclick="changeElementVisibility('back-log-section-{generate-id()}');" class="section">
 											<xsl:choose>
 												<xsl:when test="section"><xsl:value-of select="section/text()" disable-output-escaping="yes" /></xsl:when>
 												<xsl:otherwise><i>Без раздела</i></xsl:otherwise>
@@ -320,8 +320,8 @@
 								</xsl:if>
 
 								<div>
-									<a onclick="changeElementVisibility('back_log_user_{generate-id()}');" class="section"><xsl:value-of select="user/text()" disable-output-escaping="yes" /></a>
-									<div class="section" id="back_log_user_{generate-id()}">
+									<a onclick="changeElementVisibility('back-log-user-{generate-id()}');" class="section"><xsl:value-of select="user/text()" disable-output-escaping="yes" /></a>
+									<div class="section" id="back-log-user-{generate-id()}">
 										<xsl:value-of select="concat('IP: ', @user-ip)" /><br />
 										<xsl:value-of select="concat('Браузер: ', user-agent/text())" disable-output-escaping="yes" />
 									</div>

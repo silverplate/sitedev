@@ -65,8 +65,11 @@ if ($page->IsAuthorized()) {
                                     $usedCond
                                     GROUP BY $templateKey");
         $templates = array();
-        $templatesParams = array('sort_order' => 'is_document_main DESC, title');
-        foreach (App_Cms_Front_Template::getList(null, $templatesParams) as $id => $item) {
+
+        foreach (
+            App_Cms_Front_Template::getList(null, array('order' => 'is_document_main DESC, title')) as
+            $id => $item
+        ) {
             if (
                 ($obj->getId() && $obj->$templateKey == $id) ||
                 ($item->isPublished && ($item->isMultiple || !in_array($id, $used)))
@@ -99,7 +102,7 @@ if ($page->IsAuthorized()) {
                 $form->Elements['files']->AddAdditionalXml($item->GetXml());
             }
 
-            $form->Groups['content']->addAdditionalXml('<document_data />');
+            $form->Groups['content']->addAdditionalXml('<document-data />');
             $form->CreateButton('Сохранить', 'update');
             $form->CreateButton('Удалить', 'delete');
 

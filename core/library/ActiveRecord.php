@@ -738,14 +738,16 @@ abstract class Core_ActiveRecord
      * @param array $_params
      * @return array[App_ActiveRecord]
      */
-    public static function getList($_where = array(), $_params = array())
+    public static function getList($_where = null, $_params = array())
     {
         $where = array();
         $row = array();
 
-        foreach ($_where as $key => $value) {
-            if (Ext_Number::isInteger($key)) $row[] = $value;
-            else                             $where[$key] = $value;
+        if ($_where) {
+            foreach ($_where as $key => $value) {
+                if (Ext_Number::isInteger($key)) $row[] = $value;
+                else                             $where[$key] = $value;
+            }
         }
 
         if ($where) {

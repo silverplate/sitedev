@@ -38,7 +38,7 @@
     >
 		<script type="text/javascript" src="/cms/f/js/filter.js" />
 
-		<div id="filter_link">
+		<div id="filter-link">
 			<xsl:if test="@is-open"><xsl:attribute name="style">display: none;</xsl:attribute></xsl:if>
 			<a onclick="showFilter();">Отфильтровать</a>
 		</div>
@@ -57,7 +57,7 @@
 			</xsl:choose>
 		</xsl:variable>
 
-		<form id="filter" onsubmit="filterUpdate('filter_content', true, {$is-sortable}, {$is-date}); return false;">
+		<form id="filter" onsubmit="filterUpdate('filter-content', true, {$is-sortable}, {$is-date}); return false;">
 			<xsl:if test="@is-open"><xsl:attribute name="style">display: block;</xsl:attribute></xsl:if>
 			<div class="filter-close"><a onclick="hideFilter();">&times;</a></div>
 			<xsl:if test="$is-date = 'true'">
@@ -66,22 +66,22 @@
 
 			<xsl:if test="@is-title">
 				<div class="filter-input">
-					<label for="filter_title">Название</label>
-					<input type="text" name="filter_title" id="filter_title" class="string" value="{filter-title}" />
+					<label for="filter-title">Название</label>
+					<input type="text" name="filter_title" id="filter-title" class="string" value="{filter-title}" />
 				</div>
 			</xsl:if>
 
 			<xsl:if test="@is-name">
 				<div class="filter-input">
-					<label for="filter_name">Имя</label>
-					<input type="text" name="filter_name" id="filter_name" class="string" value="{filter-name}" />
+					<label for="filter-name">Имя</label>
+					<input type="text" name="filter_name" id="filter-name" class="string" value="{filter-name}" />
 				</div>
 			</xsl:if>
 
 			<xsl:if test="@is-email">
 				<div class="filter-input">
-					<label for="filter_email">Электропочта</label>
-					<input type="text" name="filter_email" id="filter_email" class="string" value="{filter-email}" />
+					<label for="filter-email">Электропочта</label>
+					<input type="text" name="filter_email" id="filter-email" class="string" value="{filter-email}" />
 				</div>
 			</xsl:if>
 
@@ -93,8 +93,8 @@
 		<br clear="all" />
 
 		<xsl:if test="@type = 'filter'">
-			<ul id="filter_content"><xsl:if test="@is-sortable"><xsl:attribute name="class">sortable</xsl:attribute></xsl:if></ul>
-			<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('filterUpdate(&quot;filter_content&quot;, false, ', $is-sortable, ', ', $is-date, ');')" /></script>
+			<ul id="filter-content"><xsl:if test="@is-sortable"><xsl:attribute name="class">sortable</xsl:attribute></xsl:if></ul>
+			<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('filterUpdate(&quot;filter-content&quot;, false, ', $is-sortable, ', ', $is-date, ');')" /></script>
 		</xsl:if>
 	</xsl:template>
 
@@ -102,14 +102,14 @@
 		<div class="filter-input">
 			<table class="chooser-item">
 				<tr>
-					<td><input type="checkbox" name="is_filter_{@name}" id="is_filter_{@name}" value="1" onclick="changeElementVisibility('filter_{@name}_ele', this.checked);">
+					<td><input type="checkbox" name="is_filter_{@name}" id="is-filter-{@name}" value="1" onclick="changeElementVisibility('filter-{@name}-ele', this.checked);">
 						<xsl:if test="@is-selected">
                             <xsl:attribute name="checked">true</xsl:attribute>
                         </xsl:if>
 					</input></td>
 					<td class="chooser-label">
-						<label for="is_filter_{@name}" class="filter_name"><xsl:value-of select="title" disable-output-escaping="yes" /></label>
-						<table class="chooser-item" id="filter_{@name}_ele">
+						<label for="is-filter-{@name}" class="filter-name"><xsl:value-of select="title" disable-output-escaping="yes" /></label>
+						<table class="chooser-item" id="filter-{@name}-ele">
 							<xsl:if test="not(@is-selected)">
                                 <xsl:attribute name="style">display: none;</xsl:attribute>
                             </xsl:if>
@@ -135,19 +135,19 @@
 			<tr>
 				<td class="label">С</td>
 				<td class="form-calendar">
-					<input type="hidden" name="filter_from" id="filter_from" value="{@from}" />
-					<input type="text" id="filter_from_input" onblur="calendarParseInput('filter_from');" />
-					<button onclick="calendarSwitcher('filter_from', event); return false;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
-					<script type="text/javascript" language="JavaScript">calendarInit('filter_from');</script>
+					<input type="hidden" name="filter_from" id="filter-from" value="{@from}" />
+					<input type="text" id="filter-from-input" onblur="calendarParseInput('filter-from');" />
+					<button onclick="calendarSwitcher('filter-from', event); return false;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
+					<script type="text/javascript" language="JavaScript">calendarInit('filter-from');</script>
 				</td>
 			</tr>
 			<tr>
 				<td class="label">По</td>
 				<td class="form-calendar">
-					<input type="hidden" name="filter_till" id="filter_till" value="{@till}" />
-					<input type="text" id="filter_till_input" onblur="calendarParseInput('filter_till');" />
-					<button onclick="calendarSwitcher('filter_till', event); return false;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
-					<script type="text/javascript" language="JavaScript">calendarInit('filter_till');</script>
+					<input type="hidden" name="filter_till" id="filter-till" value="{@till}" />
+					<input type="text" id="filter-till-input" onblur="calendarParseInput('filter-till');" />
+					<button onclick="calendarSwitcher('filter-till', event); return false;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
+					<script type="text/javascript" language="JavaScript">calendarInit('filter-till');</script>
 				</td>
 			</tr>
 		</table>
@@ -163,7 +163,7 @@
 	</xsl:template>
 
 	<xsl:template match="local-navigation" name="local-navigation" mode="list">
-		<ul id="filter_content">
+		<ul id="filter-content">
 			<xsl:if test="@is-sortable"><xsl:attribute name="class">sortable</xsl:attribute></xsl:if>
 			<xsl:choose>
 				<xsl:when test="item">
@@ -179,7 +179,7 @@
 		<xsl:if test="@is-sortable">
 			<script type="text/javascript">
 			    $(function() {
-			        $("#filter_content").sortable({update: itemSort});
+			        $("#filter-content").sortable({update: itemSort});
 			    });
 			</script>
 		</xsl:if>
@@ -190,7 +190,7 @@
 		<xsl:param name="is-sortable">0</xsl:param>
 
 		<li>
-			<xsl:if test="$is-sortable = 1"><xsl:attribute name="id">local_item_<xsl:value-of select="position()" /></xsl:attribute></xsl:if>
+			<xsl:if test="$is-sortable = 1"><xsl:attribute name="id">local-item-<xsl:value-of select="position()" /></xsl:attribute></xsl:if>
 			<xsl:for-each select="@*[name() = 'xml:lang' or name() = 'prefix']"><xsl:value-of select="concat(., '&nbsp;')" /></xsl:for-each>
 
 			<xsl:choose>

@@ -1,46 +1,7 @@
-/*** Общие функции (можно вынести в общий файл)
-*********************************************************/
-function elementEosition(ele) {
-    this.x = ele.offsetLeft;
-    this.y = ele.offsetTop;
-    this.ele = ele;
-
-    while (this.ele.offsetParent != null) {
-        this.ele = this.ele.offsetParent;
-        this.x += this.ele.offsetLeft;
-        this.y += this.ele.offsetTop;
-    }
-}
-
-function addEvent(ele, type, func) {
-	if (ele.addEventListener) {
-		ele.addEventListener(type, func, false);
-
-	} if (ele.attachEvent) {
-		ele.attachEvent('on' + type, func);
-	}
-}
-
-function removeEvent(ele, type, func) {
-	if (ele.removeEventListener) {
-		ele.removeEventListener(type, func, false);
-
-	} if (ele.detachEvent) {
-		ele.detachEvent('on' + type, func);
-	}
-}
-
-function cancelEvent(e) {
-	var evt = e ? e : window.event;
-	evt.cancelBubble = true;
-}
-
-
-/*** Календарь
-*********************************************************/
 var calendars = new Array();
 
-function getCalendar(name) {
+function getCalendar(name)
+{
 	for (var i = 0; i < calendars.length; i++) {
 		if (calendars[i].name == name) {
 			return calendars[i];
@@ -49,33 +10,40 @@ function getCalendar(name) {
 	return false;
 }
 
-function calendarInit(name, lang) {
-	calendars[calendars.length] = new calendar(name, lang);
+function calendarInit(name, lang)
+{
+	calendars[calendars.length] = new Calendar(name, lang);
 }
 
-function calendarParseInput(name) {
+function calendarParseInput(name)
+{
 	getCalendar(name).parseInput();
 }
 
-function calendarRemove() {
+function calendarRemove()
+{
 	for (var i = 0; i < calendars.length; i++) {
 		calendars[i].remove();
 	}
 }
 
-function calendarSwitcher(name, e) {
+function calendarSwitcher(name, e)
+{
 	getCalendar(name).calendar(e);
 }
 
-function calendarDraw(name, y, m, d) {
+function calendarDraw(name, y, m, d)
+{
 	getCalendar(name).draw(y, m, d);
 }
 
-function calendarSet(name, y, m, d) {
+function calendarSet(name, y, m, d)
+{
 	getCalendar(name).set(y, m, d);
 }
 
-function calendar(name, lang) {
+function Calendar(name, lang)
+{
 	this.name = name;
 	this.lang = lang != 'en' && lang != 'ru' ? 'ru' : lang;
 
@@ -87,27 +55,33 @@ function calendar(name, lang) {
 		? new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December')
 		: new Array('Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь');
 
-	this.getEleName = function() {
-		return this.name + '_calendar_ele';
-	}
+	this.getEleName = function()
+	{
+		return this.name + '-calendar-ele';
+	};
 
-	this.getInputName = function() {
-		return this.name + '_input';
-	}
+	this.getInputName = function()
+	{
+		return this.name + '-input';
+	};
 
-	this.getEle = function() {
+	this.getEle = function()
+	{
 		return document.getElementById(this.getEleName());
-	}
+	};
 
-	this.getDateEle = function() {
+	this.getDateEle = function()
+	{
 		return document.getElementById(this.name);
-	}
+	};
 
-	this.getInputEle = function() {
+	this.getInputEle = function()
+	{
 		return document.getElementById(this.getInputName());
-	}
+	};
 
-	this.stringToDate = function(string) {
+	this.stringToDate = function(string)
+	{
 		var regexp = /^\s*(\d+)[\s|\/|.|\-](.+)[\s|\/|.|\-](\d+)\s*$/i;
 		var parse = regexp.exec(string);
 		var now = new Date();
@@ -136,9 +110,10 @@ function calendar(name, lang) {
 		}
 
 		return date;
-	}
+	};
 
-	this.getSqlDate = function(date) {
+	this.getSqlDate = function(date)
+	{
 		var m = (date.getMonth() + 1).toString();
 		if (m.length == 1) m = '0' + m;
 
@@ -146,34 +121,39 @@ function calendar(name, lang) {
 		if (d.length == 1) d = '0' + d;
 
 		return date.getFullYear() + '-' + m + '-' + d;
-	}
+	};
 
-	this.getDate = function() {
+	this.getDate = function()
+	{
 		return this.stringToDate(this.getInputEle().value);
-	}
+	};
 
-	this.setDate = function(y, m, d) {
+	this.setDate = function(y, m, d)
+	{
 		var date = new Date(y, m, d);
 		this.getInputEle().value = date.getDate() + ' ' + this.months[date.getMonth()].substr(0, 3).toLowerCase() + ' ' + date.getFullYear();
 		this.getDateEle().value = this.getSqlDate(date);
-	}
+	};
 
     this.isDateSet = function()
     {
         return this.getDateEle().value != '';
-    }
+    };
 
-	this.clearDate = function() {
+	this.clearDate = function()
+	{
 		this.getInputEle().value = '';
 		this.getDateEle().value = '';
-	}
+	};
 
-	this.set = function(y, m, d) {
+	this.set = function(y, m, d)
+	{
 		this.setDate(y, m, d);
 		this.remove();
-	}
+	};
 
-	this.calendar = function(e) {
+	this.calendar = function(e)
+	{
 		cancelEvent(e);
 
 		if (this.getEle()) {
@@ -183,37 +163,41 @@ function calendar(name, lang) {
 			calendarRemove();
 			this.draw();
 		}
-	}
+	};
 
-	this.remove = function() {
+	this.remove = function()
+	{
 		if (this.getEle()) {
 			this.getEle().parentNode.removeChild(this.getEle());
 			removeEvent(document, 'click', calendarRemove);
 		}
-	}
+	};
 
-	this.parseInput = function() {
+	this.parseInput = function()
+	{
 		if (this.getInputEle().value) {
 			var date = this.getDate();
 			this.setDate(date.getFullYear(), date.getMonth(), date.getDate());
 		} else {
 			this.clearDate();
 		}
-	}
+	};
 
-	this.init = function() {
+	this.init = function()
+	{
 		if (this.getDateEle().value && this.getDateEle().value != '0000-00-00') {
 			var date = this.stringToDate(this.getDateEle().value);
 			this.setDate(date.getFullYear(), date.getMonth(), date.getDate());
 		}
-	}
+	};
 
-	this.draw = function(y, m, d) {
+	this.draw = function(y, m, d)
+	{
 		this.remove();
 
 		var bodyEle = document.getElementsByTagName('body')[0];
 		var ele = document.createElement('div');
-		var pos = new elementPosition(this.getInputEle());
+		var pos = new getElementPosition(this.getInputEle());
 
 		ele.className = 'calendar';
 		ele.id = this.getEleName();
@@ -278,7 +262,7 @@ function calendar(name, lang) {
 
 		content += '</tr></tbody></table>';
 		ele.innerHTML = content;
-	}
+	};
 
 	this.init();
 }

@@ -99,18 +99,18 @@ if (is_null($document_id) || !App_Cms_Front_Document::Load($document_id)) {
     }
 
     if ($form->UpdateStatus == FORM_ERROR) {
-        $page->SetUpdateStatus('error');
+        $page->setUpdateStatus('error');
 
-    } elseif (isset($_GET['OK'])) {
-        $page->SetUpdateStatus('success');
-        $page->AddContent('<update_parent>documentUpdateDataBlocks()</update_parent>');
+    } else if (isset($_GET['OK'])) {
+        $page->setUpdateStatus('success');
+        $page->addContent('<update-parent>documentUpdateDataBlocks()</update-parent>');
 
-    } elseif (isset($_GET['DEL'])) {
-        $page->SetUpdateStatus('success', 'Данные удалены.');
-        $page->AddContent('<update_parent>documentUpdateDataBlocks()</update_parent>');
+    } else if (isset($_GET['DEL'])) {
+        $page->setUpdateStatus('success', 'Данные удалены.');
+        $page->addContent('<update-parent>documentUpdateDataBlocks()</update-parent>');
     }
 
-    $page->AddContent($form->GetXml());
+    $page->addContent($form->getXml());
 }
 
-$page->Output();
+$page->output();

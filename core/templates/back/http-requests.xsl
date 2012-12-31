@@ -108,7 +108,7 @@
 		</div>
 	</xsl:template>
 
-	<xsl:template match="http-request[@type = 'document_data']">
+	<xsl:template match="http-request[@type = 'document-data']">
 		<xsl:apply-templates select="content/document-data" />
 	</xsl:template>
 

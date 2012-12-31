@@ -61,7 +61,9 @@
 						</xsl:attribute>
 					</xsl:if>
 
-					<a onclick="showFormGroup('{@name}'); return false"><xsl:value-of select="title/text()" disable-output-escaping="yes" /></a>
+					<a onclick="showFormGroup('{@name}'); return false;">
+                        <xsl:value-of select="title/text()" disable-output-escaping="yes" />
+                    </a>
 				</td>
 			</xsl:for-each>
 		</table>

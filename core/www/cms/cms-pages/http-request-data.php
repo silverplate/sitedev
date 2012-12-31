@@ -4,7 +4,7 @@ require '../prepend.php';
 
 $page = new App_Cms_Page();
 $page->setRootName('http-request');
-$page->setRootAttr('type', 'Data');
+$page->setRootAttr('type', 'document-data');
 $page->setTemplate(TEMPLATES . 'back/http-requests.xsl');
 
 $data = $_POST;
@@ -14,7 +14,6 @@ if (!empty($data['id'])) {
 	$page->addContent(getBranchXml($data['id']));
 }
 
-header('Content-type: text/html; charset=utf-8');
 $page->output();
 
 

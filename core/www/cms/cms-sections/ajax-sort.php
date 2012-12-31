@@ -17,7 +17,7 @@ if (isset($_POST['items']) && $_POST['items']) {
     foreach ($objects as $item) {
         $new_item_sort_order = $current_sort_order[$new_sort_order[$item->GetId()]];
         if ($new_item_sort_order) {
-            $item->UpdateAttribute('sort_order', $new_item_sort_order);
+            $item->updateAttr('sort_order', $new_item_sort_order);
         }
     }
 

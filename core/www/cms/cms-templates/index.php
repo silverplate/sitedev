@@ -21,7 +21,7 @@ if ($page->isAuthorized()) {
         $form->load('form.xml');
 
         if ($obj->getId()) {
-            $form->fillFields($obj->getDb()->toArray());
+            $form->fillFields($obj->toArray());
             $form->Elements['content']->setValue($obj->getContent());
 
             $form->createButton('Сохранить', 'update');
@@ -34,7 +34,7 @@ if ($page->isAuthorized()) {
         $form->execute();
 
         if ($form->UpdateStatus == FORM_UPDATED) {
-            $obj->getDb()->fillWithData($form->getSqlValues());
+            $obj->fillWithData($form->getSqlValues());
 
             if (
                 isset($form->Buttons['delete']) &&

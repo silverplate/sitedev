@@ -143,7 +143,7 @@ if ($page->IsAuthorized()) {
 
                         foreach (App_Cms_Front_Data::GetList(array(App_Cms_Front_Document::getPri() => $obj->getId(), 'is_mount' => 1)) as $data) {
                             if (isset($_POST['document_data_form_ele_' . $data->GetId()])) {
-                                $data->UpdateAttribute('content', $data->GetParsedContent($_POST['document_data_form_ele_' . $data->GetId()]));
+                                $data->updateAttr('content', $data->GetParsedContent($_POST['document_data_form_ele_' . $data->GetId()]));
                                 App_Cms_Back_Log::LogModule(App_Cms_Back_Log::ACT_MODIFY, $data->GetId(), 'Блоки данных. Документ ' . $obj->getId());
                             }
                         }

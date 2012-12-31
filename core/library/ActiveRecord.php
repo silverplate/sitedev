@@ -595,7 +595,7 @@ abstract class Core_ActiveRecord
             'UPDATE ' . $this->getTable() .
             App_Db::get()->getQueryFields($attrs, 'update', true) .
             'WHERE ' . $this->getPrimaryKeyWhere() .
-            'LIMIT 1'
+            ' LIMIT 1'
         );
     }
 
@@ -616,7 +616,7 @@ abstract class Core_ActiveRecord
             'UPDATE ' . $this->getTable() .
             App_Db::get()->getQueryFields($attrs, 'update', true) .
             'WHERE ' . $this->getPrimaryKeyWhere() .
-            'LIMIT 1'
+            ' LIMIT 1'
         );
     }
 

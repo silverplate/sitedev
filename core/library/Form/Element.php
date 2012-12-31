@@ -132,7 +132,7 @@ abstract class Core_Form_Element
         $xml = '<element name="' . $this->Name . '" type="' . $this->Type . '" update_type="'. $this->UpdateType . '"';
 
         if ($this->IsRequired) {
-            $xml .= ' is_required="true"';
+            $xml .= ' is-required="true"';
         }
 
         if ($this->isReadOnly()) {

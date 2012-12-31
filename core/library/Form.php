@@ -134,7 +134,7 @@ abstract class Core_Form
 			$label_node = Ext_Dom::getChildByName($_item, 'label');
 			$label = $label_node && $label_node->nodeValue ? $label_node->nodeValue : null;
 
-			$element = $this->CreateElement($_item->getAttribute('name'), $_item->getAttribute('type'), $label, $_item->hasAttribute('is_required'));
+			$element = $this->CreateElement($_item->getAttribute('name'), $_item->getAttribute('type'), $label, $_item->hasAttribute('is-required'));
 
 			if ($element) {
 			    if ($_item->hasAttribute('is-readonly')) {

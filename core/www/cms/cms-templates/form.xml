@@ -2,34 +2,34 @@
 <!DOCTYPE form SYSTEM "../../../templates/entities.dtd">
 
 <form>
-	<group name="main">
-		<title>Основное</title>
+    <group name="main">
+        <title>Основное</title>
 
-		<element name="title" type="string" is_required="true">
-			<label>Название</label>
-		</element>
+        <element name="title" type="string" is-required="true">
+            <label>Название</label>
+        </element>
 
-		<element name="filename" type="filename" is_required="true">
-			<label>Имя файла</label>
-		</element>
+        <element name="filename" type="filename" is-required="true">
+            <label>Имя файла</label>
+        </element>
 
-		<element name="is_document_main" type="boolean">
-			<label>Основной шаблон?</label>
-		</element>
+        <element name="is_document_main" type="boolean">
+            <label>Основной шаблон?</label>
+        </element>
 
-		<element name="is_multiple" type="boolean">
-			<label>Возможно использование для&nbsp;нескольких элементов?</label>
-		</element>
+        <element name="is_multiple" type="boolean">
+            <label>Возможно использование для&nbsp;нескольких элементов?</label>
+        </element>
 
-		<element name="is_published" type="boolean">
-			<label>Показывать</label>
-			<value>1</value>
-		</element>
-	</group>
+        <element name="is_published" type="boolean">
+            <label>Показывать</label>
+            <value>1</value>
+        </element>
+    </group>
 
-	<group name="content">
-		<title>Код</title>
+    <group name="content">
+        <title>Код</title>
 
-		<element name="content" type="large_text" />
-	</group>
+        <element name="content" type="large_text" />
+    </group>
 </form>

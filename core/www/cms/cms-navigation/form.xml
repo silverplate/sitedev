@@ -1,20 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
+<!DOCTYPE form SYSTEM "../../../templates/entities.dtd">
 
 <form>
-	<element name="title" type="string" is_required="true">
-		<label><![CDATA[Название]]></label>
-	</element>
+    <element name="title" type="string" is-required="true">
+        <label><![CDATA[Название]]></label>
+    </element>
 
-	<element name="name" type="folder" is_required="true">
-		<label><![CDATA[Тэг]]></label>
-		<description><![CDATA[Можно использовать латинские буквы, цифры и&nbsp;знак подчеркивания.]]></description>
-	</element>
+    <element name="name" type="folder" is-required="true">
+        <label>Тэг</label>
+        <description>Можно использовать латинские буквы, цифры и&nbsp;знак подчеркивания.</description>
+    </element>
 
-	<element name="type" type="chooser">
-		<label><![CDATA[Тип]]></label>
-	</element>
+    <element name="type" type="chooser">
+        <label>Тип</label>
+    </element>
 
-	<element name="is_published" type="boolean">
-		<label><![CDATA[Публиковать]]></label>
-	</element>
+    <element name="is_published" type="boolean">
+        <label>Публиковать</label>
+    </element>
 </form>

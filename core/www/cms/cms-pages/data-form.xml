@@ -2,11 +2,11 @@
 <!DOCTYPE form SYSTEM "../../../templates/entities.dtd">
 
 <form>
-    <element name="title" type="string" is_required="true">
+    <element name="title" type="string" is-required="true">
         <label>Название</label>
     </element>
 
-    <element name="tag" type="folder" is_required="true">
+    <element name="tag" type="folder" is-required="true">
         <label>Тэг</label>
         <description>Можно использовать латинские буквы, цифры и&nbsp;знак подчеркивания.</description>
     </element>

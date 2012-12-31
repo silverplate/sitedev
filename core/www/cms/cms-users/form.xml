@@ -1,33 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
+<!DOCTYPE form SYSTEM "../../../templates/entities.dtd">
 
 <form>
-	<element name="login" type="login" is_required="true">
-		<label><![CDATA[Логин]]></label>
-		<description><![CDATA[Можно использовать латинские буквы, цифры и&nbsp;знак подчеркивания.]]></description>
-	</element>
+    <element name="login" type="login" is-required="true">
+        <label>Логин</label>
+        <description>Можно использовать латинские буквы, цифры и&nbsp;знак подчеркивания.</description>
+    </element>
 
-	<element name="passwd" type="password">
-		<label><![CDATA[Пароль]]></label>
-	</element>
+    <element name="passwd" type="password">
+        <label>Пароль</label>
+    </element>
 
-	<element name="status_id" type="boolean">
-		<label><![CDATA[Доступ разрешён]]></label>
-		<value>1</value>
-	</element>
+    <element name="status_id" type="boolean">
+        <label>Доступ разрешён</label>
+        <value>1</value>
+    </element>
 
-	<element name="ip_restriction" type="short_text">
-		<label><![CDATA[Разрешённые <nobr>IP-адреса</nobr>]]></label>
-	</element>
+    <element name="ip_restriction" type="short_text">
+        <label>Разрешённые IP-адреса</label>
+    </element>
 
-	<element name="sections" type="multiple">
-		<label><![CDATA[Доступные разделы]]></label>
-	</element>
+    <element name="sections" type="multiple">
+        <label>Доступные разделы</label>
+    </element>
 
-	<element name="title" type="string">
-		<label><![CDATA[Имя]]></label>
-	</element>
+    <element name="title" type="string">
+        <label>Имя</label>
+    </element>
 
-	<element name="email" type="email">
-		<label><![CDATA[Электропочта]]></label>
-	</element>
+    <element name="email" type="email">
+        <label>Электропочта</label>
+    </element>
 </form>

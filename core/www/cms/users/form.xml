@@ -1,24 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
+<!DOCTYPE form SYSTEM "../../../templates/entities.dtd">
 
 <form>
-	<element name="name" type="name" is_required="true">
-		<label><![CDATA[Имя]]></label>
-	</element>
+    <element name="name" type="name" is-required="true">
+        <label>Имя</label>
+    </element>
 
-	<element name="email" type="email" is_required="true">
-		<label><![CDATA[Электропочта]]></label>
-	</element>
+    <element name="email" type="email" is-required="true">
+        <label>Электропочта</label>
+    </element>
 
-	<element name="phone" type="phone">
-		<label><![CDATA[Телефон]]></label>
-	</element>
+    <element name="phone" type="phone">
+        <label>Телефон</label>
+    </element>
 
-	<element name="passwd" type="password">
-		<label><![CDATA[Пароль]]></label>
-	</element>
+    <element name="passwd" type="password">
+        <label>Пароль</label>
+    </element>
 
-	<element name="status_id" type="boolean">
-		<label><![CDATA[Доступ разрешён]]></label>
-		<value>1</value>
-	</element>
+    <element name="status_id" type="boolean">
+        <label>Доступ разрешён</label>
+        <value>1</value>
+    </element>
 </form>

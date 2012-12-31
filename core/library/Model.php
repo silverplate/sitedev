@@ -45,9 +45,10 @@ class Core_Model extends App_ActiveRecord
         $attrs = $_attrs;
 
         if (
-            !isset($attrs['is_published']) &&
-            $this->hasAttribute('is_published') &&
-            $this->isPublished
+            !isset($attrs['is_published']) && (
+                ($this->hasAttribute('is_published') && $this->isPublished) ||
+                ($this->hasAttribute('status_id') && $this->statusId == 1)
+            )
         ) {
             $attrs['is-published'] = 1;
         }

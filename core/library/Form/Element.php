@@ -56,14 +56,11 @@ abstract class Core_Form_Element
     public function setValue()
     {
         if (func_num_args() == 1) {
-            $value = func_get_arg(0);
-            $this->Value = $value == 'NULL' ? '' : Ext_Xml::decodeCdata($value);
+            $this->Value = Ext_Xml::decodeCdata(func_get_arg(0));
 
         } else if (func_num_args() == 2) {
             if (!is_array($this->Value)) $this->Value = array();
-
-            $value = func_get_arg(1);
-            $this->Value[func_get_arg(0)] = $value == 'NULL' ? '' : Ext_Xml::decodeCdata($value);
+            $this->Value[func_get_arg(0)] = Ext_Xml::decodeCdata(func_get_arg(1));
 
         } else {
             $this->Value = '';

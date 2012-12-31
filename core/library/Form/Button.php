@@ -16,11 +16,11 @@ abstract class Core_Form_Button
         $xml = '<button name="' . $this->Name . '"';
 
         if ($this->IsSubmited()) {
-            $xml .= ' is_submited="true"';
+            $xml .= ' is-submited="true"';
         }
 
         if ($this->ImageUrl) {
-            $xml .= ' image_url="' . $this->ImageUrl . '"';
+            $xml .= ' image-url="' . $this->ImageUrl . '"';
         }
 
         $xml .= '><label><![CDATA[' . $this->Label . ']]></label></button>';

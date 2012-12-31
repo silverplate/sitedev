@@ -33,7 +33,7 @@ abstract class Core_Form
 
 	public function CreateGroup($_name, $_title) {
 		$this->Groups[$_name] = new App_Form_Group($_name, $_title);
-		$this->Groups[$_name]->SetSelected(isset($_COOKIE['form_group']) && $_COOKIE['form_group'] == $_name);
+		$this->Groups[$_name]->setSelected(isset($_COOKIE['form-group']) && $_COOKIE['form-group'] == $_name);
 
 		return $this->Groups[$_name];
 	}

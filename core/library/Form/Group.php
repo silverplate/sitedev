@@ -51,7 +51,7 @@ abstract class Core_Form_Group
     public function GetXml() {
         $result = '<group';
         if ($this->Name) $result .= ' name="' . $this->Name . '"';
-        if ($this->IsSelected) $result .= ' is_selected="true"';
+        if ($this->IsSelected) $result .= ' is-selected="true"';
         $result .= '>';
         if ($this->Title) $result .= '<title><![CDATA[' . $this->Title . ']]></title>';
         if ($this->AdditionalXml) $result .= '<additional>' . $this->AdditionalXml . '</additional>';

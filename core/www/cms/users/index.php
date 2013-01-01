@@ -87,22 +87,22 @@ if ($page->IsAuthorized()) {
     }
 
     $filter = obj_get_filter();
-    $list_xml = '<local-navigation type="filter"';
+    $listXml = '<local-navigation type="filter"';
 
     $options = array('open', 'name', 'email');
     foreach ($options as $item) {
-        if (isset($filter['is_' . $item]) && $filter['is_' . $item]) $list_xml .= ' is-' . $item . '="true"';
+        if (isset($filter['is_' . $item]) && $filter['is_' . $item]) $listXml .= ' is-' . $item . '="true"';
     }
 
-    $list_xml .= '>';
+    $listXml .= '>';
 
     foreach (array('name', 'email') as $item) {
         if (isset($filter[$item]) && $filter[$item]) {
-            $list_xml .= '<filter-' . $item . '><![CDATA[' . $filter[$item] . ']]></filter-' . $item . '>';
+            $listXml .= '<filter-' . $item . '><![CDATA[' . $filter[$item] . ']]></filter-' . $item . '>';
         }
     }
 
-    $list_xml .= '</local-navigation>';
+    $listXml .= '</local-navigation>';
 
     if (isset($obj)) {
         $module = '<module type="simple" is-able-to-add="true"';
@@ -116,14 +116,14 @@ if ($page->IsAuthorized()) {
         }
 
         $module .= $form->GetXml();
-        $module .= $list_xml;
+        $module .= $listXml;
         $module .= '</module>';
 
         $page->AddContent($module);
 
     } else {
         $about = $g_section->description ? '<p class="first">' . $g_section->description . '</p>' : '';
-        $page->AddContent('<module type="simple" is_able_to_add="true">' . $list_xml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
+        $page->AddContent('<module type="simple" is_able_to_add="true">' . $listXml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
     }
 }
 

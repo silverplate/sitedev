@@ -380,12 +380,14 @@ abstract class Core_ActiveRecord
 
     /**
      * @param string|array $_value
+     * @param boolean $_isEqual
      * @return string
      */
-    public function getPrimaryKeyWhere($_value = null)
+    public function getPrimaryKeyWhere($_value = null, $_isEqual = true)
     {
         $where = array();
         $primary = $this->getPrimaryKey();
+        $comp = $_isEqual ? '=' : '!=';
 
         if (is_array($primary)) {
             foreach ($primary as $name => $attr) {
@@ -393,7 +395,7 @@ abstract class Core_ActiveRecord
                        ? $attr->getSqlValue()
                        : App_Db::escape($_value[$name]);
 
-                $where[] = $attr->getName() . " = $value";
+                $where[] = $attr->getName() . " $comp $value";
             }
 
         } else {
@@ -401,10 +403,19 @@ abstract class Core_ActiveRecord
                    ? $primary->getSqlValue()
                    : App_Db::escape($_value);
 
-            $where[] = $primary->getName() . " = $value";
+            $where[] = $primary->getName() . " $comp $value";
         }
 
         return implode(' AND ', $where);
+    }
+
+    /**
+     * @param string $_value
+     * @return string
+     */
+    public function getPrimaryKeyWhereNot($_value = null)
+    {
+        return $this->getPrimaryKeyWhere($_value, false);
     }
 
     /**

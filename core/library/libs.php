@@ -258,8 +258,13 @@ function debug($_var)
 
 function goToUrl($_url)
 {
-	header('Location: ' . $_url);
-	exit;
+    redirect($_url);
+}
+
+function redirect($_url)
+{
+    header('Location: ' . $_url);
+    exit;
 }
 
 function reload($_append = null)

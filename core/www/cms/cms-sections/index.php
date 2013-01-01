@@ -79,11 +79,11 @@ if ($page->IsAuthorized()) {
         $page->SetUpdateStatus('success', 'Раздел удален');
     }
 
-    $list_xml = '<local-navigation is-sortable="true">';
+    $listXml = '<local-navigation is-sortable="true">';
     foreach (App_Cms_Back_Section::GetList() as $item) {
-        $list_xml .= $item->getBackOfficeXml();
+        $listXml .= $item->getBackOfficeXml();
     }
-    $list_xml .= '</local-navigation>';
+    $listXml .= '</local-navigation>';
 
     if (isset($obj)) {
         $module = '<module type="simple" is-able-to-add="true"';
@@ -97,14 +97,14 @@ if ($page->IsAuthorized()) {
         }
 
         $module .= $form->GetXml();
-        $module .= $list_xml;
+        $module .= $listXml;
         $module .= '</module>';
 
         $page->AddContent($module);
 
     } else {
         $about = $g_section->description ? '<p class="first">' . $g_section->description . '</p>' : '';
-        $page->AddContent('<module type="simple" is-able-to-add="true">' . $list_xml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
+        $page->AddContent('<module type="simple" is-able-to-add="true">' . $listXml . '<content><html><![CDATA[' . $about . ']]></html></content></module>');
     }
 }
 

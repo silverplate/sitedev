@@ -130,12 +130,13 @@
 					<xsl:otherwise>submit</xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
+
 			<xsl:attribute name="value">
+                <xsl:value-of select="text()" disable-output-escaping="yes" />
+
 				<xsl:choose>
-					<xsl:when test="@name = 'delete'"><xsl:value-of select="concat(label/text(), '&hellip;')" disable-output-escaping="yes" /></xsl:when>
-					<xsl:when test="@name = 'close_window'"><xsl:value-of select="concat(label/text(), ' &times;')" disable-output-escaping="yes" /></xsl:when>
-					<xsl:when test="label/text()"><xsl:value-of select="label/text()" disable-output-escaping="yes" /></xsl:when>
-					<xsl:otherwise>Отправить</xsl:otherwise>
+					<xsl:when test="@name = 'delete'">&hellip;</xsl:when>
+					<xsl:when test="@name = 'close_window'"> &times;</xsl:when>
 				</xsl:choose>
 			</xsl:attribute>
 

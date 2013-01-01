@@ -23,7 +23,7 @@ abstract class Core_Form_Button
             $xml .= ' image-url="' . $this->ImageUrl . '"';
         }
 
-        $xml .= '><label><![CDATA[' . $this->Label . ']]></label></button>';
+        $xml .= '><![CDATA[' . $this->Label . ']]></button>';
         return $xml;
     }
 

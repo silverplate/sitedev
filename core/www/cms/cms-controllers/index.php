@@ -6,6 +6,9 @@ $page = new App_Cms_Back_Page();
 $page->setTitle($g_section->getTitle());
 
 if ($page->isAuthorized()) {
+
+    // Инициализация объекта
+
     $obj = null;
 
     if (!empty($_GET['id'])) {
@@ -15,6 +18,9 @@ if ($page->isAuthorized()) {
     } else if (key_exists('add', $_GET)) {
         $obj = new App_Cms_Front_Controller();
     }
+
+
+    // Форма редактирования или добавления объекта
 
     if ($obj) {
         $form = App_Cms_Ext_Form::load('form.xml');
@@ -40,6 +46,8 @@ if ($page->isAuthorized()) {
                     $obj->getTitle()
                 );
 
+                App_Cms_Ext_Form::saveCookieStatus();
+
                 redirect($page->getUrl('path'));
 
             } else {
@@ -48,6 +56,9 @@ if ($page->isAuthorized()) {
                 if ($obj->typeId == 3) {
                     $obj->typeId = 2;
                     $obj->isDocumentMain = true;
+
+                } else {
+                    $obj->isDocumentMain = false;
                 }
 
                 if ($obj->checkUnique()) {
@@ -75,6 +86,8 @@ if ($page->isAuthorized()) {
                         );
                     }
 
+                    App_Cms_Ext_Form::saveCookieStatus();
+
                     reload('?id=' . $obj->getId());
 
                 } else {
@@ -85,12 +98,32 @@ if ($page->isAuthorized()) {
         }
     }
 
+
+    // Статус обработки формы
+
+    $formStatusXml = '';
+
+    if (!isset($form) || !$form->isSubmited()) {
+        $formStatusXml = App_Cms_Ext_Form::getCookieStatusXml(
+            empty($obj) ? 'Выполнено' : 'Данные контролера сохранены'
+        );
+
+        App_Cms_Ext_Form::clearCookieStatus();
+    }
+
+
+    // Внутренняя навигация
+
     $listXml = '';
-    foreach (App_Cms_Front_Controller::GetList() as $item) {
+
+    foreach (App_Cms_Front_Controller::getList() as $item) {
         $listXml .= $item->getBackOfficeXml();
     }
 
     $listXml = Ext_Xml::node('local-navigation', $listXml);
+
+
+    // XML модуля
 
     if (isset($obj)) {
         $module = '<module type="simple" is-able-to-add="true"';
@@ -104,6 +137,7 @@ if ($page->isAuthorized()) {
             $module .= Ext_Xml::cdata('title', 'Добавление');
         }
 
+        $module .= $formStatusXml;
         $module .= $form->getXml();
         $module .= $listXml;
         $module .= '</module>';
@@ -117,6 +151,7 @@ if ($page->isAuthorized()) {
 
         $page->addContent(Ext_Xml::node(
             'module',
+            $formStatusXml .
             $listXml .
             Ext_Xml::notEmptyNode('content', Ext_Xml::notEmptyCdata('html', $about)),
             array('type' => 'simple', 'is-able-to-add' => 'true')

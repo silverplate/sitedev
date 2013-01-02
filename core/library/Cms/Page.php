@@ -101,7 +101,10 @@ abstract class Core_Cms_Page
 
     public function output()
     {
-        if (isset($_GET['xml']) || !$this->_template) {
+        if (
+            key_exists('xml', $_GET) ||
+            (key_exists('post-xml', $_GET) && $_POST)
+        ) {
             header('Content-type: text/xml; charset=utf-8');
 
             echo Core_Cms_Ext_Xml::getDocumentForXml(

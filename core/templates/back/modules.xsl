@@ -3,16 +3,34 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template match="module[@type = 'tree' or @type = 'simple']">
+        <xsl:choose>
+            <xsl:when test="form[@status != 'no-update']">
+                <xsl:for-each select="form[@status != 'no-update']">
+                    <xsl:call-template name="form-status" />
+                </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates
+                    select="../update-status|form-status[@status != 'no-update']" />
+            </xsl:otherwise>
+        </xsl:choose>
+
 		<table class="module">
 			<tr>
 				<td class="title">
-					<xsl:if test="not(title or ../update-status)">
+					<xsl:if test="not(title)">
 						<xsl:attribute name="colspan">2</xsl:attribute>
 					</xsl:if>
 
 					<h1><xsl:call-template name="get-page-title" /></h1>
-					<xsl:if test="@is-able-to-add"><xsl:call-template name="module-add-element-link" /></xsl:if>
 
+					<xsl:if test="@is-able-to-add">
+                        <xsl:call-template name="module-add-element-link" />
+                    </xsl:if>
+
+                    <!--
+                    @todo Что это?
+                    -->
 					<xsl:if test="@is-simple-sort">
 						<xsl:text>&nbsp;&bull; </xsl:text>
 						<xsl:call-template name="module-element-link">
@@ -28,27 +46,12 @@
 					</xsl:if>
 				</td>
 
-				<xsl:if test="title or ../update-status">
+				<xsl:if test="title">
 					<td class="subtitle">
-						<xsl:choose>
-							<xsl:when test="title and ../update-status">
-								<table width="100%">
-									<tr valign="top">
-										<td width="99%"><xsl:apply-templates select="title" mode="subtitle" /></td>
-										<td width="1%"><xsl:apply-templates select="../update-status" /></td>
-									</tr>
-								</table>
-							</xsl:when>
-							<xsl:when test="title">
-								<xsl:apply-templates select="title" mode="subtitle" />
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:apply-templates select="../update-status" />
-							</xsl:otherwise>
-						</xsl:choose>
-					</td>
-				</xsl:if>
-			</tr>
+                        <xsl:apply-templates select="title" mode="subtitle" />
+                    </td>
+                </xsl:if>
+            </tr>
 
 			<tr>
 				<td class="navigation">
@@ -69,6 +72,7 @@
 						</xsl:otherwise>
 					</xsl:choose>
 				</td>
+
 				<td class="content">
 					<xsl:for-each select="local-navigation[@type = 'content_filter']">
 						<xsl:variable name="is-date"><xsl:choose>
@@ -77,7 +81,10 @@
 						</xsl:choose></xsl:variable>
 
 						<div id="filter-content" />
-						<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('filterUpdate(&quot;filter-content&quot;, false, false, ', $is-date, ');')" /></script>
+
+						<script type="text/javascript">
+                            <xsl:value-of select="concat('filterUpdate(&quot;filter-content&quot;, false, false, ', $is-date, ');')" />
+                        </script>
 					</xsl:for-each>
 
 					<xsl:apply-templates select="content" mode="module" />
@@ -87,10 +94,29 @@
 		</table>
 	</xsl:template>
 
+    <xsl:template match="form-status" name="form-status">
+        <div class="form-message">
+            <xsl:if test="@status = 'error'">
+                <xsl:attribute name="class">form-message form-error-message</xsl:attribute>
+            </xsl:if>
+
+            <xsl:choose>
+                <xsl:when test="result-message">
+                    <xsl:value-of select="result-message"
+                                  disable-output-escaping="yes" />
+                </xsl:when>
+                <xsl:when test="@status = 'error'">
+                    Данные не&nbsp;сохранены из-за&nbsp;допущенных ошибок
+                </xsl:when>
+                <xsl:otherwise>
+                    Изменения сохранены
+                </xsl:otherwise>
+            </xsl:choose>
+        </div>
+    </xsl:template>
+
 	<xsl:template match="content" mode="module">
-		<div style="font-size: 0.84em;">
-			<xsl:apply-templates select="*" />
-		</div>
+		<div style="font-size: 0.84em;"><xsl:apply-templates /></div>
 	</xsl:template>
 
 	<xsl:template match="document-data">

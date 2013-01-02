@@ -17,7 +17,7 @@ define('CORE_LIBRARIES', CORE_PATH . 'library/');
 
 define('MODELS', WD . 'models/');
 
-define('DATA_CONTROLLERS', LIBRARIES . 'App/Cms/Front/Document/Data/Controller/');
+define('DATA_CONTROLLERS', LIBRARIES . 'App/Cms/Front/Data/Controller/');
 define('DOCUMENT_CONTROLLERS', LIBRARIES . 'App/Cms/Front/Document/Controller/');
 
 

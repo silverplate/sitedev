@@ -63,14 +63,16 @@ abstract class Core_Cms_Front_Controller extends App_Model
 
     public function checkUnique()
     {
-        return 0 == count(self::getList(
-            array(
-                'type_id' => $this->typeId,
-                'filename' => $this->filename,
-                $this->getPrimaryKeyName() . ' != ' . $this->getSqlId()
-            ),
-            array('limit' => 1)
-        ));
+        $where = array(
+            'type_id' => $this->typeId,
+            'filename' => $this->filename
+        );
+
+        if ($this->id) {
+            $where[] = $this->getPrimaryKeyWhereNot();
+        }
+
+        return 0 == count(self::getList($where, array('limit' => 1)));
     }
 
     public function getBackOfficeXml($_xml = array(), $_attrs = array())

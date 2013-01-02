@@ -4,17 +4,15 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template name="module-add-element-link">
 		<xsl:param name="label">Добавить</xsl:param>
-		<xsl:param name="uri">./?NEW</xsl:param>
+		<xsl:param name="uri">./?add</xsl:param>
 
 		<xsl:call-template name="module-element-link">
 			<xsl:with-param name="label" select="$label" />
 			<xsl:with-param name="uri" select="$uri" />
-			<xsl:with-param name="is-selected">
-				<xsl:choose>
-					<xsl:when test="ancestor-or-self::node()[name() = 'module'][@is-new]">true</xsl:when>
-					<xsl:otherwise>false</xsl:otherwise>
-				</xsl:choose>
-			</xsl:with-param>
+			<xsl:with-param name="is-selected"><xsl:choose>
+				<xsl:when test="ancestor-or-self::node()[name() = 'module'][@is-new]">true</xsl:when>
+				<xsl:otherwise>false</xsl:otherwise>
+			</xsl:choose></xsl:with-param>
 		</xsl:call-template>
 	</xsl:template>
 
@@ -28,6 +26,7 @@
 				<xsl:text>add-element</xsl:text>
 				<xsl:if test="$is-selected = 'true'"> selected</xsl:if>
 			</xsl:attribute>
+
 			<xsl:value-of select="$label" disable-output-escaping="yes" />
 		</a>
 	</xsl:template>
@@ -224,7 +223,9 @@
 	</xsl:template>
 
 	<xsl:template match="title" mode="subtitle">
-		<h1 style="margin: 0; padding: 0"><xsl:value-of select="text()" disable-output-escaping="yes" /></h1>
+		<h1>
+            <xsl:value-of select="text()" disable-output-escaping="yes" />
+        </h1>
 	</xsl:template>
 
 	<xsl:template match="update-status">

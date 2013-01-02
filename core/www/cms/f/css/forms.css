@@ -58,14 +58,6 @@ div.add-files-description code
     background-color: #e7e7e7;
 }
 
-div.field-error-message
-{
-    float: left;
-    margin-top: 5px;
-    color: #f00;
-    font-size: 0.7em;
-}
-
 div.buttons
 {
     margin-top: 30px;
@@ -83,6 +75,31 @@ table.form select
 table.form a
 {
     cursor: pointer;
+}
+
+div.field-error-message
+{
+    float: left;
+    margin-top: 5px;
+    color: #f00;
+    font-size: 0.7em;
+}
+
+div.form-message
+{
+    font-size: 0.84em;
+    color: green;
+/*     width: 200px; */
+    width: 30%;
+    text-align: right;
+    position: absolute;
+    top: 0.4em;
+    right: 20px;
+}
+
+div.form-error-message
+{
+    color: red;
 }
 
 

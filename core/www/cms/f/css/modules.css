@@ -72,30 +72,16 @@ table.module tr td.subtitle
 	width: 70%;
 }
 
+table.module tr td.subtitle h1
+{
+    margin: 0;
+    padding: 0 230px 0 0;
+}
+
 table.module tr td.content
 {
 	padding-top: 20px;
 	width: 70%;
-}
-
-div.form-message
-{
-	padding: 6px 10px;
-	color: white;
-	font-size: 0.84em;
-	float: right;
-	width: 180px;
-	margin-left: 20px;
-}
-
-div.error
-{
-	background-color: red;
-}
-
-div.success
-{
-	background-color: #093;
 }
 
 .function
@@ -103,6 +89,16 @@ div.success
 	cursor: pointer;
 	border-bottom-width: 1px;
 	border-bottom-style: dashed;
+}
+
+div.error
+{
+    background-color: red;
+}
+
+div.success
+{
+    background-color: #093;
 }
 
 

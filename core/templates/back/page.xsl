@@ -66,7 +66,10 @@
 					<xsl:apply-templates select="module" />
 				</xsl:when>
 				<xsl:otherwise>
-					<div id="title"><h1><xsl:call-template name="get-page-title" /></h1></div>
+					<div id="title"><h1>
+                        <xsl:call-template name="get-page-title" />
+                    </h1></div>
+
 					<xsl:apply-templates select="*[name() = 'update-status']" />
 					<xsl:apply-templates select="*[name() != 'update-status']" />
 				</xsl:otherwise>

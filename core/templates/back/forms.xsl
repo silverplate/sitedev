@@ -3,48 +3,46 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template match="form">
-		<xsl:if test="not(@status) or @status != 'updated'">
-			<xsl:if test="group and count(group) > 1">
-				<script type="text/javascript" language="JavaScript">
-					<xsl:text>var formGroups = new Array(</xsl:text>
-					<xsl:for-each select="group[@name]">
-						<xsl:value-of select="concat('&quot;', @name, '&quot;')" />
-						<xsl:if test="position() != last()">, </xsl:if>
-					</xsl:for-each>
-					<xsl:text>);</xsl:text>
-				</script>
-
-				<xsl:call-template name="form-group-tabs" />
-			</xsl:if>
-
-			<form method="post" enctype="multipart/form-data">
-				<xsl:for-each select="ancestor::node()[name() = 'module' and @id != '']">
-					<input type="hidden" name="current_object_id" id="current-object-id" value="{@id}" />
+		<xsl:if test="group and count(group) > 1">
+			<script type="text/javascript">
+				<xsl:text>var formGroups = new Array(</xsl:text>
+				<xsl:for-each select="group[@name]">
+					<xsl:value-of select="concat('&quot;', @name, '&quot;')" />
+					<xsl:if test="position() != last()">, </xsl:if>
 				</xsl:for-each>
+				<xsl:text>);</xsl:text>
+			</script>
 
-				<xsl:choose>
-					<xsl:when test="group and count(group) > 1">
-						<xsl:apply-templates select="group" />
-					</xsl:when>
-					<xsl:when test="group">
-						<table class="form">
-							<xsl:apply-templates select="group/element" mode="form" />
-							<xsl:call-template name="buttons" />
-						</table>
-					</xsl:when>
-					<xsl:otherwise>
-						<table class="form">
-							<xsl:apply-templates select="element" mode="form" />
-							<xsl:call-template name="buttons" />
-						</table>
-					</xsl:otherwise>
-				</xsl:choose>
-			</form>
-
-            <xsl:if test="//element[contains(@type, 'text')]">
-                <script type="text/javascript">replaceTextareaCdata();</script>
-            </xsl:if>
+			<xsl:call-template name="form-group-tabs" />
 		</xsl:if>
+
+		<form method="post" enctype="multipart/form-data">
+			<xsl:for-each select="ancestor::node()[name() = 'module' and @id != '']">
+				<input type="hidden" name="current_object_id" id="current-object-id" value="{@id}" />
+			</xsl:for-each>
+
+			<xsl:choose>
+				<xsl:when test="count(group) > 1">
+					<xsl:apply-templates select="group" />
+				</xsl:when>
+				<xsl:when test="group">
+					<table class="form">
+						<xsl:apply-templates select="group/element" mode="form" />
+						<xsl:call-template name="buttons" />
+					</table>
+				</xsl:when>
+				<xsl:otherwise>
+					<table class="form">
+						<xsl:apply-templates select="element" mode="form" />
+						<xsl:call-template name="buttons" />
+					</table>
+				</xsl:otherwise>
+			</xsl:choose>
+		</form>
+
+        <xsl:if test="//element[contains(@type, 'text')]">
+            <script type="text/javascript">replaceTextareaCdata();</script>
+        </xsl:if>
 	</xsl:template>
 
 	<xsl:template name="form-group-tabs">
@@ -203,6 +201,10 @@
 
 				<xsl:call-template name="form-element" />
 
+                <!--
+                Прежняя реализация
+                @todo Убрать после перехода на новую реализацию.
+                -->
 				<xsl:if test="@update-type != '' and
 				              @update-type != 'no_update' and
 				              @update-type != 'success'">
@@ -221,9 +223,35 @@
 					</div>
 				</xsl:if>
 
-				<xsl:if test="description/text() and @type != 'image' and @type != 'text' and @type != 'large_text' and string-length(description/text()) > 50 and not(@type = 'adding_files')">
+                <xsl:if test="
+                    @update-status != 'success' and
+                    @update-status != 'no-update'
+                ">
+                    <div class="field-error-message">
+                        <xsl:choose>
+                            <xsl:when test="status-error-message">
+                                <xsl:value-of select="status-error-message"
+                                              disable-output-escaping="yes" />
+                            </xsl:when>
+                            <xsl:when test="@update-type = 'error-required'">Поле обязательно для&nbsp;заполнения.</xsl:when>
+                            <!-- <xsl:when test="@update-type = 'error-spelling'">Некорректное значение.</xsl:when> -->
+                            <xsl:when test="@update-type = 'error-exist'">Значение уже&nbsp;используется.</xsl:when>
+                            <xsl:otherwise>Некорректное значение.</xsl:otherwise>
+                        </xsl:choose>
+                    </div>
+                </xsl:if>
+
+				<xsl:if test="
+                    description and
+                    @type != 'image' and
+                    @type != 'text' and
+                    @type != 'large_text'
+                    and string-length(description/text()) > 50 and
+                    not(@type = 'adding_files')
+                ">
 					<div class="description">
-						<xsl:value-of select="description/text()" disable-output-escaping="yes" />
+						<xsl:value-of select="description"
+                                      disable-output-escaping="yes" />
 					</div>
 				</xsl:if>
 			</td>
@@ -354,7 +382,7 @@
 					</xsl:attribute-->
 					<a onclick="documentParentChooser('{@name}')" class="parent-document-change">Скрыть</a>
 					<div id="{@name}-tree" class="object-tree" />
-					<script type="text/javascript" language="JavaScript">
+					<script type="text/javascript">
 						<xsl:text>documentParentUpdateBranch('</xsl:text>
 						<xsl:value-of select="@name" />
 						<xsl:text>-tree', '</xsl:text>
@@ -388,7 +416,7 @@
 					<xsl:otherwise>multiple</xsl:otherwise>
 				</xsl:choose></xsl:variable>
 
-				<script type="text/javascript" language="JavaScript">
+				<script type="text/javascript">
 					<xsl:value-of select="concat('var formTreeValues_', $field-name, ' = new Array(')" />
 					<xsl:choose>
 						<xsl:when test="@type = 'single_tree' and value/text()"><xsl:value-of select="concat('&quot;', value/text(), '&quot;')" /></xsl:when>
@@ -639,7 +667,7 @@
 					</input>
 					<input type="text" id="{@name}-input" onblur="calendarParseInput('{@name}');" />
 					<button onclick="calendarSwitcher('{@name}', event); return false;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
-					<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('calendarInit(&quot;', @name , '&quot;);')" /></script>
+					<script type="text/javascript"><xsl:value-of select="concat('calendarInit(&quot;', @name , '&quot;);')" /></script>
 				</div>
 			</xsl:when>
 
@@ -655,7 +683,7 @@
 					</input>
                     <input type="text" id="{@name}-input" onblur="calendarParseInput('{@name}');" />
                     <button onclick="calendarSwitcher('{@name}', event); return false;" style="margin-right: 5px;"><img src="/cms/f/calendar/btn.gif" width="25" height="13" alt="" /></button>
-					<script type="text/javascript" language="JavaScript"><xsl:value-of select="concat('calendarInit(&quot;', @name , '&quot;);')" /></script>
+					<script type="text/javascript"><xsl:value-of select="concat('calendarInit(&quot;', @name , '&quot;);')" /></script>
 
                     <xsl:variable name="hours-value"><xsl:choose>
                         <xsl:when test="error/value/hours/text()"><xsl:value-of select="error/value/hours/text()" /></xsl:when>
@@ -784,7 +812,7 @@
 						</xsl:attribute>
 					</input>
 
-					<script type="text/javascript" language="JavaScript">
+					<script type="text/javascript">
 						<xsl:value-of select="concat('calendarInit(&quot;', @name , '-from&quot;);')" />
 						<xsl:value-of select="concat('calendarInit(&quot;', @name , '-till&quot;);')" />
 					</script>

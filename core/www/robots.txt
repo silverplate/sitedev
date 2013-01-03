@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: /cms/
-Disallow: *.php
-Crawl-delay: 2

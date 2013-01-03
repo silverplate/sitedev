@@ -4,8 +4,8 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template match="module[@type = 'tree' or @type = 'simple']">
         <xsl:choose>
-            <xsl:when test="form[@status != 'no-update']">
-                <xsl:for-each select="form[@status != 'no-update']">
+            <xsl:when test="form[@status != 'no-update' and @status != 'no_update']">
+                <xsl:for-each select="form">
                     <xsl:call-template name="form-status" />
                 </xsl:for-each>
             </xsl:when>

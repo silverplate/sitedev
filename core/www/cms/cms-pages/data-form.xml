@@ -20,7 +20,7 @@
     </element>
 
     <element name="front_controller_id" type="chooser">
-        <label>Обработчик</label>
+        <label>Контроллер</label>
     </element>
 
     <element name="apply_type_id" type="chooser">

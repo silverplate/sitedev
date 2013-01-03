@@ -6,10 +6,10 @@ $result = array();
 
 // Init for DB
 
-$boSections = array(
+$backSections = array(
     array('title' => 'Страницы', 'uri' => 'cms-pages', 'description' => 'Работа с навигацией и информационным наполнением страниц сайта.'),
     array('title' => 'Пользователи', 'uri' => 'users', 'description' => 'Редактирование пользователей сайта.', 'is_published' => 0),
-    array('title' => 'Обработчики', 'uri' => 'cms-controllers', 'description' => 'Управление обработчиками страниц сайта и блоков данных.'),
+    array('title' => 'Контроллеры', 'uri' => 'cms-controllers', 'description' => 'Управление контроллерами страниц сайта и блоков данных.'),
     array('title' => 'Шаблоны', 'uri' => 'cms-templates', 'description' => 'Управление шаблонами сайта.'),
     array('title' => 'Типы навигации', 'uri' => 'cms-navigation', 'description' => 'Редактирование типов навигации.', 'is_published' => 0),
     array('title' => 'Пользователи СУ', 'uri' => 'cms-users', 'description' => 'Редактирование пользователей СУ.'),
@@ -17,13 +17,14 @@ $boSections = array(
     array('title' => 'Логи СУ', 'uri' => 'cms-logs', 'description' => 'Просмотр действий пользователей системы управления.', 'is_published' => 0)
 );
 
-$boUsers = array(
+$backUsers = array(
     array('title' => 'Разработчик', 'login' => 'developer', 'passwd' => Ext_String::getRandomReadable(8), 'email' => 'support@sitedev.ru')
 );
 
-$foControllers = array(
+$frontControllers = array(
     'common' => array('title' => 'Страница сайта', 'type_id' => 1, 'filename' => 'Common.php', 'is_document_main' => 1, 'is_multiple' => 1),
     'not-found' => array('title' => 'Документ не найден', 'type_id' => 1, 'filename' => 'NotFound.php', 'is_document_main' => 0, 'is_multiple' => 0),
+    'sitemap' => array('title' => 'Карта сайта для поисковых роботов', 'type_id' => 1, 'filename' => 'RobotsSitemap.php', 'is_document_main' => 0, 'is_multiple' => 0),
     'subpage-navigation' => array('title' => 'Вложенная навигация', 'type_id' => 2, 'filename' => 'SubpageNavigation.php', 'is_document_main' => 0, 'is_multiple' => 1)
 );
 
@@ -32,7 +33,7 @@ $templates = array(
     'modules' => array('title' => 'Общее', 'filename' => 'site-common.xsl', 'is_document_main' => 0)
 );
 
-$foDocuments = array(
+$frontDocuments = array(
     array('/' => array('title' => SITE_TITLE,
                        'folder' => '/',
                        'сontroller' => 'common',
@@ -45,12 +46,12 @@ $foDocuments = array(
                                  'template' => 'common'))
 );
 
-$foNavigations = array(
+$frontNavigations = array(
     'main' => array('title' => 'Основная', 'name' => 'main', 'type' => 'tree'),
     'service' => array('title' => 'Сервисная', 'name' => 'service', 'type' => 'list', 'is_published' => 0)
 );
 
-$foDataContentType = array(
+$frontDataContentType = array(
     'string' => array('title' => 'Строка'),
     'text' => array('title' => 'Текст'),
     'integer' => array('title' => 'Целое число'),
@@ -65,7 +66,7 @@ $content1 .= "<p>В&nbsp;2004&nbsp;году после победы в&nbsp;че
 
 $content2  = '<p>Неправильно набран адрес, или&nbsp;такой страницы на&nbsp;сайте не&nbsp;существует. Если вы&nbsp;видите, что&nbsp;на&nbsp;сайте есть неработающая ссылка, пожалуйста, сообщите нам об&nbsp;этом.</p>';
 
-$foData = array(
+$frontData = array(
     '/' => array(
         array('title' => 'Содержание', 'tag' => 'html', App_Cms_Front_Data_ContentType::getPri() => 'text', 'content' => $content1),
     ),
@@ -92,24 +93,24 @@ foreach (explode(';', $sqlTables) as $query) {
 // Insert start entries
 // Sections
 
-$boSectionObjs = array();
-foreach ($boSections as $i) {
+$backSectionObjs = array();
+foreach ($backSections as $i) {
     $obj = App_Cms_Back_Section::createInstance();
 
     $obj->fillWithData($i);
     $obj->isPublished = !isset($i['is_published']) || $i['is_published'];
     $obj->create();
 
-    $boSectionObjs[$obj->getId()] = $obj;
+    $backSectionObjs[$obj->getId()] = $obj;
 }
 
-$result['BO sections'] = count($boSectionObjs);
+$result['Back Sections'] = count($backSectionObjs);
 
 
 // Users and user to section links
 
-$boUserObjs = array();
-foreach ($boUsers as $i) {
+$backUserObjs = array();
+foreach ($backUsers as $i) {
     $obj = App_Cms_Back_User::createInstance();
     $obj->fillWithData($i);
     $obj->setPassword($i['passwd']);
@@ -120,8 +121,8 @@ foreach ($boUsers as $i) {
 
     $obj->create();
 
-    $boUserObjs[$obj->getId()] = $obj;
-    foreach (array_keys($boSectionObjs) as $j) {
+    $backUserObjs[$obj->getId()] = $obj;
+    foreach (array_keys($backSectionObjs) as $j) {
         $link = App_Cms_Back_User_Has_Section::createInstance();
         $link->backUserId = $obj->getId();
         $link->backSectionId = $j;
@@ -129,22 +130,22 @@ foreach ($boUsers as $i) {
     }
 }
 
-$result['BO users'] = count($boUserObjs);
+$result['Back Users'] = count($backUserObjs);
 
 
 // Controllers
 
-$foControllerObjs = array();
-foreach ($foControllers as $key => $i) {
+$frontControllerObjs = array();
+foreach ($frontControllers as $key => $i) {
     $obj = App_Cms_Front_Controller::createInstance();
     $obj->fillWithData($i);
     $obj->isPublished = true;
     $obj->create();
 
-    $foControllerObjs[$key] = $obj;
+    $frontControllerObjs[$key] = $obj;
 }
 
-$result['FO controllers'] = count($foControllerObjs);
+$result['Controllers'] = count($frontControllerObjs);
 
 
 // Templates
@@ -161,35 +162,35 @@ foreach ($templates as $key => $i) {
     $templatesObjs[$key] = $obj;
 }
 
-$result['FO templates'] = count($templatesObjs);
+$result['Templates'] = count($templatesObjs);
 
 
 // Navigation
 
-$foNavigationObjs = array();
-foreach ($foNavigations as $key => $i) {
+$frontNavigationObjs = array();
+foreach ($frontNavigations as $key => $i) {
     $obj = App_Cms_Front_Navigation::createInstance();
     $obj->fillWithData($i);
     $obj->isPublished = !isset($i['is_published']) || $i['is_published'];
     $obj->create();
 
-    $foNavigationObjs[$key] = $obj;
+    $frontNavigationObjs[$key] = $obj;
 }
 
-$result['FO navigation'] = count($foNavigationObjs);
+$result['Navigation'] = count($frontNavigationObjs);
 
 
 // Documents
 
-$foDocumentObjs = array();
-foreach ($foDocuments as $level) {
+$frontDocumentObjs = array();
+foreach ($frontDocuments as $level) {
     foreach ($level as $uri => $i) {
         $obj = App_Cms_Front_Document::createInstance();
         $obj->fillWithData($i);
         $obj->isPublished = true;
 
-        if (isset($i['сontroller']) && isset($foControllerObjs[$i['сontroller']])) {
-            $obj->frontControllerId = $foControllerObjs[$i['сontroller']]->getId();
+        if (isset($i['сontroller']) && isset($frontControllerObjs[$i['сontroller']])) {
+            $obj->frontControllerId = $frontControllerObjs[$i['сontroller']]->getId();
         }
 
         if (isset($i['template']) && isset($templatesObjs[$i['template']])) {
@@ -197,18 +198,18 @@ foreach ($foDocuments as $level) {
         }
 
         $parentUri = str_replace($i['folder'] . '/', '', $uri);
-        if (isset($foDocumentObjs[$parentUri])) {
-            $obj->parentId = $foDocumentObjs[$parentUri]->getId();
+        if (isset($frontDocumentObjs[$parentUri])) {
+            $obj->parentId = $frontDocumentObjs[$parentUri]->getId();
         }
 
         $obj->create();
-        $foDocumentObjs[$uri] = $obj;
+        $frontDocumentObjs[$uri] = $obj;
 
         if (isset($i['navigations']) && is_array($i['navigations'])) {
             $links = array();
             foreach ($i['navigations'] as $j) {
-                if (isset($foNavigationObjs[$j])) {
-                    array_push($links, $foNavigationObjs[$j]->getId());
+                if (isset($frontNavigationObjs[$j])) {
+                    array_push($links, $frontNavigationObjs[$j]->getId());
                 }
             }
 
@@ -219,53 +220,53 @@ foreach ($foDocuments as $level) {
     }
 }
 
-$result['FO documents'] = count($foDocumentObjs);
+$result['Documents'] = count($frontDocumentObjs);
 
 
 // Data content type
 
-$foDataContentTypeObjs = array();
-foreach ($foDataContentType as $id => $i) {
+$frontDataContentTypeObjs = array();
+foreach ($frontDataContentType as $id => $i) {
     $obj = App_Cms_Front_Data_ContentType::createInstance();
     $obj->fillWithData($i);
     $obj->id = $id;
     $obj->isPublished = true;
     $obj->create();
 
-    $foDataContentTypeObjs[$obj->getId()] = $obj;
+    $frontDataContentTypeObjs[$obj->getId()] = $obj;
 }
 
-$result['FO data content type'] = count($foDataContentTypeObjs);
+$result['Data content type'] = count($frontDataContentTypeObjs);
 
 
 // Document data
 
-$foDataObjs = array();
-foreach ($foData as $uri => $blocks) {
-    if (isset($foDocumentObjs[$uri])) {
+$frontDataObjs = array();
+foreach ($frontData as $uri => $blocks) {
+    if (isset($frontDocumentObjs[$uri])) {
         foreach ($blocks as $i) {
             $obj = App_Cms_Front_Data::createInstance();
             $obj->fillWithData($i);
             $obj->authStatusId = App_Cms_User::AUTH_GROUP_ALL;
-            $obj->frontDocumentId = $foDocumentObjs[$uri]->getId();
+            $obj->frontDocumentId = $frontDocumentObjs[$uri]->getId();
             $obj->isPublished = true;
             $obj->isMount = true;
 
             if (
                 isset($i['сontroller']) &&
-                isset($foControllerObjs[$i['сontroller']])
+                isset($frontControllerObjs[$i['сontroller']])
             ) {
-                $obj->frontControllerId = $foControllerObjs[$i['сontroller']]->getId();
+                $obj->frontControllerId = $frontControllerObjs[$i['сontroller']]->getId();
             }
 
             $obj->create();
-            $foDataObjs[$obj->getId()] = $obj;
+            $frontDataObjs[$obj->getId()] = $obj;
         }
     }
 
 }
 
-$result['FO data'] = count($foDataObjs);
+$result['Data'] = count($frontDataObjs);
 
 
 // Сообщение о результате
@@ -275,8 +276,8 @@ print_r($result);
 echo '</pre>';
 
 echo '<p>Для доступа <a href="/cms/">в систему управления</a> используйте логин ';
-echo '<b><code>' . $boUsers[0]['login'] . '</code></b> ';
-echo 'и пароль <b><code>' . $boUsers[0]['passwd'] . '</code></b>.</p>';
+echo '<b><code>' . $backUsers[0]['login'] . '</code></b> ';
+echo 'и пароль <b><code>' . $backUsers[0]['passwd'] . '</code></b>.</p>';
 
 $isError = false;
 $permissions = array(array(DATA_CONTROLLERS, true),

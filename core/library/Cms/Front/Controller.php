@@ -2,7 +2,7 @@
 
 abstract class Core_Cms_Front_Controller extends App_Model
 {
-    protected $_originalFilename;
+    protected $_originalFilePath;
 
     public function __construct()
     {
@@ -61,6 +61,14 @@ abstract class Core_Cms_Front_Controller extends App_Model
              : false;
     }
 
+    public function saveContent($_content)
+    {
+        $content = str_replace(array("\r\n", "\r"), "\n", $_content);
+        $content = preg_replace('~[/n]{3,}~', "\n\n", $content);
+
+        Ext_File::write($this->getFilename(), $content);
+    }
+
     public function checkUnique()
     {
         $where = array(
@@ -106,16 +114,16 @@ abstract class Core_Cms_Front_Controller extends App_Model
     {
         parent::fillWithData($_data);
 
-        if (!isset($this->_originalFilename)) {
-            $this->_originalFilename = $this->filename;
+        if (!isset($this->_originalFilePath)) {
+            $this->_originalFilePath = $this->getFilename();
         }
     }
 
     public function update()
     {
-        if ($this->filename != $this->_originalFilename) {
+        if ($this->getFilename() != $this->_originalFilePath) {
             Ext_File::moveFile(
-                $this->getFolder() . '/' . $this->_originalFilename,
+                $this->_originalFilePath,
                 $this->getFilename()
             );
         }

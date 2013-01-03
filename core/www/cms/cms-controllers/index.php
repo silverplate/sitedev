@@ -54,7 +54,7 @@ if ($page->isAuthorized()) {
                 $obj->fillWithData($form->toArray());
 
                 if ($obj->typeId == 3) {
-                    $obj->typeId = 2;
+                    $obj->typeId = 1;
                     $obj->isDocumentMain = true;
 
                 } else {
@@ -74,7 +74,7 @@ if ($page->isAuthorized()) {
                         $form->isSubmited('update') ||
                         (!is_file($obj->getFilename()) && $form->content != '')
                     ) {
-                        Ext_File::write($obj->getFilename(), $form->content);
+                        $obj->saveContent($form->content);
                     }
 
                     if ($obj->isDocumentMain) {

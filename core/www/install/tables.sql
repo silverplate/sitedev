@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS `~db prefix~front_controller`;
 DROP TABLE IF EXISTS `~db prefix~session_param`;
 DROP TABLE IF EXISTS `~db prefix~session`;
 DROP TABLE IF EXISTS `~db prefix~user`;
+DROP TABLE IF EXISTS `~db prefix~file_cache`;
 
 CREATE TABLE IF NOT EXISTS `~db prefix~back_user` (
     `~db prefix~back_user_id` CHAR(10) NOT NULL,
@@ -259,4 +260,18 @@ CREATE TABLE IF NOT EXISTS `~db prefix~back_user_has_section` (
         REFERENCES `~db prefix~back_section` (`~db prefix~back_section_id`)
         ON DELETE CASCADE
         ON UPDATE CASCADE
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `~db prefix~file_cache` (
+    `~db prefix~file_cache_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `relative` VARCHAR(255) NOT NULL,
+    `absolute` VARCHAR(255) NOT NULL,
+    `creation_time` INT UNSIGNED NOT NULL,
+    `size` MEDIUMINT UNSIGNED NOT NULL,
+    `width` SMALLINT UNSIGNED NULL,
+    `height` SMALLINT UNSIGNED NULL,
+    `mime` VARCHAR(255) NULL,
+    PRIMARY KEY (`~db prefix~file_cache_id`),
+    UNIQUE INDEX `~db prefix~file_cache_relative_unq` (`relative` ASC),
+    UNIQUE INDEX `~db prefix~file_cache_absolute_unq` (`absolute` ASC)
 ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;

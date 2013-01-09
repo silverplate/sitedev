@@ -3,3 +3,4 @@
 .project
 
 sets/local.php
+scripts/dumps/*.sql*

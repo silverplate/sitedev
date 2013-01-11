@@ -4,3 +4,4 @@
 
 sets/local.php
 scripts/dumps/*.sql*
+docs/*.mwb.bak

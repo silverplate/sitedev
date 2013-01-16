@@ -7,7 +7,11 @@ global $gEnv,
        $gDbConnectionString,
        $gMail,
        $gBackOfficeMail,
-       $gCustomUrls;
+       $gCustomUrls,
+       $gAdminEmails;
+
+
+// Ключ и заголовк
 
 if (empty($gSiteKey)) {
     $gSiteKey = 'sitekey';
@@ -16,6 +20,9 @@ if (empty($gSiteKey)) {
 if (empty($gSiteTitle)) {
     $gSiteTitle = 'Система управления SiteDev';
 }
+
+
+// Почта
 
 if (!empty($gSiteTitle)) {
     if (empty($gMail['from']['name'])) {
@@ -33,7 +40,22 @@ if (!empty($gSiteTitle)) {
     }
 }
 
+// if (
+//     empty($gAdminEmails) || (
+//         count($gAdminEmails) == 1 &&
+//         current($gAdminEmails) == 'support@sitedev.ru'
+//     )
+// ) {
+//     $gAdminEmails = array('developer@support.ru');
+// }
+
+
+// Модули с rewrite
+
 $gCustomUrls = array();
+
+
+// Окружение
 
 switch ($gEnv) {
     case 'development':

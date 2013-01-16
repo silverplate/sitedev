@@ -1,1 +1,4 @@
-../core/www/robots.txt
+User-agent: *
+Disallow: /cms/
+Disallow: *.php
+Crawl-delay: 2

@@ -28,6 +28,7 @@ class App_Image extends Ext_Image
 
     public function getUrl()
     {
-        return SITE_URL . $this->getUri();
+        global $gHost;
+        return 'http://' . $gHost . $this->getUri();
     }
 }

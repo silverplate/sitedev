@@ -8,10 +8,11 @@ global $gEnv,
        $gMail,
        $gBackOfficeMail,
        $gCustomUrls,
-       $gAdminEmails;
+       $gAdminEmails,
+       $gIsCache;
 
 
-// Ключ и заголовк
+// Ключ и заголовок
 
 if (empty($gSiteKey)) {
     $gSiteKey = 'sitekey';
@@ -53,6 +54,11 @@ if (!empty($gSiteTitle)) {
 // Модули с rewrite
 
 $gCustomUrls = array();
+
+
+// Кэширование финального HTML
+
+$gIsCache = false;
 
 
 // Окружение

@@ -3,5 +3,6 @@
 .project
 
 sets/local.php
+sets/*.log
 scripts/dumps/*.sql*
 docs/*.mwb.bak

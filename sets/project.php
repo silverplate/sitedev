@@ -59,7 +59,11 @@ $gCustomUrls = array();
 
 switch ($gEnv) {
     case 'development':
-        ini_set('display_errors', 1);
+        App_Error::init(
+            App_Error::MODE_DEVELOPMENT,
+            SETS . 'error.log',
+            $gAdminEmails
+        );
 
         if (empty($gDbConnectionString)) {
             $gDbConnectionString = 'mysql://u:p@host/db';
@@ -72,7 +76,11 @@ switch ($gEnv) {
         break;
 
     case 'staging':
-        ini_set('display_errors', 1);
+        App_Error::init(
+            App_Error::MODE_DEVELOPMENT,
+            SETS . 'error.log',
+            $gAdminEmails
+        );
 
         if (empty($gDbConnectionString)) {
             $gDbConnectionString = 'mysql://u:p@host/db';
@@ -85,7 +93,11 @@ switch ($gEnv) {
         break;
 
     case 'production':
-        ini_set('display_errors', 0);
+        App_Error::init(
+            App_Error::MODE_PRODUCTION,
+            SETS . 'error.log',
+            $gAdminEmails
+        );
 
         if (empty($gDbConnectionString)) {
             $gDbConnectionString = 'mysql://u:p@host/db';

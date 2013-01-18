@@ -1,1 +1,2 @@
-../../core/www/cms/.htaccess
+RewriteEngine Off
+ErrorDocument 404 /cms/index404.php

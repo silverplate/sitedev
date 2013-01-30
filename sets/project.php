@@ -56,11 +56,6 @@ if (!empty($gSiteTitle)) {
 $gCustomUrls = array();
 
 
-// Кэширование финального HTML
-
-$gIsCache = false;
-
-
 // Окружение
 
 switch ($gEnv) {
@@ -77,6 +72,10 @@ switch ($gEnv) {
 
         if (empty($gHost)) {
             $gHost = 'sitedev';
+        }
+
+        if (empty($gIsCache) && $gIsCache !== false) {
+            $gIsCache = false;
         }
 
         break;
@@ -96,6 +95,10 @@ switch ($gEnv) {
             $gHost = 'dev.sitedev.ru';
         }
 
+        if (empty($gIsCache) && $gIsCache !== false) {
+            $gIsCache = false;
+        }
+
         break;
 
     case 'production':
@@ -111,6 +114,10 @@ switch ($gEnv) {
 
         if (empty($gHost)) {
             $gHost = 'sitedev.ru';
+        }
+
+        if (empty($gIsCache) && $gIsCache !== false) {
+            $gIsCache = true;
         }
 
         break;

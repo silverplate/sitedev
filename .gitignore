@@ -1,6 +1,7 @@
 .settings
 .buildpath
 .project
+.idea
 
 sets/local.php
 sets/*.log

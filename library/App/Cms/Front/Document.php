@@ -1,5 +1,7 @@
 <?php
 
-class App_Cms_Front_Document extends Core_Cms_Front_Document
+namespace App\Cms\Front;
+
+class Document extends \Core\Cms\Front\Document
 {
 }

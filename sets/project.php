@@ -60,8 +60,8 @@ $gCustomUrls = array();
 
 switch ($gEnv) {
     case 'development':
-        App_Error::init(
-            App_Error::MODE_DEVELOPMENT,
+        \App\Error::init(
+            \App\Error::MODE_DEVELOPMENT,
             SETS . 'error.log',
             $gAdminEmails
         );
@@ -81,8 +81,8 @@ switch ($gEnv) {
         break;
 
     case 'staging':
-        App_Error::init(
-            App_Error::MODE_DEVELOPMENT,
+        \App\Error::init(
+            \App\Error::MODE_DEVELOPMENT,
             SETS . 'error.log',
             $gAdminEmails
         );
@@ -102,8 +102,8 @@ switch ($gEnv) {
         break;
 
     case 'production':
-        App_Error::init(
-            App_Error::MODE_PRODUCTION,
+        \App\Error::init(
+            \App\Error::MODE_PRODUCTION,
             SETS . 'error.log',
             $gAdminEmails
         );
@@ -123,5 +123,5 @@ switch ($gEnv) {
         break;
 
     default:
-        throw new Exception('Unknown site');
+        throw new \Exception('Unknown site');
 }
